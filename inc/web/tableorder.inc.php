@@ -51,12 +51,12 @@ if($type2=='month'){
   $where.="  and time LIKE '%{$time}%' ";
 }
 //var_dump($data);die;
-$sql=" select id,order_num,time,money,discount,ps_money,box_money from ".tablename('pintuan_order').$where." order by id desc";
+$sql=" select id,order_num,time,money,discount,ps_money,box_money from ".tablename('mask_order').$where." order by id desc";
 //var_dump($sql);die;
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_order').$where,$data);
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_order').$where,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list=pdo_fetchall($select_sql,$data);
-$res2=pdo_getall('pintuan_order_goods');
+$res2=pdo_getall('mask_order_goods');
 $data3=array();
 for($i=0;$i<count($list);$i++){
   $data4=array();

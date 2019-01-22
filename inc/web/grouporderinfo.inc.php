@@ -3,13 +3,13 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu2();
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
-$sql=" select a.*,b.name as nick_name from".tablename('pintuan_grouporder')." a left join ".tablename('pintuan_user')." b on a.user_id=b.id where a.store_id=:store_id and a.id=:id";
+$sql=" select a.*,b.name as nick_name from".tablename('mask_grouporder')." a left join ".tablename('mask_user')." b on a.user_id=b.id where a.store_id=:store_id and a.id=:id";
 $data[':store_id']=$storeid;
 $data[':id']=$_GPC['id'];
 $item=pdo_fetch($sql,$data);
-//$item=pdo_get('pintuan_grouporder',array('id'=>$_GPC['id']));
+//$item=pdo_get('mask_grouporder',array('id'=>$_GPC['id']));
 //var_dump($item);die;
-$goods=pdo_getall('pintuan_order_goods',array('order_id'=>$_GPC['id']));
+$goods=pdo_getall('mask_order_goods',array('order_id'=>$_GPC['id']));
 if(checksubmit('submit')){
   // $data['state']=$_GPC['state'];
   $data['money']=$_GPC['money'];

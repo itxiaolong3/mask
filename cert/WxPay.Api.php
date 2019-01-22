@@ -1,6 +1,6 @@
 <?php
-require_once IA_ROOT . "/addons/pintuan/cert/WxPay.Exception.php";
-require_once IA_ROOT . "/addons/pintuan/cert/WxPay.Data.php";
+require_once IA_ROOT . "/addons/mask/cert/WxPay.Exception.php";
+require_once IA_ROOT . "/addons/mask/cert/WxPay.Data.php";
 
 /**
  * 

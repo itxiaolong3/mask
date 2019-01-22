@@ -37,17 +37,17 @@ if($type=='month'){
 }
 }
 //总数统计
-$sql2="select sum(money) as 'total_money', sum(discount) as 'discount' from" . tablename("pintuan_order") ." as a".$where;
+$sql2="select sum(money) as 'total_money', sum(discount) as 'discount' from" . tablename("mask_order") ." as a".$where;
 $list2=pdo_fetch($sql2,$data);
 // //退款统计
-// $sql3="select sum(money) as 'tk_money' from" . tablename("pintuan_order") ." as a".$where." and (a.state=9 or a.state=7)";
+// $sql3="select sum(money) as 'tk_money' from" . tablename("mask_order") ." as a".$where." and (a.state=9 or a.state=7)";
 // $list3=pdo_fetch($sql3,$data);
 //获取商家手续费
-$sql="select b.dn_poundage from".tablename('pintuan_store')."a  left join ".tablename('pintuan_storetype')." b on a.md_type=b.id where a.id={$storeid}";
+$sql="select b.dn_poundage from".tablename('mask_store')."a  left join ".tablename('mask_storetype')." b on a.md_type=b.id where a.id={$storeid}";
 	$list4=pdo_fetch($sql);
 
-$sql="SELECT a.* FROM ".tablename('pintuan_order'). " a".$where." ORDER BY a.id DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_order'). " a"  .$where." ORDER BY a.id DESC",$data);
+$sql="SELECT a.* FROM ".tablename('mask_order'). " a".$where." ORDER BY a.id DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_order'). " a"  .$where." ORDER BY a.id DESC",$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 
 $list=pdo_fetchall($select_sql,$data);
@@ -58,7 +58,7 @@ $fw_money= number_format($list4['dn_poundage']/100*($list2['total_money']),2);
 if(checksubmit('export_submit', true)) {
   $start=strtotime($_GPC['time']['start']);
   $end=strtotime($_GPC['time']['end']);
-  $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("pintuan_order")." WHERE type=2 and store_id={$storeid} and pay_type in (1,2) and dn_state=2 and UNIX_TIMESTAMP(time) >='{$start}' and UNIX_TIMESTAMP(time)<='{$end}'");
+  $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE type=2 and store_id={$storeid} and pay_type in (1,2) and dn_state=2 and UNIX_TIMESTAMP(time) >='{$start}' and UNIX_TIMESTAMP(time)<='{$end}'");
   $pagesize = ceil($count/5000);
         //array_unshift( $names,  '活动名称'); 
   $header = array(
@@ -84,7 +84,7 @@ if(checksubmit('export_submit', true)) {
   }
   $html .= "\n";
   for ($j = 1; $j <= $pagesize; $j++) {
-    $sql = "select * from " . tablename("pintuan_order")." WHERE type=2 and store_id={$storeid} and pay_type in (1,2) and dn_state=2 and UNIX_TIMESTAMP(time) >='{$start}' and UNIX_TIMESTAMP(time)<='{$end}' ORDER BY id DESC limit " . ($j - 1) * 5000 . ",5000 ";
+    $sql = "select * from " . tablename("mask_order")." WHERE type=2 and store_id={$storeid} and pay_type in (1,2) and dn_state=2 and UNIX_TIMESTAMP(time) >='{$start}' and UNIX_TIMESTAMP(time)<='{$end}' ORDER BY id DESC limit " . ($j - 1) * 5000 . ",5000 ";
     $list = pdo_fetchall($sql);            
   }
 

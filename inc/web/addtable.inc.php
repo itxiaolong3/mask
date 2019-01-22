@@ -6,7 +6,7 @@ $cur_store = $this->getStoreById($storeid);
 function  getCoade($table_id,$storeid){
 		function getaccess_token(){
 			global $_W, $_GPC;
-         $res=pdo_get('pintuan_system',array('uniacid' => $_W['uniacid']));
+         $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
          $appid=$res['appid'];
          $secret=$res['appsecret'];
        $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -23,7 +23,7 @@ function  getCoade($table_id,$storeid){
        $access_token = getaccess_token();
         $data2=array(
 				"scene"=>$table_id.",".$storeid,
-				"page"=>"pintuan/pages/smdc/smdcindex",
+				"page"=>"mask/pages/smdc/smdcindex",
 				"width"=>400
                );
  		$data2 = json_encode($data2);
@@ -46,8 +46,8 @@ function  getCoade($table_id,$storeid){
 	if(!$_GPC['id']==''){
 		$img=getCoade($_GPC['id'],$storeid);
 	}
-		$list = pdo_get('pintuan_table',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
-		$type = pdo_getall('pintuan_table_type',array('uniacid' => $_W['uniacid'],'store_id'=>$storeid));
+		$list = pdo_get('mask_table',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
+		$type = pdo_getall('mask_table_type',array('uniacid' => $_W['uniacid'],'store_id'=>$storeid));
 		if(checksubmit('submit')){
 			$data['name']=$_GPC['name'];
 			$data['num']=$_GPC['num'];
@@ -59,14 +59,14 @@ function  getCoade($table_id,$storeid){
 			$data['orderby']=$_GPC['orderby'];		
 			if($_GPC['id']==''){
 			$data['status']=0;		
-				$res=pdo_insert('pintuan_table',$data);
+				$res=pdo_insert('mask_table',$data);
 				if($res){
 					message('添加成功',$this->createWebUrl('table',array()),'success');
 				}else{
 					message('添加失败','','error');
 				}
 			}else{		
-		$res = pdo_update('pintuan_table', $data, array('id' => $_GPC['id']));
+		$res = pdo_update('mask_table', $data, array('id' => $_GPC['id']));
 				if($res){
 					message('编辑成功',$this->createWebUrl('table',array()),'success');
 				}else{

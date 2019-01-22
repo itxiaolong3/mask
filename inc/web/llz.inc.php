@@ -3,13 +3,13 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
-$sql="select * from".tablename('pintuan_llz')." where uniacid={$_W['uniacid']}";
-$total=pdo_fetchcolumn("select count(*) from".tablename('pintuan_llz')." where uniacid={$_W['uniacid']} ");
+$sql="select * from".tablename('mask_llz')." where uniacid={$_W['uniacid']}";
+$total=pdo_fetchcolumn("select count(*) from".tablename('mask_llz')." where uniacid={$_W['uniacid']} ");
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list=pdo_fetchall($select_sql);
 $pager = pagination($total, $pageindex, $pagesize);
 if($_GPC['op']=='delete'){
-	$res=pdo_delete('pintuan_llz',array('id'=>$_GPC['id']));
+	$res=pdo_delete('mask_llz',array('id'=>$_GPC['id']));
 	if($res){
 		 message('删除成功！', $this->createWebUrl('llz'), 'success');
 		}else{
@@ -18,7 +18,7 @@ if($_GPC['op']=='delete'){
 }
 if($_GPC['status']){
 	$data['status']=$_GPC['status'];
-	$res=pdo_update('pintuan_llz',$data,array('id'=>$_GPC['id']));
+	$res=pdo_update('mask_llz',$data,array('id'=>$_GPC['id']));
 	if($res){
 		 message('编辑成功！', $this->createWebUrl('llz'), 'success');
 		}else{

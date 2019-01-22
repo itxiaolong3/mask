@@ -2,8 +2,8 @@
 global $_GPC, $_W;
 
 $GLOBALS['frames'] = $this->getMainMenu();
-$storetype=pdo_getall('pintuan_storetype',array('uniacid'=>$_W['uniacid']),array(),'','num asc');
-$sql="SELECT * FROM ".tablename('pintuan_store')."  where id=:id ";
+$storetype=pdo_getall('mask_storetype',array('uniacid'=>$_W['uniacid']),array(),'','num asc');
+$sql="SELECT * FROM ".tablename('mask_store')."  where id=:id ";
 $item=pdo_fetch($sql,array(':id'=>$_GPC['id']));
 // print_r($item);die;
 if(checksubmit('submit')){   
@@ -30,14 +30,14 @@ if(checksubmit('submit')){
 		// if(strlen($item['yyzz'])<25){
 		// 	$data['yyzz']=$_W['attachurl'].$item['yyzz'];
 		// }
-		$set=pdo_get('pintuan_storeset',array('store_id'=>$item['id']));
+		$set=pdo_get('mask_storeset',array('store_id'=>$item['id']));
     if(!$set){   
       $data3['store_id']=$item['id'];
-      pdo_insert('pintuan_storeset',$data3);
+      pdo_insert('mask_storeset',$data3);
   		}
 	}
 	$data['details']=html_entity_decode($_GPC['details']);
-	$rst=pdo_update('pintuan_store',$data,array('id'=>$item['id']));
+	$rst=pdo_update('mask_store',$data,array('id'=>$item['id']));
 	if($rst){
 
 	     message('编辑成功！', $this->createWebUrl('rzcheck'), 'success');

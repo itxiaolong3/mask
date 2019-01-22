@@ -7,5 +7,5 @@ $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
 
-$item=pdo_get('pintuan_order',array('id'=>$_GPC['id']));
+$item=pdo_get('mask_order',array('id'=>$_GPC['id']));
 include $this->template('web/dlinydorderinfo');

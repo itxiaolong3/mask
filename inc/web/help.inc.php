@@ -7,10 +7,10 @@ $GLOBALS['frames'] = $this->getMainMenu();
 $operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
 if ($operation == 'display') {
 
-   $list = pdo_getall('pintuan_help',array('uniacid'=>$_W['uniacid']),array() , '' , 'sort ASC');
+   $list = pdo_getall('mask_help',array('uniacid'=>$_W['uniacid']),array() , '' , 'sort ASC');
        
 } elseif ($operation == 'post') {
-   $list = pdo_get('pintuan_help',array('id'=>$_GPC['id']));
+   $list = pdo_get('mask_help',array('id'=>$_GPC['id']));
         if(checksubmit('submit')){
             $data['created_time']=date("Y-m-d H:i:s");
             $data['question']=$_GPC['question'];
@@ -18,14 +18,14 @@ if ($operation == 'display') {
             $data['sort']=$_GPC['sort'];
             $data['uniacid']=$_W['uniacid'];
             if($_GPC['id']==''){
-                $res=pdo_insert('pintuan_help',$data);
+                $res=pdo_insert('mask_help',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('help',array()),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_help', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_help', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl('help',array()),'success');
                 }else{
@@ -36,7 +36,7 @@ if ($operation == 'display') {
 } elseif ($operation == 'delete') {
     $id=$_GPC['id'];
    
-        $result = pdo_delete('pintuan_help', array('id'=>$id));
+        $result = pdo_delete('mask_help', array('id'=>$id));
         if($result){
             message('删除成功',$this->createWebUrl('help',array()),'success');
         }else{

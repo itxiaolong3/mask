@@ -1,12 +1,12 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$stores = pdo_fetchall("SELECT * FROM " . tablename('pintuan_store') . " WHERE uniacid= :weid and state=2 ORDER BY id DESC", array(':weid' => $_W['uniacid']), 'id');
+$stores = pdo_fetchall("SELECT * FROM " . tablename('mask_store') . " WHERE uniacid= :weid and state=2 ORDER BY id DESC", array(':weid' => $_W['uniacid']), 'id');
     $id = intval($_GPC['id']);
     //echo $id;die;
     $storeid = intval($_GPC['storeid']);
     if (!empty($id)) {
-        $account = pdo_fetch("SELECT * FROM " . tablename('pintuan_account') . " WHERE weid = :weid AND id=:id ORDER BY id DESC", array(':weid' => $_W['uniacid'], ':id' => $id));
+        $account = pdo_fetch("SELECT * FROM " . tablename('mask_account') . " WHERE weid = :weid AND id=:id ORDER BY id DESC", array(':weid' => $_W['uniacid'], ':id' => $id));
         //$fans = $this->getFansByOpenid($account['from_user']);
     }
     if (!empty($account)) {
@@ -62,10 +62,10 @@ $stores = pdo_fetchall("SELECT * FROM " . tablename('pintuan_store') . " WHERE u
                     'uid' => $uid,
                     'uniacid' => $_W['uniacid'],
                     'url' => '',
-                    'type' => 'pintuan',
-                    'permission' => 'pintuan'
+                    'type' => 'mask',
+                    'permission' => 'mask'
                 ));
-                pdo_insert('pintuan_account', array(
+                pdo_insert('mask_account', array(
                     'uid' => $uid,
                     'weid' => $_W['uniacid'],
                     'storeid' => intval($_GPC['storeid']),
@@ -88,7 +88,7 @@ $stores = pdo_fetchall("SELECT * FROM " . tablename('pintuan_store') . " WHERE u
             }
         }else {
             user_update($user);
-            pdo_update('pintuan_account', array(
+            pdo_update('mask_account', array(
                 'weid' => $_W['uniacid'],
                 'storeid' => intval($_GPC['storeid']),
                 'from_user' => trim($_GPC['from_user']),

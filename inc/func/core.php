@@ -11,7 +11,7 @@ class Core extends WeModuleSite
         $do = $_GPC['do'];
         $navemenu = array();
         $cur_color = ' style="color:#d9534f;" ';
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         if ($_W['role'] == 'operator') {
             $navemenu[0] = array(
                 'title' => '<a href="javascript:void(0)" class="panel-title wytitle"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  业务菜单</a>',
@@ -21,7 +21,7 @@ class Core extends WeModuleSite
                 )
             );}elseif($_W['isfounder'] || $_W['role'] == 'manager' || $_W['role'] == 'operator') {
            $navemenu[0] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=store&m=pintuan" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  栏目管理</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=store&m=mask" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  栏目管理</a>',
                 'items' => array(
                     // 0 => $this->createMainMenu('数据概况 ', $do, 'gaikuangdata', ''),
                     1 => $this->createMainMenu('栏目列表', $do, 'store', ''),
@@ -36,7 +36,7 @@ class Core extends WeModuleSite
             );
 
             $navemenu[1] = array(
-               'title' => '<a href="index.php?c=site&a=entry&op=display&do=order&m=pintuan" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-bars"></icon>  订单管理</a>',
+               'title' => '<a href="index.php?c=site&a=entry&op=display&do=order&m=mask" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-bars"></icon>  订单管理</a>',
                 'items' => array(
                     0 => $this->createMainMenu('所有订单 ', $do, 'order', ''),
                   
@@ -45,7 +45,7 @@ class Core extends WeModuleSite
 
 
             $navemenu[2] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=ad&m=pintuan" class="panel-title wytitle" id="yframe-2"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>轮播图</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=ad&m=mask" class="panel-title wytitle" id="yframe-2"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>轮播图</a>',
                 'items' => array(
                     0 => $this->createMainMenu('轮播图列表 ', $do, 'ad', ''),
                     1 => $this->createMainMenu('轮播图添加', $do, 'addad', ''),
@@ -53,21 +53,21 @@ class Core extends WeModuleSite
                 )
             );
             //             $navemenu[3] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=nav&m=pintuan" class="panel-title wytitle" id="yframe-3"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-compass"></icon>  导航管理</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=nav&m=mask" class="panel-title wytitle" id="yframe-3"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-compass"></icon>  导航管理</a>',
 //                'items' => array(
 //                     0 => $this->createMainMenu('底部导航管理 ', $do, 'nav', ''),
 //                     1 => $this->createMainMenu('分类导航管理 ', $do, 'typead', ''),
 //                )
 //            );
             $navemenu[3] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=area&m=pintuan" class="panel-title wytitle" id="yframe-3"><icon style="color:#8d8d8d;" class="fa fa-map-marker"></icon>  栏目区域</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=area&m=mask" class="panel-title wytitle" id="yframe-3"><icon style="color:#8d8d8d;" class="fa fa-map-marker"></icon>  栏目区域</a>',
                 'items' => array(
                     0 => $this->createMainMenu('区域列表', $do, 'area', ''),
                     1 => $this->createMainMenu('区域添加', $do, 'addarea', ''),
                 )
             );
 //            $navemenu[4] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=typeset&m=pintuan" class="panel-title wytitle" id="yframe-4"><icon style="color:#8d8d8d;" class="fa fa-university"></icon>  门店类型</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=typeset&m=mask" class="panel-title wytitle" id="yframe-4"><icon style="color:#8d8d8d;" class="fa fa-university"></icon>  门店类型</a>',
 //                'items' => array(
 //                    0 => $this->createMainMenu('分类设置 ', $do, 'typeset', ''),
 //                    1 => $this->createMainMenu('类型管理 ', $do, 'storetype', ''),
@@ -76,20 +76,20 @@ class Core extends WeModuleSite
 //                )
 //            );
             //$navemenu[5] = array(
-            // 'title' => '<a href="index.php?c=site&a=entry&op=display&do=coupons&m=pintuan" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  天降红包</a>',
+            // 'title' => '<a href="index.php?c=site&a=entry&op=display&do=coupons&m=mask" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  天降红包</a>',
             //  'items' => array(
             //      0 => $this->createMainMenu('红包管理 ', $do, 'coupons', ''),
             //     1 => $this->createMainMenu('红包设置 ', $do, 'couponset', ''),
             //  )
             //  );
             // $navemenu[6] = array(
-            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=cptj&m=pintuan" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-trophy"></icon>菜品推荐</a>',
+            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=cptj&m=mask" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-trophy"></icon>菜品推荐</a>',
             //     'items' => array(
             //         0 => $this->createMainMenu('推荐管理 ', $do, 'cptj', ''),
             //     )
             // );
             // $navemenu[5] = array(
-            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=ruzhu&m=pintuan" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  入驻管理</a>',
+            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=ruzhu&m=mask" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  入驻管理</a>',
             //     'items' => array(
             //         0 => $this->createMainMenu('申请列表 ', $do, 'ruzhu', ''),
             //         1 => $this->createMainMenu('入驻设置 ', $do, 'ruzhusz', ''),
@@ -100,7 +100,7 @@ class Core extends WeModuleSite
 
             if($system['jfgn']==1){
                 $navemenu[8] = array(
-                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=jfgoods&m=pintuan" class="panel-title wytitle" id="yframe-8"><icon style="color:#8d8d8d;" class="fa fa-star-half-o"></icon>  积分商城</a>',
+                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=jfgoods&m=mask" class="panel-title wytitle" id="yframe-8"><icon style="color:#8d8d8d;" class="fa fa-star-half-o"></icon>  积分商城</a>',
                     'items' => array(
                         0 => $this->createMainMenu('签到管理', $do, 'integral', ''),
                         1 => $this->createMainMenu('商品列表', $do, 'jfgoods', ''),
@@ -113,7 +113,7 @@ class Core extends WeModuleSite
 
             if($system['fxgn']==1){
                 $navemenu[9] = array(
-                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=fxlist&m=pintuan" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-users"></icon>分销系统</a>',
+                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=fxlist&m=mask" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-users"></icon>分销系统</a>',
                     'items' => array(
                         0 => $this->createMainMenu('分销商管理',$do, 'fxlist', ''),
                         1 => $this->createMainMenu('分销设置', $do, 'fxset', ''),
@@ -124,7 +124,7 @@ class Core extends WeModuleSite
             }
             if($system['qggn']==1){
                 $navemenu[19] = array(
-                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=qgorderall&m=pintuan" class="panel-title wytitle" id="yframe-19"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>限时抢购</a>',
+                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=qgorderall&m=mask" class="panel-title wytitle" id="yframe-19"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>限时抢购</a>',
                     'items' => array(
                         0 => $this->createMainMenu('订单管理', $do, 'qgorderall', ''),
                         1 => $this->createMainMenu('商品管理', $do, 'qggoodall', ''),
@@ -136,7 +136,7 @@ class Core extends WeModuleSite
             }
             if($system['ptgn']==1){
                 $navemenu[18] = array(
-                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=allgroupgoods&m=pintuan" class="panel-title wytitle" id="yframe-18"><icon style="color:#8d8d8d;" class="fa fa fa-newspaper-o"></icon>拼团管理</a>',
+                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=allgroupgoods&m=mask" class="panel-title wytitle" id="yframe-18"><icon style="color:#8d8d8d;" class="fa fa fa-newspaper-o"></icon>拼团管理</a>',
                     'items' => array(
                         2 => $this->createMainMenu('商品管理', $do, 'allgroupgoods', ''),
                         0 => $this->createMainMenu('分类列表 ', $do, 'grouptype', ''),
@@ -153,7 +153,7 @@ class Core extends WeModuleSite
             //     )
             // );
             //  $navemenu[11] = array(
-            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=integral&m=pintuan" class="panel-title wytitle" id="yframe-11"><icon style="color:#8d8d8d;" class="fa fa-pencil-square-o"></icon>  签到管理</a>',
+            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=integral&m=mask" class="panel-title wytitle" id="yframe-11"><icon style="color:#8d8d8d;" class="fa fa-pencil-square-o"></icon>  签到管理</a>',
             //     'items' => array(
             //          0 => $this->createMainMenu('签到规则 ', $do, 'integral', '')
             //     )
@@ -162,7 +162,7 @@ class Core extends WeModuleSite
 
             if($system['hygn']==1){
                 $navemenu[16] = array(
-                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=hyuser&m=pintuan" class="panel-title wytitle" id="yframe-16"><icon style="color:#8d8d8d;" class="fa fa-star-half-o"></icon>  会员卡</a>',
+                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=hyuser&m=mask" class="panel-title wytitle" id="yframe-16"><icon style="color:#8d8d8d;" class="fa fa-star-half-o"></icon>  会员卡</a>',
                     'items' => array(
                         0 => $this->createMainMenu('会员列表', $do, 'hyuser', ''),
                         1 => $this->createMainMenu('会员期限', $do, 'hyqx', ''),
@@ -172,20 +172,20 @@ class Core extends WeModuleSite
                 );
             }
             // $navemenu[17] = array(
-            //   'title' => '<a href="index.php?c=site&a=entry&op=display&do=message&m=pintuan" class="panel-title wytitle" id="yframe-17"><icon style="color:#8d8d8d;" class="fa fa-users"></icon>消息推送</a>',
+            //   'title' => '<a href="index.php?c=site&a=entry&op=display&do=message&m=mask" class="panel-title wytitle" id="yframe-17"><icon style="color:#8d8d8d;" class="fa fa-users"></icon>消息推送</a>',
             //    'items' => array(
             //       0 => $this->createMainMenu('消息推送', $do, 'message', ''),
             //      1 => $this->createMainMenu('发送记录', $do, 'messagelist', ''),
             //  )
             // );
             $navemenu[12] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=user&m=pintuan" class="panel-title wytitle" id="yframe-12"><icon style="color:#8d8d8d;" class="fa fa-user"></icon>  用户管理</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=user&m=mask" class="panel-title wytitle" id="yframe-12"><icon style="color:#8d8d8d;" class="fa fa-user"></icon>  用户管理</a>',
                 'items' => array(
                     0 => $this->createMainMenu('用户列表 ', $do, 'user', ''),
                 )
             );
          //   $navemenu[13] = array(
-     //           'title' => '<a href="index.php?c=site&a=entry&op=display&do=txlist&m=pintuan" class="panel-title wytitle" id="yframe-13"><icon style="color:#8d8d8d;" class="fa fa-jpy"></icon>  售后管理</a>',
+     //           'title' => '<a href="index.php?c=site&a=entry&op=display&do=txlist&m=mask" class="panel-title wytitle" id="yframe-13"><icon style="color:#8d8d8d;" class="fa fa-jpy"></icon>  售后管理</a>',
        //         'items' => array(
 //                    0 => $this->createMainMenu('退款管理 ', $do, 'txlist', ''),
 //                    1 => $this->createMainMenu('提现设置 ', $do, 'txsz', ''),
@@ -195,7 +195,7 @@ class Core extends WeModuleSite
     //            )
   //          );
             // $navemenu[15] = array(
-            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=analysis&m=pintuan" class="panel-title wytitle" id="yframe-15"><icon style="color:#8d8d8d;" class="fa fa-recycle"></icon>  经营分析</a>',
+            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=analysis&m=mask" class="panel-title wytitle" id="yframe-15"><icon style="color:#8d8d8d;" class="fa fa-recycle"></icon>  经营分析</a>',
             //     'items' => array(
             //         0 => $this->createMainMenu('经营分析 ', $do, 'analysis', ''),
             //         // 1 => $this->createMainMenu('营业统计 ', $do, 'statistics', ''),
@@ -203,7 +203,7 @@ class Core extends WeModuleSite
             //     )
             // );
             $navemenu[7] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=allgood&m=pintuan" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>商品管理</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=allgood&m=mask" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>商品管理</a>',
                 'items' => array(
                     //0 => $this->createMainMenu('栏目列表', $do, 'allgood', ''),
                 )
@@ -227,12 +227,12 @@ class Core extends WeModuleSite
                 array_push($navarr, $this->createMainMenu('快服务 ', $do, 'kfw', ''));
             }
             $navemenu[14] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=peiz&m=pintuan" class="panel-title wytitle" id="yframe-14"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>系统设置</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=peiz&m=mask" class="panel-title wytitle" id="yframe-14"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>系统设置</a>',
                 'items' =>$navarr,
             );
             if ($_W['role'] == 'founder'){
                 $navemenu[15] = array(
-                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=wxapplist&m=pintuan" class="panel-title wytitle" id="yframe-15"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-unlock-alt"></icon>  权限设置</a>',
+                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=wxapplist&m=mask" class="panel-title wytitle" id="yframe-15"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-unlock-alt"></icon>  权限设置</a>',
                     'items' => array(
                         1 => $this->createMainMenu('小程序列表', $do, 'wxapplist', ''),
 
@@ -250,13 +250,13 @@ class Core extends WeModuleSite
     {
         global $_W, $_GPC;
         ini_set("memory_limit","800M");
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         $do = $_GPC['do'];
         $navemenu = array();
         $cur_color = ' style="color:#d9534f;" ';
         if($_W['isfounder'] || $_W['role'] == 'manager' || $_W['role'] == 'operator') {
             //$navemenu[0] = array(
-             //   'title' => '<a href="index.php?c=site&a=entry&op=display&do=index&m=pintuan" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-key"></icon>  栏目信息</a>',
+             //   'title' => '<a href="index.php?c=site&a=entry&op=display&do=index&m=mask" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-key"></icon>  栏目信息</a>',
              // 'items' => array(
              //       0 => $this->createMainMenu('栏目详细', $do, 'index', ''),
               //      1 => $this->createMainMenu('栏目信息 ', $do, 'storeinfo', ''),
@@ -272,7 +272,7 @@ class Core extends WeModuleSite
               // )
           // );
 //            $navemenu[1] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=inorder&m=pintuan" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-bars"></icon>  订单管理</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=inorder&m=mask" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-bars"></icon>  订单管理</a>',
 //                'items' => array(
 //
 //                    0 => $this->createMainMenu('外卖订单', $do, 'inorder', ''),
@@ -283,14 +283,14 @@ class Core extends WeModuleSite
 //                )
 //            );
 			$navemenu[1] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=onetype&m=pintuan" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>  分类管理</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=onetype&m=mask" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>  分类管理</a>',
                  'items' => array(
                      0 => $this->createMainMenu('一级列表 ', $do, 'onetype', ''),
                     1 => $this->createMainMenu('二级列表 ', $do, 'twotype', ''),
                 )
             );
             $navemenu[2] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=dishes2&m=pintuan" class="panel-title wytitle" id="yframe-2"><icon style="color:#8d8d8d;" class="fa fa-trophy"></icon>  商品管理</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=dishes2&m=mask" class="panel-title wytitle" id="yframe-2"><icon style="color:#8d8d8d;" class="fa fa-trophy"></icon>  商品管理</a>',
                 'items' => array(
                      //0 => $this->createMainMenu('商品列表 ', $do, 'dishes2', ''),
                     // 2 => $this->createMainMenu('商品分类', $do, 'dishestype', ''),
@@ -299,7 +299,7 @@ class Core extends WeModuleSite
                 )
             );
            // $navemenu[9] = array(
-               // 'title' => '<a href="index.php?c=site&a=entry&op=display&do=storead&m=pintuan" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>  广告管理</a>',
+               // 'title' => '<a href="index.php?c=site&a=entry&op=display&do=storead&m=mask" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>  广告管理</a>',
                // 'items' => array(
                   // 0 => $this->createMainMenu('广告管理 ', $do, 'storead', ''),
                  //  1 => $this->createMainMenu('广告管理 ', $do, 'storead', ''),
@@ -307,7 +307,7 @@ class Core extends WeModuleSite
               // )
             //);
 //            $navemenu[3] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=table&m=pintuan" class="panel-title wytitle" id="yframe-3"><icon style="color:#8d8d8d;" class="fa fa-binoculars"></icon>  餐桌管理</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=table&m=mask" class="panel-title wytitle" id="yframe-3"><icon style="color:#8d8d8d;" class="fa fa-binoculars"></icon>  餐桌管理</a>',
 //                'items' => array(
 //                    0 => $this->createMainMenu('餐桌列表 ', $do, 'table', ''),
 //                    1 => $this->createMainMenu('餐桌类型', $do, 'tabletype', ''),
@@ -317,7 +317,7 @@ class Core extends WeModuleSite
 //
 //            );
 //            $navemenu[10] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=calllog&m=pintuan" class="panel-title wytitle" id="yframe-10"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  呼叫服务</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=calllog&m=mask" class="panel-title wytitle" id="yframe-10"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  呼叫服务</a>',
 //                'items' => array(
 //
 //                    1 => $this->createMainMenu('呼叫记录', $do, 'calllog', ''),
@@ -326,7 +326,7 @@ class Core extends WeModuleSite
 //                )
 //            );
 //            $navemenu[13] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=number&m=pintuan" class="panel-title wytitle" id="yframe-13"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  排队取号</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=number&m=mask" class="panel-title wytitle" id="yframe-13"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  排队取号</a>',
 //                'items' => array(
 //                    0 => $this->createMainMenu('排队分类', $do, 'numbertype', ''),
 //                    3 => $this->createMainMenu('排队取号', $do, 'number', ''),
@@ -335,7 +335,7 @@ class Core extends WeModuleSite
 //            );
 
             // $navemenu[5] = array(
-            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=ygdata&m=pintuan" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-key"></icon>  数据统计</a>',
+            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=ygdata&m=mask" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-key"></icon>  数据统计</a>',
             //     'items' => array(
             //         0 => $this->createMainMenu('销售统计', $do, 'ygdata', ''),
             //         1 => $this->createMainMenu('消费排行 ', $do, 'ygranking', ''),
@@ -345,7 +345,7 @@ class Core extends WeModuleSite
             // );
 //            if($system['qggn']==1){
 //                $navemenu[12] = array(
-//                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=qggoods&m=pintuan" class="panel-title wytitle" id="yframe-12"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  限时抢购</a>',
+//                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=qggoods&m=mask" class="panel-title wytitle" id="yframe-12"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  限时抢购</a>',
 //                    'items' => array(
 //                        0 => $this->createMainMenu('商品管理 ', $do, 'qggoods', ''),
 //                        1 => $this->createMainMenu('订单管理 ', $do, 'qgorder', ''),
@@ -354,7 +354,7 @@ class Core extends WeModuleSite
 //            }
 //            if($system['ptgn']==1){
 //                $navemenu[11] = array(
-//                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=groupgoods&m=pintuan" class="panel-title wytitle" id="yframe-11"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  拼团管理</a>',
+//                    'title' => '<a href="index.php?c=site&a=entry&op=display&do=groupgoods&m=mask" class="panel-title wytitle" id="yframe-11"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  拼团管理</a>',
 //                    'items' => array(
 //                        0 => $this->createMainMenu('商品管理 ', $do, 'groupgoods', ''),
 //                        1 => $this->createMainMenu('订单管理 ', $do, 'grouporder', ''),
@@ -364,7 +364,7 @@ class Core extends WeModuleSite
 //                );
 //            }
 //            $navemenu[6] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=zjlist&m=pintuan" class="panel-title wytitle" id="yframe-6"><icon style="color:#8d8d8d;" class="fa fa-book"></icon>  资金管理</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=zjlist&m=mask" class="panel-title wytitle" id="yframe-6"><icon style="color:#8d8d8d;" class="fa fa-book"></icon>  资金管理</a>',
 //                'items' => array(
 //                    0 => $this->createMainMenu('外卖资金管理', $do, 'zjlist', ''),
 //                    1 => $this->createMainMenu('店内资金管理 ', $do, 'dnzjlist', ''),
@@ -380,7 +380,7 @@ class Core extends WeModuleSite
 
 
 //            $navemenu[7] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=comment&m=pintuan" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>  评论管理</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=comment&m=mask" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>  评论管理</a>',
 //                'items' => array(
 //                    0 => $this->createMainMenu('评论管理', $do, 'comment', ''),
 //                )
@@ -388,7 +388,7 @@ class Core extends WeModuleSite
 //
 //
 //            $navemenu[8] = array(
-//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=print&m=pintuan" class="panel-title wytitle" id="yframe-8"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  打印设置</a>',
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=print&m=mask" class="panel-title wytitle" id="yframe-8"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  打印设置</a>',
 //                'items' => array(
 //                    0 => $this->createMainMenu('打印设备 ', $do, 'print', ''),
 //                    1 => $this->createMainMenu('添加打印 ', $do, 'addprint', ''),
@@ -397,7 +397,7 @@ class Core extends WeModuleSite
 //                )
 //            );
             // $navemenu[9] = array(
-            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=assess2&m=pintuan" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-user"></icon>  评论管理</a>',
+            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=assess2&m=mask" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-user"></icon>  评论管理</a>',
             //     'items' => array(
             //          0 => $this->createMainMenu('评论管理 ', $do, 'assess2', ''),
             //     )
@@ -411,9 +411,9 @@ class Core extends WeModuleSite
     {
         global $_W, $_GPC;
         ini_set("memory_limit","800M");
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
-        $account=pdo_get('pintuan_account',array('storeid'=>$storeid,'uid'=>$uid));
-        $storeInfo=pdo_get('pintuan_storeset',array('store_id'=>$storeid));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+        $account=pdo_get('mask_account',array('storeid'=>$storeid,'uid'=>$uid));
+        $storeInfo=pdo_get('mask_storeset',array('store_id'=>$storeid));
         $array=array();
         if($storeInfo['is_wm']==1){
             array_push($array, $this->createSubMenu('外卖订单', $do, 'dlinorder', 'fa-angle-right', $cur_color, $storeid));
@@ -434,7 +434,7 @@ class Core extends WeModuleSite
         $cur_color = '#8d8d8d';
         if($account['role']==1){
             $navemenu[0] = array(
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=start&m=pintuan" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  门店设置</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=start&m=mask" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  门店设置</a>',
                 'items' => array(
                     0 => $this->createSubMenu('数据概况', $do, 'start', 'fa-angle-right', $cur_color, $storeid),
                     1 => $this->createSubMenu('门店信息 ', $do, 'dlstoreinfo', 'fa-angle-right', $cur_color, $storeid),
@@ -448,17 +448,17 @@ class Core extends WeModuleSite
             );
             $cur_color = '#8d8d8d';
             $navemenu[1] = array(
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlinorder&m=pintuan" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  订单管理</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlinorder&m=mask" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  订单管理</a>',
 
                 'items' =>$array
 
             );
             $cur_color = '#8d8d8d';
             $navemenu[2] = array(
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dldishes2&m=pintuan" class="panel-title wytitle" id="yframe-2"><icon style="color:' . $cur_color . ';" class="fa fa-trophy"></icon> 商品管理</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dldishes2&m=mask" class="panel-title wytitle" id="yframe-2"><icon style="color:' . $cur_color . ';" class="fa fa-trophy"></icon> 商品管理</a>',
             );
             $navemenu[9] = array(
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlstoread&m=pintuan" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>  广告管理</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlstoread&m=mask" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>  广告管理</a>',
                 'items' => array(
                     0 => $this->createSubMenu('广告管理 ', $do, 'dlstoread',  'fa-angle-right', $cur_color, $storeid),
 
@@ -468,7 +468,7 @@ class Core extends WeModuleSite
 
             if($storeInfo['is_dn']==1||$storeInfo['is_yy']==1){
                 $navemenu[3] = array(
-                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dltable2&m=pintuan" class="panel-title wytitle" id="yframe-3"><icon style="color:' . $cur_color . ';" class="fa fa-binoculars"></icon>  餐桌管理</a>',
+                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dltable2&m=mask" class="panel-title wytitle" id="yframe-3"><icon style="color:' . $cur_color . ';" class="fa fa-binoculars"></icon>  餐桌管理</a>',
                     'items' => array(
                         0 => $this->createSubMenu('餐桌列表 ', $do, 'dltable2', 'fa-angle-right', $cur_color, $storeid),
                         1 => $this->createSubMenu('餐桌类型', $do, 'dltabletype2', 'fa-angle-right', $cur_color, $storeid),
@@ -480,7 +480,7 @@ class Core extends WeModuleSite
             }
             if($storeInfo['is_dn']==1){
                 $navemenu[10] = array(
-                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlcalllog&m=pintuan" class="panel-title wytitle" id="yframe-10"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  呼叫服务</a>',
+                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlcalllog&m=mask" class="panel-title wytitle" id="yframe-10"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  呼叫服务</a>',
                     'items' => array(
 
                         1 => $this->createSubMenu('呼叫记录', $do, 'dlcalllog',  'fa-angle-right', $cur_color, $storeid),
@@ -491,7 +491,7 @@ class Core extends WeModuleSite
             }
             if($storeInfo['is_pd']){
                 $navemenu[13] = array(
-                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlnumber&m=pintuan" class="panel-title wytitle" id="yframe-13"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  排队取号</a>',
+                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlnumber&m=mask" class="panel-title wytitle" id="yframe-13"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  排队取号</a>',
                     'items' => array(
                         0 => $this->createSubMenu('排队分类', $do, 'dlnumbertype', 'fa-angle-right', $cur_color, $storeid),
                         3 => $this->createSubMenu('排队取号', $do, 'dlnumber', 'fa-angle-right', $cur_color, $storeid),
@@ -501,12 +501,12 @@ class Core extends WeModuleSite
             }
             $cur_color = '#8d8d8d';
             $navemenu[4] = array(
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlygquan&m=pintuan" class="panel-title wytitle" id="yframe-4"><icon style="color:' . $cur_color . ';" class="fa fa-gift"></icon>  营销设置</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlygquan&m=mask" class="panel-title wytitle" id="yframe-4"><icon style="color:' . $cur_color . ';" class="fa fa-gift"></icon>  营销设置</a>',
 
             );
             if($system['qggn']==1  and $storeInfo['is_qg']){
                 $navemenu[12] = array(
-                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlqgorder&m=pintuan" class="panel-title wytitle" id="yframe-12"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  限时抢购</a>',
+                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlqgorder&m=mask" class="panel-title wytitle" id="yframe-12"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  限时抢购</a>',
                     'items' => array(
                         0 => $this->createSubMenu('订单管理 ', $do, 'dlqgorder', 'fa-angle-right', $cur_color, $storeid),
                         1 => $this->createSubMenu('商品管理 ', $do, 'dlqggoods', 'fa-angle-right', $cur_color, $storeid),
@@ -515,7 +515,7 @@ class Core extends WeModuleSite
             }
             if($system['ptgn']==1 and $storeInfo['is_pt']){
                 $navemenu[11] = array(
-                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlgroupgoods&m=pintuan" class="panel-title wytitle" id="yframe-11"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  拼团管理</a>',
+                    'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlgroupgoods&m=mask" class="panel-title wytitle" id="yframe-11"><icon style="color:#8d8d8d;" class="fa fa-clipboard"></icon>  拼团管理</a>',
                     'items' => array(
                         0 => $this->createSubMenu('商品管理 ', $do, 'dlgroupgoods', 'fa-angle-right', $cur_color, $storeid),
                         1 => $this->createSubMenu('订单管理 ', $do, 'dlgrouporder', 'fa-angle-right', $cur_color, $storeid),
@@ -525,7 +525,7 @@ class Core extends WeModuleSite
                 );
             }
             $navemenu[6] = array(
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlzjlist&m=pintuan" class="panel-title wytitle" id="yframe-6"><icon style="color:#8d8d8d;" class="fa fa-book"></icon>  资金管理</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlzjlist&m=mask" class="panel-title wytitle" id="yframe-6"><icon style="color:#8d8d8d;" class="fa fa-book"></icon>  资金管理</a>',
                 'items' => array(
                     0 => $this->createSubMenu('外卖资金管理', $do, 'dlzjlist','fa-angle-right', $cur_color, $storeid),
                     1 => $this->createSubMenu('店内资金管理 ', $do, 'dldnzjlist','fa-angle-right', $cur_color, $storeid),
@@ -537,14 +537,14 @@ class Core extends WeModuleSite
                 )
             );
             $navemenu[7] = array(
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlcomment&m=pintuan" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>  评论管理</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlcomment&m=mask" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>  评论管理</a>',
                 'items' => array(
                     0 => $this->createMainMenu('评论管理', $do, 'dlcomment', 'fa-angle-right', $cur_color, $storeid),
                 )
             );
             $cur_color = '#8d8d8d';
             $navemenu[8] = array(
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlprint&m=pintuan" class="panel-title wytitle" id="yframe-8"><icon style="color:' . $cur_color . ';" class="fa fa-database"></icon>  打印设置</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlprint&m=mask" class="panel-title wytitle" id="yframe-8"><icon style="color:' . $cur_color . ';" class="fa fa-database"></icon>  打印设置</a>',
                 'items' => array(
                     0 => $this->createSubMenu('打印设备 ', $do, 'dlprint', 'fa-angle-right', $cur_color, $storeid),
                     1 => $this->createSubMenu('添加打印 ', $do, 'dladdprint', 'fa-angle-right', $cur_color, $storeid),
@@ -555,7 +555,7 @@ class Core extends WeModuleSite
 
             $navemenu[14] = array(
 
-                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlaccount&m=pintuan" class="panel-title wytitle" id="yframe-14"><icon style="color:#8d8d8d;" class="fa fa-newspaper-o"></icon>  账号管理</a>',
+                'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlaccount&m=mask" class="panel-title wytitle" id="yframe-14"><icon style="color:#8d8d8d;" class="fa fa-newspaper-o"></icon>  账号管理</a>',
                 'items' => array(
 
                     1 => $this->createSubMenu('账号管理 ', $do, 'dlaccount', 'fa-angle-right', $cur_color, $storeid),
@@ -569,7 +569,7 @@ class Core extends WeModuleSite
             foreach ($arr as $key => $value) {
                 if( $value=='start'){
                     $navemenu[0] = array(
-                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=start&m=pintuan" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  门店设置</a>',
+                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=start&m=mask" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  门店设置</a>',
                         'items' => array(
                             0 => $this->createSubMenu('数据概况', $do, 'start', 'fa-angle-right', $cur_color, $storeid),
                             1 => $this->createSubMenu('门店信息 ', $do, 'dlstoreinfo', 'fa-angle-right', $cur_color, $storeid),
@@ -585,7 +585,7 @@ class Core extends WeModuleSite
                 }
                 if( $value=='dlinorder'){
                     $navemenu[1] = array(
-                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlinorder&m=pintuan" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  订单管理</a>',
+                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlinorder&m=mask" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  订单管理</a>',
 
                         'items' =>$array
 
@@ -594,13 +594,13 @@ class Core extends WeModuleSite
 
                 if($value=='dldishes2'){
                     $navemenu[2] = array(
-                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dldishes2&m=pintuan" class="panel-title wytitle" id="yframe-2"><icon style="color:' . $cur_color . ';" class="fa fa-trophy"></icon> 商品管理</a>',
+                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dldishes2&m=mask" class="panel-title wytitle" id="yframe-2"><icon style="color:' . $cur_color . ';" class="fa fa-trophy"></icon> 商品管理</a>',
                     );
                 }
 
                 if($value=='dlstoread'){
                     $navemenu[9] = array(
-                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlstoread&m=pintuan" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>广告管理</a>',
+                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlstoread&m=mask" class="panel-title wytitle" id="yframe-9"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>广告管理</a>',
                         'items' => array(
                             0 => $this->createSubMenu('广告管理 ', $do, 'dlstoread',  'fa-angle-right', $cur_color, $storeid),
 
@@ -610,7 +610,7 @@ class Core extends WeModuleSite
                 if($value=='dltable2'){
                     if($storeInfo['is_dn']==1||$storeInfo['is_yy']==1){
                         $navemenu[3] = array(
-                            'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dltable2&m=pintuan" class="panel-title wytitle" id="yframe-3"><icon style="color:' . $cur_color . ';" class="fa fa-binoculars"></icon>  餐桌管理</a>',
+                            'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dltable2&m=mask" class="panel-title wytitle" id="yframe-3"><icon style="color:' . $cur_color . ';" class="fa fa-binoculars"></icon>  餐桌管理</a>',
                             'items' => array(
                                 0 => $this->createSubMenu('餐桌列表 ', $do, 'dltable2', 'fa-angle-right', $cur_color, $storeid),
                                 1 => $this->createSubMenu('餐桌类型', $do, 'dltabletype2', 'fa-angle-right', $cur_color, $storeid),
@@ -624,7 +624,7 @@ class Core extends WeModuleSite
                 if($value=='dlcalllog'){
                     if($storeInfo['is_dn']==1){
                         $navemenu[10] = array(
-                            'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlcalllog&m=pintuan" class="panel-title wytitle" id="yframe-10"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  呼叫服务</a>',
+                            'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlcalllog&m=mask" class="panel-title wytitle" id="yframe-10"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-sellsy"></icon>  呼叫服务</a>',
                             'items' => array(
 
                                 1 => $this->createSubMenu('呼叫记录', $do, 'dlcalllog',  'fa-angle-right', $cur_color, $storeid),
@@ -636,13 +636,13 @@ class Core extends WeModuleSite
                 }
                 if($value=='dlygquan'){
                     $navemenu[4] = array(
-                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlygquan&m=pintuan" class="panel-title wytitle" id="yframe-4"><icon style="color:' . $cur_color . ';" class="fa fa-gift"></icon>  营销设置</a>',
+                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlygquan&m=mask" class="panel-title wytitle" id="yframe-4"><icon style="color:' . $cur_color . ';" class="fa fa-gift"></icon>  营销设置</a>',
 
                     );
                 }
                 if($value=='dlzjlist'){
                     $navemenu[6] = array(
-                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlzjlist&m=pintuan" class="panel-title wytitle" id="yframe-6"><icon style="color:#8d8d8d;" class="fa fa-book"></icon> 资金管理</a>',
+                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlzjlist&m=mask" class="panel-title wytitle" id="yframe-6"><icon style="color:#8d8d8d;" class="fa fa-book"></icon> 资金管理</a>',
                         'items' => array(
                             0 => $this->createSubMenu('外卖资金管理', $do, 'dlzjlist','fa-angle-right', $cur_color, $storeid),
                             1 => $this->createSubMenu('店内资金管理 ', $do, 'dldnzjlist','fa-angle-right', $cur_color, $storeid),
@@ -656,7 +656,7 @@ class Core extends WeModuleSite
                 }
                 if($value=='dlcomment'){
                     $navemenu[7] = array(
-                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlcomment&m=pintuan" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>  评论管理</a>',
+                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlcomment&m=mask" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>  评论管理</a>',
                         'items' => array(
                             0 => $this->createMainMenu('评论管理', $do, 'dlcomment', 'fa-angle-right', $cur_color, $storeid),
                         )
@@ -664,7 +664,7 @@ class Core extends WeModuleSite
                 }
                 if($value=='dlprint'){
                     $navemenu[8] = array(
-                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlprint&m=pintuan" class="panel-title wytitle" id="yframe-8"><icon style="color:' . $cur_color . ';" class="fa fa-database"></icon>  打印设置</a>',
+                        'title' => '<a href="cjdianc.php?c=site&a=entry&op=display&do=dlprint&m=mask" class="panel-title wytitle" id="yframe-8"><icon style="color:' . $cur_color . ';" class="fa fa-database"></icon>  打印设置</a>',
                         'items' => array(
                             0 => $this->createSubMenu('打印设备 ', $do, 'dlprint', 'fa-angle-right', $cur_color, $storeid),
                             1 => $this->createSubMenu('添加打印 ', $do, 'dladdprint', 'fa-angle-right', $cur_color, $storeid),
@@ -801,7 +801,7 @@ class Core extends WeModuleSite
     //获取栏目
     public function getStoreById($id)
     {
-        $store = pdo_fetch("SELECT * FROM " . tablename('pintuan_lanmu') . " WHERE QsID=:id LIMIT 1", array(':id' => $id));
+        $store = pdo_fetch("SELECT * FROM " . tablename('mask_lanmu') . " WHERE QsID=:id LIMIT 1", array(':id' => $id));
         return $store;
     }
 
@@ -826,13 +826,13 @@ class Core extends WeModuleSite
 
     public function qtPrint($order_id){ //前台打印
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/print/dyj.php';
-        $res=pdo_get('pintuan_order',array('id'=>$order_id));
-        $store=pdo_get('pintuan_store',array('id'=>$res['store_id']),'name');
-        $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>1));
-        $res2=pdo_getall('pintuan_order_goods',array('order_id'=>$order_id));
+        include IA_ROOT.'/addons/mask/print/dyj.php';
+        $res=pdo_get('mask_order',array('id'=>$order_id));
+        $store=pdo_get('mask_store',array('id'=>$res['store_id']),'name');
+        $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>1));
+        $res2=pdo_getall('mask_order_goods',array('order_id'=>$order_id));
         if($res['type']==2){
-            $sql=" select a.name,b.name as type_name from ".tablename('pintuan_table')." a left join ".tablename('pintuan_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
+            $sql=" select a.name,b.name as type_name from ".tablename('mask_table')." a left join ".tablename('mask_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
             $table=pdo_fetch($sql);
         }
         if($res['pay_type']==1){
@@ -868,7 +868,7 @@ class Core extends WeModuleSite
                 $content = "^N".$value['num'];
             }
             if($res['type']==4){
-                $user=pdo_get('pintuan_user',array('id'=>$res['user_id']),'name');
+                $user=pdo_get('mask_user',array('id'=>$res['user_id']),'name');
                 $content.= "              收银台".$style.$style.$style;
                 $content.= "--------------------------------".$style;
                 $content.= "金额    ：" . $res['money'] . "元".$style;
@@ -994,21 +994,21 @@ class Core extends WeModuleSite
 //后厨打印
     public function hcPrint($order_id){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/print/hcdyj.php';
-        $res=pdo_get('pintuan_order',array('id'=>$order_id));
-        $sql="select a.*,b.label_id from".tablename('pintuan_order_goods')."a left join ".tablename('pintuan_goods')." b on a.dishes_id=b.id  where a.order_id={$order_id}";
+        include IA_ROOT.'/addons/mask/print/hcdyj.php';
+        $res=pdo_get('mask_order',array('id'=>$order_id));
+        $sql="select a.*,b.label_id from".tablename('mask_order_goods')."a left join ".tablename('mask_goods')." b on a.dishes_id=b.id  where a.order_id={$order_id}";
         $res2=pdo_fetchall($sql);
         if($res['type']==2){
-            //$table = pdo_get('pintuan_table', array('id' => $res['table_id']));
-            $sql=" select a.name,b.name as type_name from ".tablename('pintuan_table')." a left join ".tablename('pintuan_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
+            //$table = pdo_get('mask_table', array('id' => $res['table_id']));
+            $sql=" select a.name,b.name as type_name from ".tablename('mask_table')." a left join ".tablename('mask_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
             $table=pdo_fetch($sql);
         }
 
-        //$res2=pdo_getall('pintuan_order_goods',array('order_id'=>$order_id));
+        //$res2=pdo_getall('mask_order_goods',array('order_id'=>$order_id));
         $result =   array();
 
         //判断打印类型
-        $type=pdo_get('pintuan_storeset',array('store_id'=>$res['store_id']));
+        $type=pdo_get('mask_storeset',array('store_id'=>$res['store_id']));
         if($type['print_type']==2){
             //按相同标签组成新的数组
             foreach($res2 as $k=>$v){
@@ -1016,7 +1016,7 @@ class Core extends WeModuleSite
             }
             foreach ($result as $key => $value) {
                 $content1='';
-                $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2,'tag_id'=>$key));
+                $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2,'tag_id'=>$key));
                 $content1 .= "         订单编号  #".$_GPC['order_id']."\n\n";
                 $content1 .= "       ".$res3[0]['dyj_title']."\n\n";
                 $content1 .= "开台时间：".$res['time']."\n\n";
@@ -1062,7 +1062,7 @@ class Core extends WeModuleSite
             }
 
         }else{
-            $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2));
+            $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2));
             $content1 .= "         订单编号  #".$order_id."\n\n";
             $content1 .= "          ".$res3[0]['dyj_title']."\n\n";
             $content1 .= "下单时间：".$res['time']."\n\n";
@@ -1112,17 +1112,17 @@ class Core extends WeModuleSite
     //订单退款
     public function wxrefund($order_id){
         global $_W, $_GPC;
-        include_once IA_ROOT . '/addons/pintuan/cert/WxPay.Api.php';
+        include_once IA_ROOT . '/addons/mask/cert/WxPay.Api.php';
         load()->model('account');
         load()->func('communication');
-        $refund_order =pdo_get('pintuan_order',array('id'=>$order_id));
+        $refund_order =pdo_get('mask_order',array('id'=>$order_id));
         $WxPayApi = new WxPayApi();
         $input = new WxPayRefund();
-        $path_cert = IA_ROOT . "/addons/pintuan/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
-        $path_key = IA_ROOT . "/addons/pintuan/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
+        $path_cert = IA_ROOT . "/addons/mask/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
+        $path_key = IA_ROOT . "/addons/mask/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
         $account_info = $_W['account'];
-        $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 
         $appid=$system['appid'];
         $key=$res['wxkey'];
@@ -1145,17 +1145,17 @@ class Core extends WeModuleSite
     //商户退款
     public function shrefund($sh_id){
         global $_W, $_GPC;
-        include_once IA_ROOT . '/addons/pintuan/cert/WxPay.Api.php';
+        include_once IA_ROOT . '/addons/mask/cert/WxPay.Api.php';
         load()->model('account');
         load()->func('communication');
-        $refund_order =pdo_get('pintuan_store',array('id'=>$sh_id));
+        $refund_order =pdo_get('mask_store',array('id'=>$sh_id));
         $WxPayApi = new WxPayApi();
         $input = new WxPayRefund();
-        $path_cert = IA_ROOT . "/addons/pintuan/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
-        $path_key = IA_ROOT . "/addons/pintuan/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
+        $path_cert = IA_ROOT . "/addons/mask/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
+        $path_key = IA_ROOT . "/addons/mask/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
         $account_info = $_W['account'];
-        $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 
         $appid=$system['appid'];
         $key=$res['wxkey'];
@@ -1177,10 +1177,10 @@ class Core extends WeModuleSite
 //达达
     public function dada($order_id){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/peisong/peisong.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
-        $set=pdo_get('pintuan_psset',array('store_id'=>$order['store_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/peisong/peisong.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
+        $set=pdo_get('mask_psset',array('store_id'=>$order['store_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 //*********************配置项*************************
         $config = array();
         $config['app_key'] = $system['dada_key'];
@@ -1208,7 +1208,7 @@ class Core extends WeModuleSite
             'receiver_phone'=> $order['tel'],
             'receiver_lat'=> $order['lat'],
             'receiver_lng'=> $order['lng'],
-            'callback'=>$_W['siteroot']."addons/pintuan/payment/peisong/notify.php"
+            'callback'=>$_W['siteroot']."addons/mask/payment/peisong/notify.php"
         );
         $result= Peisong::requestMethod($config,$data2);
         return $result;
@@ -1217,9 +1217,9 @@ class Core extends WeModuleSite
 
     public function kfw($order_id){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/peisong/peisong.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
-        $goods=pdo_getall('pintuan_order_goods',array('order_id'=>$order_id,'uniacid'=>$_W['uniacid']),array('name','spec'));
+        include IA_ROOT.'/addons/mask/peisong/peisong.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
+        $goods=pdo_getall('mask_order_goods',array('order_id'=>$order_id,'uniacid'=>$_W['uniacid']),array('name','spec'));
         $goods_info='';
         foreach ($goods as $key => $value) {
             $goods_info.=','.$value['name'];
@@ -1229,9 +1229,9 @@ class Core extends WeModuleSite
         }
         $goods_info=mb_substr($goods_info,1);
 
-        $set=pdo_get('pintuan_kfwset',array('store_id'=>$order['store_id']));
-        $storeInfo=pdo_get('pintuan_store',array('id'=>$order['store_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $set=pdo_get('mask_kfwset',array('store_id'=>$order['store_id']));
+        $storeInfo=pdo_get('mask_store',array('id'=>$order['store_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         $city=explode(',',$order['area']);
         $city=$city['1'];
         if(!$set['access_token']){//绑定商户
@@ -1239,8 +1239,8 @@ class Core extends WeModuleSite
             $res=json_decode($res);
             $data['access_token']=$res->data->access_token;
             $data['openid']=$res->data->openid;
-            pdo_update('pintuan_kfwset',$data,array('store_id'=>$order['store_id']));
-            $set=pdo_get('pintuan_kfwset',array('store_id'=>$order['store_id']));
+            pdo_update('mask_kfwset',$data,array('store_id'=>$order['store_id']));
+            $set=pdo_get('mask_kfwset',array('store_id'=>$order['store_id']));
         }
         $sender_zb=explode(',',$storeInfo['coordinates']);
         $sender_zb=peisong::coordinate_switchf($sender_zb[0],$sender_zb[1]);
@@ -1264,7 +1264,7 @@ class Core extends WeModuleSite
             'sender_lng'=>$sender_zb['Longitude'],
             'receiver_lat'=>$zb['Latitude'],
             'receiver_lng'=>$zb['Longitude'],
-            'callback_url'=>$_W['siteroot']."addons/pintuan/payment/peisong/notify2.php",
+            'callback_url'=>$_W['siteroot']."addons/mask/payment/peisong/notify2.php",
         );
         $obj= new KfwOpenapi();
         $sign=$obj->getSign($data,$system['kfw_appsecret']);
@@ -1279,11 +1279,11 @@ class Core extends WeModuleSite
 
     public function qxkfw($order_id){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/peisong/peisong.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
-        $set=pdo_get('pintuan_kfwset',array('store_id'=>$order['store_id']));
-        $storeInfo=pdo_get('pintuan_store',array('id'=>$order['store_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/peisong/peisong.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
+        $set=pdo_get('mask_kfwset',array('store_id'=>$order['store_id']));
+        $storeInfo=pdo_get('mask_store',array('id'=>$order['store_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         //下订单
         $data = array(
             'app_id'=>  $system['kfw_appid'],
@@ -1307,7 +1307,7 @@ class Core extends WeModuleSite
 //改变佣金
     public function updcommission($order_id){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_earnings',array('state'=>2),array('order_id'=>$order_id));
+        $res=pdo_update('mask_earnings',array('state'=>2),array('order_id'=>$order_id));
         if($res){
             echo '1';
         }else{
@@ -1318,7 +1318,7 @@ class Core extends WeModuleSite
 
     public function invalidcommission($order_id){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_earnings',array('state'=>3),array('order_id'=>$order_id));
+        $res=pdo_update('mask_earnings',array('state'=>3),array('order_id'=>$order_id));
         // if($res){
         // 	echo '1';
         // }else{
@@ -1330,11 +1330,11 @@ class Core extends WeModuleSite
 
     public function cjpt($order_id){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/peisong/cjpt.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
-        $store=pdo_get('pintuan_store',array('id'=>$order['store_id']),array('name','address','tel','coordinates','logo'));
+        include IA_ROOT.'/addons/mask/peisong/cjpt.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
+        $store=pdo_get('mask_store',array('id'=>$order['store_id']),array('name','address','tel','coordinates','logo'));
         $zb= explode (",", $store['coordinates']);
-        $goods=pdo_getall('pintuan_order_goods',array('order_id'=>$order_id));
+        $goods=pdo_getall('mask_order_goods',array('order_id'=>$order_id));
         $bind=pdo_get('cjpt_bind',array('cy_uniacid'=>$_W['uniacid']));
         $goods_info='';
         foreach ($goods as $key => $value) {
@@ -1375,8 +1375,8 @@ class Core extends WeModuleSite
 
     public function qxpt($order_id){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/peisong/cjpt.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
+        include IA_ROOT.'/addons/mask/peisong/cjpt.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
         $bind=pdo_get('cjpt_bind',array('cy_uniacid'=>$_W['uniacid']));
         $newstr = substr($news,0,strlen($news)-1);
         //下订单
@@ -1395,10 +1395,10 @@ class Core extends WeModuleSite
 
     public function doPageQxDada($order_id){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/peisong/peisong.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
-        $set=pdo_get('pintuan_psset',array('store_id'=>$order['store_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/peisong/peisong.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
+        $set=pdo_get('mask_psset',array('store_id'=>$order['store_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 //*********************配置项*************************
         $config = array();
         $config['app_key'] = $system['dada_key'];

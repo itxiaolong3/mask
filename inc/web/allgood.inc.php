@@ -1,7 +1,7 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$type=pdo_getall('pintuan_lanmu',array('uniacid'=>$_W['uniacid']));
+$type=pdo_getall('mask_lanmu',array('uniacid'=>$_W['uniacid']));
 $where=" WHERE a.uniacid=:uniacid";
 $data[':uniacid']=$_W['uniacid'];
 
@@ -25,20 +25,20 @@ if($_GPC['is_show2']){
 
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=15;
-$sql="select a.* ,b.hname,c.Name as typename,c.ID,d.QsID,d.Name from " . tablename("pintuan_goodmy") . " a"
-    . " left join " . tablename("pintuan_bighome")
-    . " b on b.bid=a.StallsName". " left join " . tablename("pintuan_typetwomy")
-    . " c on c.ID=a.tid ". " left join " . tablename("pintuan_lanmu")
+$sql="select a.* ,b.hname,c.Name as typename,c.ID,d.QsID,d.Name from " . tablename("mask_goodmy") . " a"
+    . " left join " . tablename("mask_bighome")
+    . " b on b.bid=a.StallsName". " left join " . tablename("mask_typetwomy")
+    . " c on c.ID=a.tid ". " left join " . tablename("mask_lanmu")
     . " d on a.zid=d.QsID ".$where." and a.isdelete=0 order by a.Statu asc";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 
 $list = pdo_fetchall($select_sql,$data);
-$total=pdo_fetchcolumn("select count(*) from " . tablename("pintuan_goodmy") . " a"  . " left join " . tablename("pintuan_bighome") . " b on b.bid=a.StallsName".$where,$data);
+$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_goodmy") . " a"  . " left join " . tablename("mask_bighome") . " b on b.bid=a.StallsName".$where,$data);
 $pager = pagination($total, $pageindex, $pagesize);
 if($_GPC['id']){
     $data2['Statu']=$_GPC['is_show'];
 
-    $res=pdo_update('pintuan_goodmy',$data2,array('gID'=>$_GPC['id']));
+    $res=pdo_update('mask_goodmy',$data2,array('gID'=>$_GPC['id']));
     if($res){
         message('设置成功',$this->createWebUrl('allgood',array('page'=>$_GPC['page'],'keywords'=>$_GPC['keywords'],'type_id'=>$_GPC['type_id'],'is_show2'=>$_GPC['is_show2'])),'success');
     }else{
@@ -46,7 +46,7 @@ if($_GPC['id']){
     }
 }
 if($_GPC['op']=='delete'){
-    $result = pdo_delete('pintuan_goodmy', array('gID'=>$_GPC['delid']));
+    $result = pdo_delete('mask_goodmy', array('gID'=>$_GPC['delid']));
     if($result){
         message('删除成功',$this->createWebUrl('allgood',array()),'success');
     }else{
@@ -58,7 +58,7 @@ if(checksubmit('submit2')){
     $url=$_W['attachurl'];
     $filename = $_FILES['file_stu']['name'];
     $tmp_name = $_FILES['file_stu']['tmp_name'];
-    $filePath = IA_ROOT . '/addons/pintuan/excel/';
+    $filePath = IA_ROOT . '/addons/mask/excel/';
     include 'phpexcelreader/reader.php';
     $data = new Spreadsheet_Excel_Reader();
     $data->setOutputEncoding('utf-8');
@@ -112,7 +112,7 @@ if(checksubmit('submit2')){
             }
             $insert['Images'] = $row[13];
             $insert['uniacid'] = $_W['uniacid'];
-            $res= pdo_insert('pintuan_goodmy',$insert);
+            $res= pdo_insert('mask_goodmy',$insert);
             $count = $count + $res;
         }
     }

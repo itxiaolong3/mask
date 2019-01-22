@@ -1,9 +1,9 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$list = pdo_getall('pintuan_warehome',array('uniacid'=>$_W['uniacid']));
+$list = pdo_getall('mask_warehome',array('uniacid'=>$_W['uniacid']));
 if($_GPC['op']=='delete'){
-    $res=pdo_delete('pintuan_warehome',array('fid'=>$_GPC['id']));
+    $res=pdo_delete('mask_warehome',array('fid'=>$_GPC['id']));
     if($res){
         message('删除成功！', $this->createWebUrl('warehome'), 'success');
     }else{

@@ -5,7 +5,7 @@ $uid=$_COOKIE["uid"];
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
-$info=pdo_get('pintuan_storead',array('id'=>$_GPC['id']));
+$info=pdo_get('mask_storead',array('id'=>$_GPC['id']));
 if(checksubmit('submit')){
     if($info['logo']!=$_GPC['logo']){
     $data['logo']=$_W['attachurl'].$_GPC['logo'];
@@ -26,14 +26,14 @@ if(checksubmit('submit')){
         $data['uniacid']=$_W['uniacid'];
         $data['created_time']=date('Y-m-d H:i:s');
      if($_GPC['id']==''){  
-        $res=pdo_insert('pintuan_storead',$data);
+        $res=pdo_insert('mask_storead',$data);
         if($res){
              message('添加成功！', $this->createWebUrl2('<dl></dl>storead'), 'success');
         }else{
              message('添加失败！','','error');
         }
     }else{
-        $res=pdo_update('pintuan_storead',$data,array('id'=>$_GPC['id']));
+        $res=pdo_update('mask_storead',$data,array('id'=>$_GPC['id']));
         if($res){
              message('编辑成功！', $this->createWebUrl2('<dl></dl>storead'), 'success');
         }else{

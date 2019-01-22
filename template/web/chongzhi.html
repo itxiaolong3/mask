@@ -71,7 +71,7 @@
                                   console.log(id);
                                   $.ajax({
                                       type:"post",
-                                      url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=DelCz&m=pintuan",
+                                      url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=DelCz&m=mask",
                                       dataType:"text",
                                       data:{id:id},
                                       success:function(data){
@@ -134,7 +134,7 @@
           console.log(list);
           $.ajax({
               type:"post",
-              url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=AddCz&m=pintuan",
+              url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=AddCz&m=mask",
               dataType:"text",
               data:{list:list},
               success:function(data){

@@ -3,7 +3,7 @@ global $_GPC, $_W;
 // $action = 'ad';
 // $title = $this->actions_titles[$action];
 $GLOBALS['frames'] = $this->getMainMenu();
-$item=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
+$item=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
 if(checksubmit('submit')){
 	$data['appkey']=trim($_GPC['appkey']);
 	$data['tpl_id']=trim($_GPC['tpl_id']);
@@ -23,14 +23,14 @@ if(checksubmit('submit')){
 //	}
 	$data['uniacid']=trim($_W['uniacid']);
 	if($_GPC['id']==''){                
-		$res=pdo_insert('pintuan_message',$data);
+		$res=pdo_insert('mask_message',$data);
 		if($res){
 			message('添加成功',$this->createWebUrl('sms',array()),'success');
 		}else{
 			message('添加失败','','error');
 		}
 	}else{
-		$res = pdo_update('pintuan_message', $data, array('id' => $_GPC['id']));
+		$res = pdo_update('mask_message', $data, array('id' => $_GPC['id']));
 		if($res){
 			message('编辑成功',$this->createWebUrl('sms',array()),'success');
 		}else{

@@ -2,10 +2,10 @@
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
 
-$list=pdo_getall('pintuan_coupons',array('uniacid' => $_W['uniacid'],'is_hy'=>1));
+$list=pdo_getall('mask_coupons',array('uniacid' => $_W['uniacid'],'is_hy'=>1));
 if($_GPC['id']){
-	$result = pdo_delete('pintuan_coupons', array('id'=>$_GPC['id']));
-	pdo_delete('pintuan_usercoupons',array('coupon_id'=>$_GPC['id']));
+	$result = pdo_delete('mask_coupons', array('id'=>$_GPC['id']));
+	pdo_delete('mask_usercoupons',array('coupon_id'=>$_GPC['id']));
 	if($result){
 		message('删除成功',$this->createWebUrl('coupons',array()),'success');
 	}else{

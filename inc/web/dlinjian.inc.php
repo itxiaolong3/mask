@@ -6,9 +6,9 @@ $uid=$_COOKIE["uid"];
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
-$list=pdo_getall('pintuan_reduction',array('store_id'=>$storeid));
+$list=pdo_getall('mask_reduction',array('store_id'=>$storeid));
 if($_GPC['id']){
-	$res=pdo_delete('pintuan_reduction',array('id'=>$_GPC['id']));
+	$res=pdo_delete('mask_reduction',array('id'=>$_GPC['id']));
 	if($res){
 		 message('删除成功！', $this->createWebUrl2('dlinjian'), 'success');
 		}else{

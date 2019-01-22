@@ -5,9 +5,9 @@ $uid=$_COOKIE["uid"];
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
-$list=pdo_getall('pintuan_coupons',array('uniacid' => $_W['uniacid'],'store_id'=>$storeid));
+$list=pdo_getall('mask_coupons',array('uniacid' => $_W['uniacid'],'store_id'=>$storeid));
 if($_GPC['id']){
-	$result = pdo_delete('pintuan_coupons', array('id'=>$_GPC['id']));
+	$result = pdo_delete('mask_coupons', array('id'=>$_GPC['id']));
 	if($result){
 		message('删除成功',$this->createWebUrl2('dlincoupons',array()),'success');
 	}else{

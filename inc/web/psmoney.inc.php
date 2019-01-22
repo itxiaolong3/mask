@@ -3,9 +3,9 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
 $store_id=$_GPC['id'];
 
-$list=pdo_getall('pintuan_distribution',array('store_id'=>$store_id));
+$list=pdo_getall('mask_distribution',array('store_id'=>$store_id));
 if($_GPC['op']=='delete'){
-	$res=pdo_delete('pintuan_distribution',array('id'=>$_GPC['id']));
+	$res=pdo_delete('mask_distribution',array('id'=>$_GPC['id']));
 	if($res){
 		 message('删除成功！', $this->createWebUrl('psmoney',array('id'=>$_GPC['store_id'])), 'success');
 		}else{

@@ -1,8 +1,8 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-	$info = pdo_get('pintuan_jfgoods',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
-	$type = pdo_getall('pintuan_jftype',array('uniacid' => $_W['uniacid']));
+	$info = pdo_get('mask_jfgoods',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
+	$type = pdo_getall('mask_jftype',array('uniacid' => $_W['uniacid']));
 		if(checksubmit('submit')){
 			$data['name']=$_GPC['name'];
 			if($info['img']!=$_GPC['img']){
@@ -22,14 +22,14 @@ $GLOBALS['frames'] = $this->getMainMenu();
 			$data['hb_moeny']=$_GPC['hb_moeny'];
 			$data['uniacid']=$_W['uniacid'];
 			if($_GPC['id']==''){				
-				$res=pdo_insert('pintuan_jfgoods',$data);
+				$res=pdo_insert('mask_jfgoods',$data);
 				if($res){
 					message('添加成功',$this->createWebUrl('jfgoods',array()),'success');
 				}else{
 					message('添加失败','','error');
 				}
 			}else{
-				$res = pdo_update('pintuan_jfgoods', $data, array('id' => $_GPC['id']));
+				$res = pdo_update('mask_jfgoods', $data, array('id' => $_GPC['id']));
 				if($res){
 					message('编辑成功',$this->createWebUrl('jfgoods',array()),'success');
 				}else{

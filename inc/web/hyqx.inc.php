@@ -2,9 +2,9 @@
 
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$list = pdo_getall('pintuan_hyqx',array('uniacid' => $_W['uniacid']),array(),'','num asc');
+$list = pdo_getall('mask_hyqx',array('uniacid' => $_W['uniacid']),array(),'','num asc');
 if($_GPC['id']){
-    $res=pdo_delete('pintuan_hyqx',array('id'=>$_GPC['id']));
+    $res=pdo_delete('mask_hyqx',array('id'=>$_GPC['id']));
     if($res){
         message('删除成功',$this->createWebUrl('hyqx',array()),'success');
     }else{

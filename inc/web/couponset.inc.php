@@ -2,7 +2,7 @@
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
 
-$item=pdo_get('pintuan_couponset',array('uniacid'=>$_W['uniacid']));
+$item=pdo_get('mask_couponset',array('uniacid'=>$_W['uniacid']));
 
 
     if(checksubmit('submit')){
@@ -19,14 +19,14 @@ $item=pdo_get('pintuan_couponset',array('uniacid'=>$_W['uniacid']));
             $data['number']=$_GPC['number'];
             $data['uniacid']=$_W['uniacid'];
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_couponset',$data);
+                $res=pdo_insert('mask_couponset',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('couponset',array()),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{	
-	            $res = pdo_update('pintuan_couponset', $data, array('id' => $_GPC['id']));
+	            $res = pdo_update('mask_couponset', $data, array('id' => $_GPC['id']));
 	            if($res){
 	                message('编辑成功',$this->createWebUrl('couponset',array()),'success');
 	            }else{

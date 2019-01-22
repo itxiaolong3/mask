@@ -1,7 +1,7 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$info=pdo_get('pintuan_cptj',array('id'=>$_GPC['id']));
+$info=pdo_get('mask_cptj',array('id'=>$_GPC['id']));
 if(checksubmit('submit')){
     if($info['img']!=$_GPC['img']){
     $data['img']=$_W['attachurl'].$_GPC['img'];
@@ -13,14 +13,14 @@ if(checksubmit('submit')){
   $data['details']=html_entity_decode($_GPC['details']);
   $data['uniacid']=$_W['uniacid'];
      if($_GPC['id']==''){  
-        $res=pdo_insert('pintuan_cptj',$data);
+        $res=pdo_insert('mask_cptj',$data);
         if($res){
              message('添加成功！', $this->createWebUrl('cptj'), 'success');
         }else{
              message('添加失败！','','error');
         }
     }else{
-        $res=pdo_update('pintuan_cptj',$data,array('id'=>$_GPC['id']));
+        $res=pdo_update('mask_cptj',$data,array('id'=>$_GPC['id']));
         if($res){
              message('编辑成功！', $this->createWebUrl('cptj'), 'success');
         }else{

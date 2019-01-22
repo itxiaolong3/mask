@@ -2,7 +2,7 @@
 global $_GPC, $_W;
 //founder 创始人
 $GLOBALS['frames'] = $this->getMainMenu();
- $item=pdo_get('pintuan_system',array('uniacid'=>$_GPC['uniacid']));
+ $item=pdo_get('mask_system',array('uniacid'=>$_GPC['uniacid']));
     if(checksubmit('submit')){
     		$data['link_name']=$_GPC['link_name'];
              if($item['link_logo']!=$_GPC['link_logo']){
@@ -18,14 +18,14 @@ $GLOBALS['frames'] = $this->getMainMenu();
     		$data['support']=$_GPC['support'];
             $data['uniacid']=$_GPC['uniacid'];
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_system',$data);
+                $res=pdo_insert('mask_system',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('banquanset',array('uniacid'=>$_GPC['uniacid'])),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_system', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_system', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl('banquanset',array('uniacid'=>$_GPC['uniacid'])),'success');
                 }else{

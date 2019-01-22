@@ -3,9 +3,9 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu2();
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
-$list=pdo_getall('pintuan_reduction',array('store_id'=>$storeid));
+$list=pdo_getall('mask_reduction',array('store_id'=>$storeid));
 if($_GPC['id']){
-	$res=pdo_delete('pintuan_reduction',array('id'=>$_GPC['id']));
+	$res=pdo_delete('mask_reduction',array('id'=>$_GPC['id']));
 	if($res){
 		 message('删除成功！', $this->createWebUrl('injian'), 'success');
 		}else{

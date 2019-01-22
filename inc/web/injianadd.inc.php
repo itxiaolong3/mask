@@ -3,7 +3,7 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu2();
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
-$info=pdo_get('pintuan_reduction',array('id'=>$_GPC['id']));
+$info=pdo_get('mask_reduction',array('id'=>$_GPC['id']));
 if(checksubmit('submit')){
          $data['name']=$_GPC['name'];
         $data['full']=$_GPC['full'];
@@ -11,14 +11,14 @@ if(checksubmit('submit')){
         $data['type']=$_GPC['type'];
       	$data['store_id']=$storeid;
      if($_GPC['id']==''){  
-        $res=pdo_insert('pintuan_reduction',$data);
+        $res=pdo_insert('mask_reduction',$data);
         if($res){
              message('添加成功！', $this->createWebUrl('injian'), 'success');
         }else{
              message('添加失败！','','error');
         }
     }else{
-        $res=pdo_update('pintuan_reduction',$data,array('id'=>$_GPC['id']));
+        $res=pdo_update('mask_reduction',$data,array('id'=>$_GPC['id']));
         if($res){
              message('编辑成功！', $this->createWebUrl('injian'), 'success');
         }else{

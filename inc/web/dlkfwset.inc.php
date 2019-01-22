@@ -5,15 +5,15 @@ $uid=$_COOKIE["uid"];
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
-$info=pdo_get('pintuan_kfwset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
+$info=pdo_get('mask_kfwset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
 if(checksubmit('submit')){
 	$data['store_id']=$storeid;
 	$data['user_id']=$_GPC['user_id'];	
 	$data['uniacid']=$_W['uniacid'];
 	if($_GPC['id']==''){
-		$res = pdo_insert('pintuan_kfwset', $data);
+		$res = pdo_insert('mask_kfwset', $data);
 	}else{
-		$res = pdo_update('pintuan_kfwset', $data, array('store_id' => $storeid));
+		$res = pdo_update('mask_kfwset', $data, array('store_id' => $storeid));
 	}	
 	if($res){
 		message('编辑成功',$this->createWebUrl2('dlkfwset',array()),'success');

@@ -223,7 +223,7 @@
                     </div>
                     <div class="info_left_content">
                         <p><span>预定时间：</span>{$item['time']}</p>
-                         {php $zz=pdo_get('pintuan_table_type',array('id'=>$item['table_id']))}
+                         {php $zz=pdo_get('mask_table_type',array('id'=>$item['table_id']))}
                         <p><span>预定信息：</span>{$item['name']}--{$item['tel']}--{$zz['name']}</p>
                         <p><span>预计到店时间：</span>{$item['delivery_time']}</p>
                     </div>

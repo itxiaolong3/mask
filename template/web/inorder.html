@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
     .ygrow{margin-top: 20px;}
     .yg5_key>div{float: left;line-height: 34px;}
@@ -124,7 +124,7 @@
         <form action="" method="get" style="padding: 0" class="col-md-4">
             <input type="hidden" name="c" value="site" />
             <input type="hidden" name="a" value="entry" />
-            <input type="hidden" name="m" value="pintuan" />
+            <input type="hidden" name="m" value="mask" />
             <input type="hidden" name="do" value="inorder" />
             <div class="input-group" style="width: 300px;">
                 <input type="text" name="keywords" class="form-control" placeholder="请输入姓名/订单编号/门店名称">
@@ -143,7 +143,7 @@
         <form action="" method="get" class="col-md-4">
            <input type="hidden" name="c" value="site" />
            <input type="hidden" name="a" value="entry" />
-           <input type="hidden" name="m" value="pintuan" />
+           <input type="hidden" name="m" value="mask" />
            <input type="hidden" name="do" value="inorder" />
             <div class="input-group" style="width: 100px">
                 {php echo tpl_form_field_daterange('time',$_GPC['time'],true);}
@@ -163,7 +163,7 @@
     {if !$data3}
         <div class="panel panel-default">
             <div class="orderwu">
-                <img src="../addons/pintuan/template/images/noorder.png">
+                <img src="../addons/mask/template/images/noorder.png">
                 <p class="wufont1">暂无指定订单</p>
                 <p class="orfont10">暂时没有筛选条件的订单，稍后再来看看吧！</p>
             </div>
@@ -175,15 +175,15 @@
                 <div class="row" style="position: relative;">
                 {if $item['order']['state']==1 || $item['order']['state']==6}
                     <div class="ortypeimg">
-                        <img src="../addons/pintuan/template/images/daizhifu.png">
+                        <img src="../addons/mask/template/images/daizhifu.png">
                     </div>
                      {elseif $item['order']['pay_type']==4}
                     <div class="ortypeimg2">
-                        <img src="../addons/pintuan/template/images/hdfk.png">
+                        <img src="../addons/mask/template/images/hdfk.png">
                     </div>
                     {else}
                     <div class="ortypeimg2">
-                        <img src="../addons/pintuan/template/images/yizhifu.png">
+                        <img src="../addons/mask/template/images/yizhifu.png">
                     </div>
                     {/if}
                     <div class="col-md-12 orderback">
@@ -245,7 +245,7 @@
                         <div class="">
                             <div class="left orfont9">{$item['order']['address']}</div>
                             <div class="right ordertelimg1">
-                                <img src="../addons/pintuan/template/images/ordertel.png" class="ordertelimg">
+                                <img src="../addons/mask/template/images/ordertel.png" class="ordertelimg">
                                 <span>{$item['order']['tel']} </span>
                             </div>
                         </div>
@@ -360,9 +360,9 @@
 
 
 <div class="tip"></div>
-<audio id="myaudio5" src="../addons/pintuan/template/images/wm.wav" controls="controls"  hidden="true" ></audio>
-<audio id="myaudio6" src="../addons/pintuan/template/images/dn.wav" controls="controls"  hidden="true" ></audio>
-<audio id="myaudio7" src="../addons/pintuan/template/images/yy.wav" controls="controls"  hidden="true" ></audio>
+<audio id="myaudio5" src="../addons/mask/template/images/wm.wav" controls="controls"  hidden="true" ></audio>
+<audio id="myaudio6" src="../addons/mask/template/images/dn.wav" controls="controls"  hidden="true" ></audio>
+<audio id="myaudio7" src="../addons/mask/template/images/yy.wav" controls="controls"  hidden="true" ></audio>
 
 <script type="text/javascript">
 $(function(){
@@ -370,13 +370,13 @@ $(function(){
                $.ajax({ 
                 type: "post",
                 dataType: "json",
-                url: "{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=neworder&m=pintuan&store={$_COOKIE['storeid']}",
+                url: "{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=neworder&m=mask&store={$_COOKIE['storeid']}",
                 success: function (data) {
                     console.log(data);
                    if(data==1){
                      var myAuto5 = document.getElementById('myaudio5');
                      myAuto5.play(); 
-                     // $(".tip").append('<audio id="myaudio" src="../addons/pintuan/template/images/wm.wav" controls="controls"  hidden="true" autoplay></audio>')
+                     // $(".tip").append('<audio id="myaudio" src="../addons/mask/template/images/wm.wav" controls="controls"  hidden="true" autoplay></audio>')
                     }else if(data==2){
                         var myAuto6 = document.getElementById('myaudio6');
                      myAuto6.play(); 
@@ -405,12 +405,12 @@ $(function(){
          // var dis_info = ''
          if(dis_info!='达达配送'&&dis_info!='快服务配送'&&dis_info!='商家配送'){
          	// $(".dis_info").hide()
-         	var sjData = '{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=GetPtInfo&m=pintuan'
+         	var sjData = '{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=GetPtInfo&m=mask'
          }else if(dis_info=='达达配送'){
-			var sjData = '{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=GetDadaInfo&m=pintuan'
+			var sjData = '{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=GetDadaInfo&m=mask'
          }else if(dis_info=='快服务配送'){
          	// GetDadaInfo
-			var sjData = '{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=GetKfwInfo&m=pintuan'
+			var sjData = '{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=GetKfwInfo&m=mask'
          }
          console.log(dis_info)
          // 点击详情展开骑手信息

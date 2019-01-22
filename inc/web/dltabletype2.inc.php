@@ -6,9 +6,9 @@ $uid=$_COOKIE["uid"];
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
-$list = pdo_getall('pintuan_table_type',array('uniacid' => $_W['uniacid'],'store_id'=>$storeid), array() , '' , 'orderby ASC');
+$list = pdo_getall('mask_table_type',array('uniacid' => $_W['uniacid'],'store_id'=>$storeid), array() , '' , 'orderby ASC');
 if($_GPC['id']){
-		$result = pdo_delete('pintuan_table_type', array('id'=>$_GPC['id']));
+		$result = pdo_delete('mask_table_type', array('id'=>$_GPC['id']));
 		if($result){
 			message('删除成功',$this->createWebUrl2('dltabletype2',array()),'success');
 		}else{

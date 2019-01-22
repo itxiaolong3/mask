@@ -45,7 +45,7 @@ function _login($forward = '') {
 			message('您的账号正在审核或是已经被系统禁止，请联系网站管理员解决！');
 		}
 
-		$account = pdo_fetch("SELECT * FROM " . tablename("pintuan_account") . " WHERE status=2 AND uid=:uid ORDER BY id DESC LIMIT 1", array(':uid' => $record['uid']));
+		$account = pdo_fetch("SELECT * FROM " . tablename("mask_account") . " WHERE status=2 AND uid=:uid ORDER BY id DESC LIMIT 1", array(':uid' => $record['uid']));
 		if (!empty($account)) {
 			$storeid = $account['storeid'];
 			$_W['uniacid'] = $account['weid'];
@@ -102,9 +102,9 @@ function _login($forward = '') {
 			'lastvisit' => TIMESTAMP,
 			'lastip' => CLIENT_IP,
 		);
-		pdo_update("pintuan_account", $data, array('id' => $record['id']));
+		pdo_update("mask_account", $data, array('id' => $record['id']));
 
-		message("欢迎回来，{$record['username']}！", url('site/entry/stores', array('m' => 'pintuan', 'id' => $storeid,'uid'=>$record['uid'], 'do' => 'start')), 'success');
+		message("欢迎回来，{$record['username']}！", url('site/entry/stores', array('m' => 'mask', 'id' => $storeid,'uid'=>$record['uid'], 'do' => 'start')), 'success');
 	} else {
 		if (empty($failed)) {
 			pdo_insert('users_failed_login', array('ip' => CLIENT_IP, 'username' => $username, 'count' => '1', 'lastupdate' => TIMESTAMP));

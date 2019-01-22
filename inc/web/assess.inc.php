@@ -7,10 +7,10 @@ $where="where a.uniacid=".$_W['uniacid'];
 if($_GPC['type']==2){
   $where=" and a.state=1";
 }
-$sql="select  a.*,b.name ,b.img as user_img,c.name as  store_name  from " . tablename("pintuan_assess")  . " a"  . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id  " . " left join " . tablename("pintuan_store") . " c on c.id=a.store_id ".$where." order by a.id DESC";
+$sql="select  a.*,b.name ,b.img as user_img,c.name as  store_name  from " . tablename("mask_assess")  . " a"  . " left join " . tablename("mask_user") . " b on b.id=a.user_id  " . " left join " . tablename("mask_store") . " c on c.id=a.store_id ".$where." order by a.id DESC";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list = pdo_fetchall($select_sql);     
-$total=pdo_fetchcolumn("select count(*) from " . tablename("pintuan_assess") . " a"  . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id " . " left join " . tablename("pintuan_store") . " c on c.id=a.store_id  ".$where);
+$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_assess") . " a"  . " left join " . tablename("mask_user") . " b on b.id=a.user_id " . " left join " . tablename("mask_store") . " c on c.id=a.store_id  ".$where);
 $pager = pagination($total, $pageindex, $pagesize);
 for($i=0;$i<count($list);$i++){
     if($list[$i]['img']){
@@ -27,7 +27,7 @@ for($i=0;$i<count($list);$i++){
       $data['state']=2;
       $data['hf']=$_GPC['con'];
       $data['hf_time']=date("Y-m-d H:i:s");
-      $res=pdo_update('pintuan_assess',$data,array('id'=>$_GPC['id']));
+      $res=pdo_update('mask_assess',$data,array('id'=>$_GPC['id']));
       if($res){
         message('回复成功！', $this->createWebUrl('assess',array('type'=>$_GPC['type'],'page'=>$_GPC['page'])), 'success');
       }else{
@@ -35,13 +35,13 @@ for($i=0;$i<count($list);$i++){
       }
   }
   if($_GPC['op']=='delete'){
-    $res=pdo_delete('pintuan_assess',array('id'=>$_GPC['id']));
+    $res=pdo_delete('mask_assess',array('id'=>$_GPC['id']));
     if($res){
         message('删除成功！', $this->createWebUrl('assess',array('type'=>$_GPC['type'],'page'=>$_GPC['page'])), 'success');
       }else{
         message('删除失败！','','error');
       }
   }
-$qb=pdo_getall('pintuan_assess',array('uniacid'=>$_W['uniacid']));
-$whf=pdo_getall('pintuan_assess',array('uniacid'=>$_W['uniacid'],'state'=>1));
+$qb=pdo_getall('mask_assess',array('uniacid'=>$_W['uniacid']));
+$whf=pdo_getall('mask_assess',array('uniacid'=>$_W['uniacid'],'state'=>1));
 include $this->template('web/assess');

@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
     .ygrow{margin-top: 20px;font-size: 12px;}
     .ygmartop{margin-top: 30px;font-size: 12px;}
@@ -46,7 +46,7 @@
             <div class="col-md-12 ygboxl">
                <input type="hidden" name="c" value="site" />
                <input type="hidden" name="a" value="entry" />
-               <input type="hidden" name="m" value="pintuan" />
+               <input type="hidden" name="m" value="mask" />
                <input type="hidden" name="do" value="dlgroupgoods" />
                 <div class="col-md-2" style="padding: 0px;">
                     <div class="yg_name">商品名称</div>
@@ -142,7 +142,7 @@
 									        name = inp;
 									    	$.ajax({
 									    		type:"post",
-									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=pintuan",
+									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=mask",
 									    		dataType:"text",
 										        data:{id:id,name:name},
 										        success:function(data){
@@ -179,7 +179,7 @@
 									        money = inp;
 									    	$.ajax({
 									    		type:"post",
-									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=pintuan",
+									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=mask",
 									    		dataType:"text",
 										        data:{id:id,money:money},
 										        success:function(data){
@@ -216,7 +216,7 @@
 									        wm_money = inp;
 									    	$.ajax({
 									    		type:"post",
-									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=pintuan",
+									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=mask",
 									    		dataType:"text",
 										        data:{id:id,wm_money:wm_money},
 										        success:function(data){
@@ -253,7 +253,7 @@
 									        box_fee = inp;
 									    	$.ajax({
 									    		type:"post",
-									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=pintuan",
+									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=mask",
 									    		dataType:"text",
 										        data:{id:id,box_fee:box_fee},
 										        success:function(data){
@@ -290,7 +290,7 @@
 									        num = inp;
 									    	$.ajax({
 									    		type:"post",
-									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=pintuan",
+									    		url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=mask",
 									    		dataType:"text",
 										        data:{id:id,num:num},
 										        success:function(data){
@@ -327,7 +327,7 @@
                                             xs_num = inp;
                                             $.ajax({
                                                 type:"post",
-                                                url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=pintuan",
+                                                url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupupdate&m=mask",
                                                 dataType:"text",
                                                 data:{id:id,xs_num:xs_num},
                                                 success:function(data){
@@ -454,7 +454,7 @@
                console.log(id)
                 $.ajax({
                     type:"post",
-                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupsj&m=pintuan",
+                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupsj&m=mask",
                     dataType:"text",
                     data:{id:id},
                     success:function(data){
@@ -480,7 +480,7 @@
                console.log(id)
                 $.ajax({
                     type:"post",
-                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupxj&m=pintuan",
+                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=groupxj&m=mask",
                     dataType:"text",
                     data:{id:id},
                     success:function(data){
@@ -510,7 +510,7 @@
                // console.log(id)
                 $.ajax({
                     type:"post",
-                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=delgroup&m=pintuan",
+                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=delgroup&m=mask",
                     dataType:"text",
                     data:{id:id},
                     success:function(data){

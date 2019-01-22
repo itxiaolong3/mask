@@ -1,7 +1,7 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$sys=pdo_get('pintuan_fxset',array('uniacid'=>$_W['uniacid']),'is_ej');
+$sys=pdo_get('mask_fxset',array('uniacid'=>$_W['uniacid']),'is_ej');
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
 $state=$_GPC['state'];
@@ -17,8 +17,8 @@ if($state&&$state!="all"){
 } 
 
 
-$sql="select a.* ,b.img,b.name from " . tablename("pintuan_retail") . " a"  . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id  ". $where." ORDER BY id DESC";
-  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_retail') . " a"  . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id ".  "".$where,$data);
+$sql="select a.* ,b.img,b.name from " . tablename("mask_retail") . " a"  . " left join " . tablename("mask_user") . " b on b.id=a.user_id  ". $where." ORDER BY id DESC";
+  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_retail') . " a"  . " left join " . tablename("mask_user") . " b on b.id=a.user_id ".  "".$where,$data);
 $list=pdo_fetchall( $sql,$data);
 
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
@@ -26,18 +26,18 @@ $list=pdo_fetchall($select_sql,$data);
 
 foreach ($list as $key => $value) {
   //上级分销商
-  $sql3=" select b.name from".tablename('pintuan_fxuser')." a left join".tablename('pintuan_user')." b on a.user_id=b.id where a.fx_user={$value['user_id']}";
+  $sql3=" select b.name from".tablename('mask_fxuser')." a left join".tablename('mask_user')." b on a.user_id=b.id where a.fx_user={$value['user_id']}";
     $sj=pdo_fetch($sql3);
   //一级分销商人数
-  $xjrs=pdo_get('pintuan_fxuser', array('user_id'=>$value['user_id']), array('count(id) as count','fx_user'));
+  $xjrs=pdo_get('mask_fxuser', array('user_id'=>$value['user_id']), array('count(id) as count','fx_user'));
  if($sys['is_ej']==2){
- 	$ejrs=pdo_get('pintuan_fxuser', array('user_id'=>$xjrs['fx_user']), array('count(id) as count'));
+ 	$ejrs=pdo_get('mask_fxuser', array('user_id'=>$xjrs['fx_user']), array('count(id) as count'));
 
  }
   //有效佣金
-  $sql2="select sum( case when state=1 then money else 0 end) as djyj, sum( case when state=2 then money else 0 end) as yxjy from  ".tablename('pintuan_earnings')." where user_id={$value['user_id']}";
+  $sql2="select sum( case when state=1 then money else 0 end) as djyj, sum( case when state=2 then money else 0 end) as yxjy from  ".tablename('mask_earnings')." where user_id={$value['user_id']}";
 $yj=pdo_fetch($sql2);
-$sql3="select sum( tx_cost) as money from  ".tablename('pintuan_commission_withdrawal')." where user_id={$value['user_id']} and state in (1,2)";
+$sql3="select sum( tx_cost) as money from  ".tablename('mask_commission_withdrawal')." where user_id={$value['user_id']} and state in (1,2)";
 $tx=pdo_fetch($sql3);
 $list[$key]['sj']='总店';
 $list[$key]['xjrs']='0';
@@ -72,7 +72,7 @@ $pager = pagination($total, $pageindex, $pagesize);
 $operation=$_GPC['op'];
 if($operation=='adopt'){//审核通过
     $id=$_GPC['id'];
-    $res=pdo_update('pintuan_retail',array('state'=>2,'sh_time'=>time()),array('id'=>$id));
+    $res=pdo_update('mask_retail',array('state'=>2,'sh_time'=>time()),array('id'=>$id));
     if($res){
         message('审核成功',$this->createWebUrl('fxlist',array()),'success');
     }else{
@@ -81,7 +81,7 @@ if($operation=='adopt'){//审核通过
 }
 if($operation=='reject'){
      $id=$_GPC['id'];
-    $res=pdo_update('pintuan_retail',array('state'=>3,'sh_time'=>time()),array('id'=>$id));
+    $res=pdo_update('mask_retail',array('state'=>3,'sh_time'=>time()),array('id'=>$id));
      if($res){
         message('拒绝成功',$this->createWebUrl('fxlist',array()),'success');
     }else{
@@ -90,12 +90,12 @@ if($operation=='reject'){
 }
 if($operation=='delete'){
      $id=$_GPC['id'];
-     $user_id=pdo_get('pintuan_retail',array('id'=>$id),'user_id');
+     $user_id=pdo_get('mask_retail',array('id'=>$id),'user_id');
      $user_id=$user_id['user_id'];
-     $res=pdo_delete('pintuan_retail',array('id'=>$id));
+     $res=pdo_delete('mask_retail',array('id'=>$id));
      if($res){
      	 //删除上下级关系
-     $sql="delete from ".tablename('pintuan_fxuser')." where fx_user={$user_id} or user_id={$user_id} ";
+     $sql="delete from ".tablename('mask_fxuser')." where fx_user={$user_id} or user_id={$user_id} ";
      pdo_query($sql);
         message('删除成功',$this->createWebUrl('fxlist',array()),'success');
     }else{
@@ -110,7 +110,7 @@ if(checksubmit('submit')){
   $data2['note']='后台充值';
   $data2['state']=2;
   $data2['uniacid']=$_W['uniacid'];
-  $res=pdo_insert('pintuan_earnings',$data2);
+  $res=pdo_insert('mask_earnings',$data2);
   if($res){
       message('充值成功',$this->createWebUrl('fxlist',array()),'success');
   }else{

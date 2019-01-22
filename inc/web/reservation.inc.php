@@ -6,13 +6,13 @@ $cur_store = $this->getStoreById($storeid);
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=15;
 $where=" WHERE uniacid={$_W['uniacid']} and store_id={$storeid}";
-$sql=" select * from" . tablename("pintuan_reservation") .$where." order by num asc";
+$sql=" select * from" . tablename("mask_reservation") .$where." order by num asc";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list = pdo_fetchall($select_sql);	   
-$total=pdo_fetchcolumn("select count(*) from " . tablename("pintuan_reservation").$where);
+$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_reservation").$where);
 $pager = pagination($total, $pageindex, $pagesize);
 if($_GPC['op']=='delete'){
-	$result = pdo_delete('pintuan_reservation', array('id'=>$_GPC['id']));
+	$result = pdo_delete('mask_reservation', array('id'=>$_GPC['id']));
 	if($result){
 		message('删除成功',$this->createWebUrl('reservation',array()),'success');
 	}else{

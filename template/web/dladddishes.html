@@ -133,7 +133,7 @@
       color: #00aeff;
   } 
 </style>
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcss.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcss.css">
 <div class="nav_box col-md-1">
     <ul class="left_nav">
     <!--     <span class="ygxian"></span>
@@ -442,7 +442,7 @@
           // $("#lv_table_con").show()
       $.ajax({
           type:"post",
-          url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=GoodInfo&m=pintuan",
+          url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=GoodInfo&m=mask",
           dataType:"text",
           data:{good_id:good_id},
           success:function(data){
@@ -858,7 +858,7 @@
                if(good_id==''){//如果good是空的就调用添加接口
               $.ajax({
                 type:"post",
-                 url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=AddGood&m=pintuan",
+                 url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=AddGood&m=mask",
                 dataType:"text",
                 data:{                  
                   storeid:storeid,
@@ -902,7 +902,7 @@
             }else{//如果good是有值的就调用修改接口
               $.ajax({
                 type:"post",
-                url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=UpdGood&m=pintuan",
+                url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=UpdGood&m=mask",
                 dataType:"text",
                 data:{
                   box_money:box_money, //餐盒费

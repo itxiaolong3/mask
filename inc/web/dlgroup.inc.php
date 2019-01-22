@@ -33,8 +33,8 @@ if($_GPC['time']){
 	}
 
 }
-$sql="SELECT * FROM ".tablename('pintuan_group').$where." ORDER BY id DESC";
-$total=pdo_fetchcolumn("SELECT * FROM ".tablename('pintuan_group').$where,$data);
+$sql="SELECT * FROM ".tablename('mask_group').$where." ORDER BY id DESC";
+$total=pdo_fetchcolumn("SELECT * FROM ".tablename('mask_group').$where,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 
 $list=pdo_fetchall($select_sql,$data);

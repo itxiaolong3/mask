@@ -29,8 +29,8 @@ if($type=='cancel'){
 
 
 
-$sql="SELECT a.*,b.name as md_name,c.yd_poundage as md_poundage,d.poundage FROM ".tablename('pintuan_order'). " a"  . " left join " . tablename("pintuan_store") . " b on a.store_id=b.id " . " left join " . tablename("pintuan_storetype") . " c on b.md_type=c.id ". " left join " . tablename("pintuan_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_order'). " a"  . " left join " . tablename("pintuan_store") . " b on a.store_id=b.id  " . " left join " . tablename("pintuan_storetype") . " c on b.md_type=c.id ". " left join " . tablename("pintuan_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC",$data);
+$sql="SELECT a.*,b.name as md_name,c.yd_poundage as md_poundage,d.poundage FROM ".tablename('mask_order'). " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id " . " left join " . tablename("mask_storetype") . " c on b.md_type=c.id ". " left join " . tablename("mask_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_order'). " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id  " . " left join " . tablename("mask_storetype") . " c on b.md_type=c.id ". " left join " . tablename("mask_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC",$data);
 
 $select_sql =$sql."  LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list=pdo_fetchall($select_sql,$data);
@@ -42,16 +42,16 @@ $pager = pagination($total, $pageindex, $pagesize);
 
 
 if($_GPC['op']=='ok'){
-pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
 $data2['yy_state']=3;
-$rst=pdo_update('pintuan_order',$data2,array('id'=>$_GPC['id']));
+$rst=pdo_update('mask_order',$data2,array('id'=>$_GPC['id']));
   if($rst){
-     file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=addintegral&m=pintuan&type=4&order_id=".$_GPC['id']);
+     file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=addintegral&m=mask&type=4&order_id=".$_GPC['id']);
     //有效分销佣金
     $this->updcommission($_GPC['id']);
     ///////////////模板消息通过///////////////////
         function getaccess_token($_W){
-         $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+         $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
          $appid=$res['appid'];
          $secret=$res['appsecret'];
          $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -67,16 +67,16 @@ $rst=pdo_update('pintuan_order',$data2,array('id'=>$_GPC['id']));
       //设置与发送模板信息
        function set_msg($_W){
          $access_token = getaccess_token($_W);
-         $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-         $res2=pdo_get('pintuan_order',array('id'=>$_GET['id']));
-         $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-         $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-         $table=pdo_get('pintuan_table_type',array('id'=>$res2['table_id']));
-         $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+         $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+         $res2=pdo_get('mask_order',array('id'=>$_GET['id']));
+         $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+         $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+         $table=pdo_get('mask_table_type',array('id'=>$res2['table_id']));
+         $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
          $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["yy_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -129,7 +129,7 @@ $rst=pdo_update('pintuan_order',$data2,array('id'=>$_GPC['id']));
          $data = curl_exec($ch);
          curl_close($ch);
         // return $data;
-        pdo_delete('pintuan_formid',array('id'=>$form['id']));
+        pdo_delete('mask_formid',array('id'=>$form['id']));
        }
        echo set_msg($_W);
  ///////////////模板消息///////////////////
@@ -141,7 +141,7 @@ $rst=pdo_update('pintuan_order',$data2,array('id'=>$_GPC['id']));
   }
 }
 if($_GPC['op']=='delete'){
-    $res=pdo_delete('pintuan_order',array('id'=>$_GPC['id']));
+    $res=pdo_delete('mask_order',array('id'=>$_GPC['id']));
     if($res){
          message('删除成功！', $this->createWebUrl('inydorder'), 'success');
         }else{
@@ -149,27 +149,27 @@ if($_GPC['op']=='delete'){
         }
 }
 if($_GPC['op']=='tg'){
-   pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+   pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
     $this->invalidcommission($_GPC['id']);
-  $order=pdo_get('pintuan_order',array('id'=>$_GPC['id']));
+  $order=pdo_get('mask_order',array('id'=>$_GPC['id']));
   if($order['money']!=0 and ($order['pay_type']==1 || $order['pay_type']==2)){//金额大于零且微信支付
     if($order['pay_type']==1){
      $result=$this->wxrefund($_GPC['id']);
     }
 
     if($order['pay_type']==2){
-      pdo_update('pintuan_user', array('wallet +=' => $order['money']), array('id' => $order['user_id']));
+      pdo_update('mask_user', array('wallet +=' => $order['money']), array('id' => $order['user_id']));
         $tk['money'] = $order['money'];
         $tk['user_id'] = $order['user_id'];
         $tk['type'] = 1;
         $tk['note'] = '订单拒绝';
         $tk['time'] = date('Y-m-d H:i:s');
-        $tkres = pdo_insert('pintuan_qbmx', $tk);
+        $tkres = pdo_insert('mask_qbmx', $tk);
     }
   if ($result['result_code'] == 'SUCCESS' || $tkres) {//退款成功
       ///////////////模板消息拒绝///////////////////
         function getaccess_token($_W){
-         $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+         $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
          $appid=$res['appid'];
          $secret=$res['appsecret'];
          $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -185,15 +185,15 @@ if($_GPC['op']=='tg'){
       //设置与发送模板信息
        function set_msg($_W){
          $access_token = getaccess_token($_W);
-         $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-         $res2=pdo_get('pintuan_order',array('id'=>$_GET['id']));
-         $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-         $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-         $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+         $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+         $res2=pdo_get('mask_order',array('id'=>$_GET['id']));
+         $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+         $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+         $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
          $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["jj_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -238,14 +238,14 @@ if($_GPC['op']=='tg'){
          $data = curl_exec($ch);
          curl_close($ch);
         // return $data;
-        pdo_delete('pintuan_formid',array('id'=>$form['id']));
+        pdo_delete('mask_formid',array('id'=>$form['id']));
        }
        echo set_msg($_W);
  ///////////////模板消息///////////////////
  ///
   ///////////////模板消息退款///////////////////
  function getaccess_token2($_W){
-         $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+         $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
          $appid=$res['appid'];
          $secret=$res['appsecret'];
          $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -261,21 +261,21 @@ if($_GPC['op']=='tg'){
       //设置与发送模板信息
        function set_msg2($_W){
          $access_token = getaccess_token2($_W);
-         $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-         $res2=pdo_get('pintuan_order',array('id'=>$_GET['id']));
+         $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+         $res2=pdo_get('mask_order',array('id'=>$_GET['id']));
 
         if($res2['pay_type']==1){
             $note='微信钱包';
          }elseif($res2['pay_type']==2){
             $note='余额钱包';
          }
-         $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-         $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-         $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+         $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+         $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+         $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
          $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["tk_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -312,13 +312,13 @@ if($_GPC['op']=='tg'){
          $data = curl_exec($ch);
          curl_close($ch);
         // return $data;
-       pdo_delete('pintuan_formid',array('id'=>$form['id']));
+       pdo_delete('mask_formid',array('id'=>$form['id']));
        }
        echo set_msg2($_W);
  ///////////////模板消息///////////////////
 
  
-      pdo_update('pintuan_order',array('yy_state'=>4),array('id'=>$_GPC['id']));
+      pdo_update('mask_order',array('yy_state'=>4),array('id'=>$_GPC['id']));
      
       message('拒绝成功',$this->createWebUrl('inydorder',array()),'success');
 }else{
@@ -330,11 +330,11 @@ if($_GPC['op']=='tg'){
 
 
 }else{
-    $res=pdo_update('pintuan_order',array('yy_state'=>4),array('id'=>$_GPC['id']));
+    $res=pdo_update('mask_order',array('yy_state'=>4),array('id'=>$_GPC['id']));
     if($res){
       ///////////////模板消息拒绝///////////////////
  function getaccess_token($_W){
-         $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+         $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
          $appid=$res['appid'];
          $secret=$res['appsecret'];
          $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -350,15 +350,15 @@ if($_GPC['op']=='tg'){
       //设置与发送模板信息
        function set_msg($_W){
          $access_token = getaccess_token($_W);
-         $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-         $res2=pdo_get('pintuan_order',array('id'=>$_GET['id']));
-         $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-         $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-         $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+         $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+         $res2=pdo_get('mask_order',array('id'=>$_GET['id']));
+         $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+         $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+         $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
          $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["jj_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -403,7 +403,7 @@ if($_GPC['op']=='tg'){
          $data = curl_exec($ch);
          curl_close($ch);
         // return $data;
-        pdo_delete('pintuan_formid',array('id'=>$form['id']));
+        pdo_delete('mask_formid',array('id'=>$form['id']));
        }
        echo set_msg($_W);
  ///////////////模板消息///////////////////
@@ -427,7 +427,7 @@ if(checksubmit('export_submit', true)) {
   $time="'%$time%'";
    $start=$_GPC['time']['start'];
   $end=$_GPC['time']['end'];
-  $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("pintuan_order")." WHERE type=3 and store_id={$storeid} and yy_state!=1 and time >='{$start}' and time<='{$end}'");
+  $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE type=3 and store_id={$storeid} and yy_state!=1 and time >='{$start}' and time<='{$end}'");
   $pagesize = ceil($count/5000);
         //array_unshift( $names,  '活动名称'); 
 
@@ -451,7 +451,7 @@ if(checksubmit('export_submit', true)) {
   }
   $html .= "\n";
   for ($j = 1; $j <= $pagesize; $j++) {
-    $sql = "select a.*,b.name as md_name,c.name as table_name from " . tablename("pintuan_order")."  a"  . " inner join " . tablename("pintuan_store")." b on a.store_id=b.id inner join " . tablename("pintuan_table_type")." c on a.table_id=c.id WHERE a.type=3 and a.store_id={$storeid} and yy_state!=1 and a.time >='{$start}' and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
+    $sql = "select a.*,b.name as md_name,c.name as table_name from " . tablename("mask_order")."  a"  . " inner join " . tablename("mask_store")." b on a.store_id=b.id inner join " . tablename("mask_table_type")." c on a.table_id=c.id WHERE a.type=3 and a.store_id={$storeid} and yy_state!=1 and a.time >='{$start}' and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
     $list = pdo_fetchall($sql);            
   }
   if (!empty($list)) {
@@ -477,7 +477,7 @@ if(checksubmit('export_submit', true)) {
         }elseif($row['pay_type']==5){
           $row['pay_type']='餐后付款';
         }
-        $good=pdo_getall('pintuan_order_goods',array('order_id'=>$row['id']));
+        $good=pdo_getall('mask_order_goods',array('order_id'=>$row['id']));
         for($i=0;$i<count($good);$i++){
           $date6='';
           if($good[$i]['spec']){

@@ -8,8 +8,8 @@ $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
 
 
-$item=pdo_get('pintuan_order',array('id'=>$_GPC['id']));
-$goods=pdo_getall('pintuan_order_goods',array('order_id'=>$_GPC['id']));
+$item=pdo_get('mask_order',array('id'=>$_GPC['id']));
+$goods=pdo_getall('mask_order_goods',array('order_id'=>$_GPC['id']));
 if(checksubmit('submit')){
 	// $data['state']=$_GPC['state'];
 	$data['money']=$_GPC['money'];

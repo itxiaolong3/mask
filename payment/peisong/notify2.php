@@ -5,9 +5,9 @@ global $_W, $_GPC;
 $input = file_get_contents('php://input');
 $isxml = true;
 $data = json_decode($input, true);
-pdo_update('pintuan_order',array('kfw_info'=>$input),array('ship_id'=>$data['ship_id']));
+pdo_update('mask_order',array('kfw_info'=>$input),array('ship_id'=>$data['ship_id']));
  if($data['order_status']==4){
-	pdo_update('pintuan_order',array('state'=>4,'complete_time'=>date('Y-m-d H:i:s',time())),array('ship_id'=>$data['ship_id']));
+	pdo_update('mask_order',array('state'=>4,'complete_time'=>date('Y-m-d H:i:s',time())),array('ship_id'=>$data['ship_id']));
 	return 'success';
 }
 

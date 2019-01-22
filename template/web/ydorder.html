@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
     .ygrow{margin-top: 20px;}
     .yg5_key>div{float: left;line-height: 34px;}
@@ -104,7 +104,7 @@
     {if !$list}
         <div class="panel panel-default">
             <div class="orderwu">
-                <img src="../addons/pintuan/template/images/noorder.png">
+                <img src="../addons/mask/template/images/noorder.png">
                 <p class="wufont1">暂无指定订单</p>
                 <p class="orfont10">暂时没有筛选条件的订单，稍后再来看看吧！</p>
             </div>
@@ -137,10 +137,10 @@
                             <a href="{php echo $this->createWebUrl('ydorderinfo',array('id'=>$item['id']));}"><div class="right btn btn-sm btn-default" style="border:none;">查看详情</div></a>
                         </div>
                         <div class="">
-                        {php $zz=pdo_get('pintuan_table_type',array('id'=>$item['table_id']))}
+                        {php $zz=pdo_get('mask_table_type',array('id'=>$item['table_id']))}
                             <div class="left orfont9">{$zz['name']}</div>
                             <div class="right ordertelimg1">
-                                <img src="../addons/pintuan/template/images/ordertel.png" class="ordertelimg">
+                                <img src="../addons/mask/template/images/ordertel.png" class="ordertelimg">
                                 <span>{$item['tel']}</span>
                             </div>
                         </div>
@@ -159,7 +159,7 @@
                             <div class="orderbox2 left">{$item['tableware']}人</div>
                         </div>               
                     </div>
-                    {php $goods=pdo_getall('pintuan_order_goods',array('order_id'=>$item['id']))}
+                    {php $goods=pdo_getall('mask_order_goods',array('order_id'=>$item['id']))}
                     {if $goods}
                      <div class="col-md-12 orderback2">
                         <p class="orfont3">商品信息</p>

@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
     .row{padding-top: 20px;padding-bottom: 50px;}
     .neirong>tr:nth-child(odd){background-color: #F4F6F7;}
@@ -93,7 +93,7 @@
     var sele = $('#sele').val();
     $.ajax({
         type:"post",
-        url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=Time2&m=pintuan",
+        url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=Time2&m=mask",
         dataType:"json",
         data:{nian:year,store_id:inpname},
         success:function(data){
@@ -116,7 +116,7 @@
             // console.log(sele)
             $.ajax({
                 type:"post",
-                url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=Time2&m=pintuan",
+                url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=Time2&m=mask",
                 dataType:"json",
                 data:{nian:year,store_id:inpname},
                 success:function(data){
@@ -135,7 +135,7 @@
             // console.log(sele)
             $.ajax({
                 type:"post",
-                url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=Time&m=pintuan",
+                url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=Time&m=mask",
                 dataType:"json",
                 data:{nian:year,yue:month,store_id:inpname},
                 success:function(data){

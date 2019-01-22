@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
   .store_td1{height: 45px;}
   .yg5_tabel{border-color: #e5e5e5;outline: 1px solid #e5e5e5;}
@@ -61,7 +61,7 @@
                     <div>桌台状态</div>
                   </a>
                   <a class="btn btn-success btn-sm tabel_btn" href="javascript:void(0);">
-                    <img class="tabel_erwei" src="../addons/pintuan/template/images/saoma.png">
+                    <img class="tabel_erwei" src="../addons/mask/template/images/saoma.png">
                     <div>二维码</div>
                   </a> -->
                    <form  action="" method="POST">
@@ -179,7 +179,7 @@
         		// 请求接口删除数据
         	 $.ajax({
                     type:"post",
-                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=AllDelTable&m=pintuan",
+                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=AllDelTable&m=mask",
                     dataType:"text",
                     data:{id:check},
                     success:function(data){

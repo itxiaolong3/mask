@@ -2,7 +2,7 @@
 global $_GPC, $_W;
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
-pdo_update('pintuan_order',array('state'=>4),array('state'=>3,'time <='=>$time));
+pdo_update('mask_order',array('state'=>4),array('state'=>3,'time <='=>$time));
 $GLOBALS['frames'] = $this->getMainMenu2();
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=8;
@@ -40,15 +40,15 @@ if($type=='invalid'){
 } 
 
 }
-$sql="SELECT a.*,b.name as nick_name FROM ".tablename('pintuan_grouporder'). " a"  . " left join " . tablename("pintuan_user") . " b on a.user_id=b.id " .$where." ORDER BY a.id DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_grouporder'). " a"  . " left join " . tablename("pintuan_user") . " b on a.user_id=b.id  " .$where,$data);
+$sql="SELECT a.*,b.name as nick_name FROM ".tablename('mask_grouporder'). " a"  . " left join " . tablename("mask_user") . " b on a.user_id=b.id " .$where." ORDER BY a.id DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_grouporder'). " a"  . " left join " . tablename("mask_user") . " b on a.user_id=b.id  " .$where,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 
 $list=pdo_fetchall($select_sql,$data);
 $pager = pagination($total, $pageindex, $pagesize);
 
 if($_GPC['op']=='delete'){
-  $res=pdo_delete('pintuan_grouporder',array('id'=>$_GPC['id']));
+  $res=pdo_delete('mask_grouporder',array('id'=>$_GPC['id']));
   if($res){
    message('删除成功！', $this->createWebUrl('grouporder'), 'success');
  }else{

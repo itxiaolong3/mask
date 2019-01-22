@@ -6,7 +6,7 @@ $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
 $id=$_GPC['id'];
-$item = pdo_get('pintuan_reservation',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
+$item = pdo_get('mask_reservation',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
 if (checksubmit('submit')) {
     $data = array(
         'uniacid' =>$_W['uniacid'],
@@ -18,10 +18,10 @@ if (checksubmit('submit')) {
         );
 
     if (empty($id)) {
-        pdo_insert('pintuan_reservation', $data);
+        pdo_insert('mask_reservation', $data);
     } else {
         unset($data['dateline']);
-        pdo_update('pintuan_reservation', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
+        pdo_update('mask_reservation', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
     }
     message('操作成功！', $this->createWebUrl2('dlreservation', array('op' => 'display', 'storeid' => $storeid)), 'success');
 }

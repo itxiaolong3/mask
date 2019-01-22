@@ -4,7 +4,7 @@ $GLOBALS['frames'] = $this->getMainMenu2();
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $id=$_GPC['id'];
-$item = pdo_get('pintuan_service',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
+$item = pdo_get('mask_service',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
 if (checksubmit('submit')) {
     $data = array(
         'uniacid' =>$_W['uniacid'],
@@ -15,10 +15,10 @@ if (checksubmit('submit')) {
         );
 
     if (empty($id)) {
-        pdo_insert('pintuan_service', $data);
+        pdo_insert('mask_service', $data);
     } else {
         unset($data['dateline']);
-        pdo_update('pintuan_service', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
+        pdo_update('mask_service', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
     }
     message('操作成功！', $this->createWebUrl('service', array('op' => 'display', 'storeid' => $storeid)), 'success');
 }

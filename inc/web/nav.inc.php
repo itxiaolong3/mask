@@ -1,9 +1,9 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$list=pdo_getall('pintuan_nav',array('uniacid'=>$_W['uniacid']),array(),'','num ASC');
+$list=pdo_getall('mask_nav',array('uniacid'=>$_W['uniacid']),array(),'','num ASC');
 if($_GPC['op']=='delete'){
-	$res=pdo_delete('pintuan_nav',array('id'=>$_GPC['id']));
+	$res=pdo_delete('mask_nav',array('id'=>$_GPC['id']));
 	if($res){
 		 message('删除成功！', $this->createWebUrl('nav'), 'success');
 		}else{
@@ -12,7 +12,7 @@ if($_GPC['op']=='delete'){
 }
 if($_GPC['state']){
 	$data['state']=$_GPC['state'];
-	$res=pdo_update('pintuan_nav',$data,array('id'=>$_GPC['id']));
+	$res=pdo_update('mask_nav',$data,array('id'=>$_GPC['id']));
 	if($res){
 		 message('编辑成功！', $this->createWebUrl('nav'), 'success');
 		}else{

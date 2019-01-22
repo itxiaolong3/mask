@@ -710,41 +710,41 @@
           <ul class="col-md-12 yg9_quie">
           <a href="{php echo $this->createWebUrl2('dladddishes');}">
             <li class="">
-              <img src="../addons/pintuan/template/images/zu.png">
+              <img src="../addons/mask/template/images/zu.png">
               <p>添加商品</p>
             </li>
             </a>
 <!--             <li class="col-md-1">
-              <img src="../addons/pintuan/template/images/xiaoshou.png">
+              <img src="../addons/mask/template/images/xiaoshou.png">
               <div>菜品管理</div>
             </li> -->
              <a href="{php echo $this->createWebUrl2('dlinorder');}">
             <li class="">
-              <img src="../addons/pintuan/template/images/dingdan.png">
+              <img src="../addons/mask/template/images/dingdan.png">
               <p>订单列表</p>
             </li>
              </a>
 <!--               <a href="{php echo $this->createWebUrl('table2');}">
             <li class="">
-              <img src="../addons/pintuan/template/images/duanxin.png">
+              <img src="../addons/mask/template/images/duanxin.png">
               <p>餐桌管理</p>
             </li>
             </a> -->
             <a href="{php echo $this->createWebUrl2('dlygquan');}">
             <li class="">
-              <img src="../addons/pintuan/template/images/yuanxing.png">
+              <img src="../addons/mask/template/images/yuanxing.png">
               <p>营销管理</p>
             </li>
             </a>
              <a href="{php echo $this->createWebUrl2('dlprint');}">
             <li class="">
-              <img src="../addons/pintuan/template/images/miaosha.png">
+              <img src="../addons/mask/template/images/miaosha.png">
               <p>打印管理</p>
             </li>
             </a>
              <a href="{php echo $this->createWebUrl2('dlstoreinfo');}">
             <li class="">
-              <img src="../addons/pintuan/template/images/tuijian.png">
+              <img src="../addons/mask/template/images/tuijian.png">
               <p>门店信息</p>
             </li>
             </a>
@@ -823,7 +823,7 @@ $(function(){
                $.ajax({ 
                 type: "post",
                 dataType: "json",
-                url: "{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=neworder&m=pintuan&store={$_COOKIE['storeid']}",
+                url: "{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=neworder&m=mask&store={$_COOKIE['storeid']}",
                 success: function (data) {
                     console.log(data);
                    if(data==1){

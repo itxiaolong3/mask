@@ -5,15 +5,15 @@
 
  * @author 武汉志汇科技
 
- * @url pintuan
+ * @url mask
  */
 ini_set("memory_limit","500M");
 defined('IN_IA') or exit('Access Denied');
 header("Access-Control-Allow-Origin: *");
-class pintuanModuleWxapp extends WeModuleWxapp {
+class maskModuleWxapp extends WeModuleWxapp {
     public function doPageSystem(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         if($res['gs_img']){
             if(strpos($res['gs_img'],',')){
                 $res['gs_img']= explode(',',$res['gs_img']);
@@ -34,7 +34,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //获取openid
     public function doPageOpenid(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         $code=$_GPC['code'];
         $appid=$res['appid'];
         $secret=$res['appsecret'];
@@ -65,9 +65,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_GPC, $_W;
         $getlid=$_GPC['zid'];//专栏id
         if(!empty($getlid)){
-            $resdata['result']=pdo_getall('pintuan_goodmy',array('zid'=>$getlid));
+            $resdata['result']=pdo_getall('mask_goodmy',array('zid'=>$getlid));
         }else{
-            $resdata['result']=pdo_getall('pintuan_goodmy',array());
+            $resdata['result']=pdo_getall('mask_goodmy',array());
         }
         echo json_encode($resdata);
     }
@@ -82,7 +82,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         if(empty($openid)){
             $res=0;
         }else{
-            $res=pdo_update('pintuan_user',$sdata,array('u_id'=>$uid));
+            $res=pdo_update('mask_user',$sdata,array('u_id'=>$uid));
         }
         if ($res){
             $data['code']=1;
@@ -98,11 +98,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPagegetareaorlanmu(){
         global $_GPC, $_W;
         $getaid=$_GPC['cid'];
-        $areeres=pdo_getall('pintuan_areatype',array('uniacid'=>$_W['uniacid']));
+        $areeres=pdo_getall('mask_areatype',array('uniacid'=>$_W['uniacid']));
         if (empty($getaid)){
             $getaid=$areeres[0]['Cid'];
         }
-        $lanmures=pdo_getall('pintuan_lanmu',array('uniacid'=>$_W['uniacid'],'tid'=>$getaid,'HasNewItems'=>0));
+        $lanmures=pdo_getall('mask_lanmu',array('uniacid'=>$_W['uniacid'],'tid'=>$getaid,'HasNewItems'=>0));
         $data=array();
         $Data=array();
         if($areeres&&$lanmures){
@@ -127,7 +127,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         if (empty($getaid)){
             $getaid=1;
         }
-        $bannerres=pdo_getall('pintuan_banner',array('uniacid'=>$_W['uniacid'],'aid'=>$getaid));
+        $bannerres=pdo_getall('mask_banner',array('uniacid'=>$_W['uniacid'],'aid'=>$getaid));
         $data=array();
         if($bannerres){
             $data['msg']='success';
@@ -149,7 +149,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $ordernum=$_GPC['ordernum'] ? $_GPC['ordernum'] : 0;
         $getstate=$_GPC['state'];
         //栏目信息
-        $lanmu=pdo_get('pintuan_lanmu',array('QsID'=>$getlid,'uniacid'=>$_W['uniacid']));
+        $lanmu=pdo_get('mask_lanmu',array('QsID'=>$getlid,'uniacid'=>$_W['uniacid']));
         $alldata=array();
         $info=array();//专场信息
         $info['ID']=$lanmu['QsID'];
@@ -232,7 +232,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         //$where="WHERE uniacid=:uniacid and isdelete=0 and Statu=1 and zid=";
         //$data[':uniacid']=$_W['uniacid'];
-        // $sql="select * from " . tablename("pintuan_goodmy") .$where.$getlid.$orders;
+        // $sql="select * from " . tablename("mask_goodmy") .$where.$getlid.$orders;
         //如果是搜索进来的
         $keyword=$_GPC['key'];
        
@@ -240,7 +240,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $where="WHERE uniacid=:uniacid and isdelete=0 and Statu=1 and Title LIKE  concat('%', :name,'%') ";
             $data[':name']=$keyword;
             $data[':uniacid']=$_W['uniacid'];
-            $sql="select * from " . tablename("pintuan_goodmy") .$where.$orders;
+            $sql="select * from " . tablename("mask_goodmy") .$where.$orders;
             $alldata['Data']['SortMenus']=$SortMenus;
             $alldata['Data']['Part1Title']='本期新款';
             $alldata['Data']['Part2Title']='近期好货';
@@ -249,17 +249,17 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }else if($getstate==0){//普通的
             $where="WHERE uniacid=:uniacid and isdelete=0 and Statu=1 and zid=";
             $data[':uniacid']=$_W['uniacid'];
-            $sql="select * from " . tablename("pintuan_goodmy") .$where.$getlid.$orders;
+            $sql="select * from " . tablename("mask_goodmy") .$where.$getlid.$orders;
         }else if($getstate==2){//分类
             $gettid=$_GPC['rid'];
             if ($gettid==0){
                 $where="WHERE uniacid=:uniacid and isdelete=0 and Statu=1";
                 $data[':uniacid']=$_W['uniacid'];
-                $sql="select * from " . tablename("pintuan_goodmy") .$where.$orders;
+                $sql="select * from " . tablename("mask_goodmy") .$where.$orders;
             }else{
                 $where="WHERE uniacid=:uniacid and isdelete=0 and Statu=1 and tid=";
                 $data[':uniacid']=$_W['uniacid'];
-                $sql="select * from " . tablename("pintuan_goodmy") .$where.$gettid.$orders;
+                $sql="select * from " . tablename("mask_goodmy") .$where.$gettid.$orders;
             }
             $alldata['Data']['SortMenus']=$SortMenus;
             $alldata['Data']['Part1Title']='本期新款';
@@ -295,15 +295,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $panerl=['商品分类','大厦筛选','价格区间','货期情况'];
         if ($getstate==0){//栏目下的筛选
             //获取指定栏目下的所有商品分类id
-            $getalltid=pdo_getall('pintuan_goodmy', array('zid' => $getQsID), array('tid'));
+            $getalltid=pdo_getall('mask_goodmy', array('zid' => $getQsID), array('tid'));
             //获取指定栏目下的所有商品所在大厦id
-            $StallsName=pdo_getall('pintuan_goodmy', array('zid' => $getQsID), array('StallsName'));
+            $StallsName=pdo_getall('mask_goodmy', array('zid' => $getQsID), array('StallsName'));
         }else if ($getstate==1){//搜索里面的筛选
             //所有商品分类id
-            $getalltid=pdo_getall('pintuan_goodmy', array(), array('tid'));
+            $getalltid=pdo_getall('mask_goodmy', array(), array('tid'));
             $data['Data']['sqlinfo']=$getalltid;
             //所有商品所在大厦id
-            $StallsName=pdo_getall('pintuan_goodmy', array(), array('StallsName'));
+            $StallsName=pdo_getall('mask_goodmy', array(), array('StallsName'));
         }else{//分类里面的筛选
 
         }
@@ -320,12 +320,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $idandname=array();
         $bidandhname=array();
         foreach ($uniqueid as $k=>$v){
-            $IDandName=pdo_get('pintuan_typetwomy', array('ID' => $v), array('ID','Name'));
+            $IDandName=pdo_get('mask_typetwomy', array('ID' => $v), array('ID','Name'));
             array_push($idandname,$IDandName);
 
         }
         foreach ($uniquebigid as $k=>$v){
-            $IDandName=pdo_fetch("SELECT bid as ID, hname as Name FROM ".tablename('pintuan_bighome')." WHERE bid = :uid LIMIT 1", array(':uid' => $v));
+            $IDandName=pdo_fetch("SELECT bid as ID, hname as Name FROM ".tablename('mask_bighome')." WHERE bid = :uid LIMIT 1", array(':uid' => $v));
             array_push($bidandhname,$IDandName);
         }
 
@@ -376,8 +376,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_GPC, $_W;
         $gid=$_GPC['gID'];//商品id
         $uid=$_GPC['uid'];//用户id
-        $islike=pdo_get('pintuan_mylike',array('gid'=>$gid,'uid'=>$uid,'uniacid'=>$_W['uniacid']));
-        $good=pdo_get('pintuan_goodmy',array('gID'=>$gid,'uniacid'=>$_W['uniacid']));
+        $islike=pdo_get('mask_mylike',array('gid'=>$gid,'uid'=>$uid,'uniacid'=>$_W['uniacid']));
+        $good=pdo_get('mask_goodmy',array('gID'=>$gid,'uniacid'=>$_W['uniacid']));
         $alldata=array();
         $Activity=array();//专场信息
         $Activity['ChengTuanCount']=1;
@@ -428,8 +428,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $alldata['Data']['Size']=$good['Sizes'];
         $alldata['Data']['Videos']=$good['Videos'];
         //获取地区
-        $gettid=pdo_get('pintuan_lanmu', array('QsID' => $good['zid']), array('fid'));
-        $Name=pdo_get('pintuan_warehome', array('fid' => $gettid['fid']), array('Name'));
+        $gettid=pdo_get('mask_lanmu', array('QsID' => $good['zid']), array('fid'));
+        $Name=pdo_get('mask_warehome', array('fid' => $gettid['fid']), array('Name'));
         $endtime=date("m月d日",time());
         $preendtime=date("m月d日",time()+604800);
         $alldata['Data']['endmsg']="明天（".$endtime."）12点结束";
@@ -468,7 +468,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $psw=$_GPC['psw'];
         $data=array();
         if(!empty($uid)){
-            $res=pdo_get('pintuan_user',array('u_id'=>$uid,'uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_user',array('u_id'=>$uid,'uniacid'=>$_W['uniacid']));
             if ($phone==$res['phone']){
                 $data['code']=1;
                 $data['msg']='检验登录成功';
@@ -480,7 +480,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             }
             echo json_encode($data);
         }else if (!empty($phone)){
-            $res=pdo_get('pintuan_user',array('phone'=>$phone,'psw'=>$psw,'uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_user',array('phone'=>$phone,'psw'=>$psw,'uniacid'=>$_W['uniacid']));
             if ($res){
                 $data['code']=1;
                 $data['msg']='用户登录成功';
@@ -503,11 +503,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $getphone=$_GPC['phone'];
         $getpsw=$_GPC['psw'];
         $data=array();
-        $res=pdo_get('pintuan_user',array('phone'=>$getphone,'uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_user',array('phone'=>$getphone,'uniacid'=>$_W['uniacid']));
         if ($res){//找回密码，也就是重新设置密码
             $cdata=array();
             $cdata['psw']=$getpsw;
-            $cres=pdo_update('pintuan_user',$cdata,array('phone'=>$getphone));
+            $cres=pdo_update('mask_user',$cdata,array('phone'=>$getphone));
             if ($cres){
                 $data['code']=1;
                 $data['msg']='找回密码成功';
@@ -523,7 +523,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $inserdata['psw']=$getpsw;
             $inserdata['uniacid']=$_W['uniacid'];
             $inserdata['username']=$this->randName(7);
-            $res=pdo_insert('pintuan_user',$inserdata);
+            $res=pdo_insert('mask_user',$inserdata);
             if ($res){
                 $data['code']=1;
                 $data['msg']='注册成功';
@@ -540,7 +540,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //短信验证码,聚合或者腾讯云的或者阿里云的
     public function doPageSmscode(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
         $resarr=array();
         if($res['item']==1){
             $tpl_id=$res['tpl_id'];
@@ -552,7 +552,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             print_r($data);
         }
         if($res['item']==2){
-            include IA_ROOT.'/addons/pintuan/txsms/SmsSingleSender.php';
+            include IA_ROOT.'/addons/mask/txsms/SmsSingleSender.php';
             $appid = $res['appid'];; // 1400开头
             $appkey = $res['tx_appkey'];;
             $phoneNumbers = $_GPC['tel'];;
@@ -581,7 +581,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //获取搜索标签
     public function doPageSeachTag() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_searchtag');
+        $res = pdo_getall('mask_searchtag');
         $data=array();
         $name=array();
         foreach ($res as $k=>$v){
@@ -597,10 +597,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageAllType(){
         global $_W, $_GPC;
         $alldata=array();
-        $type=pdo_getall('pintuan_typeonemy',array('uniacid'=>$_W['uniacid']),array(),'','ID ASC');
+        $type=pdo_getall('mask_typeonemy',array('uniacid'=>$_W['uniacid']),array(),'','ID ASC');
         $alldata['Data']['List']=$type;
         foreach ($type as $k=>$v){
-            $list=pdo_getall('pintuan_typetwomy',array('uniacid'=>$_W['uniacid'],'Pid'=>$v['ID']),array(),'','ID ASC');
+            $list=pdo_getall('mask_typetwomy',array('uniacid'=>$_W['uniacid'],'Pid'=>$v['ID']),array(),'','ID ASC');
             $alldata['Data']['List'][$k]['Datas']=$list;
         }
 
@@ -613,10 +613,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $uid=$_GPC['uid'];
         $data=array();
         if (!empty($getid)&&!empty($uid)){
-            $res = pdo_get('pintuan_mylike', array('gid' => $getid,'uid'=>$uid));
+            $res = pdo_get('mask_mylike', array('gid' => $getid,'uid'=>$uid));
             if($res){
                 //存在就删除
-                $deleres=pdo_delete('pintuan_mylike', array('gid' => $getid,'uid'=>$uid));
+                $deleres=pdo_delete('mask_mylike', array('gid' => $getid,'uid'=>$uid));
                 if ($deleres){
                     $data['msg']="取消收藏成功";
                     $data['code']=1;
@@ -626,7 +626,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 }
             }else{
                 //不存在就插入
-                $res=pdo_insert('pintuan_mylike',array('gid'=>$getid,'uid'=>$uid,'uniacid' => $_W['uniacid']));
+                $res=pdo_insert('mask_mylike',array('gid'=>$getid,'uid'=>$uid,'uniacid' => $_W['uniacid']));
                 if ($res){
                     $data['msg']="收藏成功";
                     $data['code']=1;
@@ -644,11 +644,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     }
     public function doPageGetlike() {
         global $_W, $_GPC;
-        $list = pdo_getall('pintuan_mylike', array('uid' => $_GPC['uid']));
+        $list = pdo_getall('mask_mylike', array('uid' => $_GPC['uid']));
         $allgood=array();
         $echogood=array();
         foreach ($list as $k=>$v){
-            $getgood=pdo_get('pintuan_goodmy', array('gID' => $v['gid']));
+            $getgood=pdo_get('mask_goodmy', array('gID' => $v['gid']));
             array_push($allgood,$getgood);
         }
         foreach ($allgood as $k=>$v){
@@ -681,8 +681,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $arr=json_decode($data,true);
         $gid=$_GPC['itemId'];
         $uid=$_GPC['uid'];
-        $zid=pdo_get("pintuan_goodmy",array('gID'=>$gid),array('zid'));
-        $getfid=pdo_get("pintuan_lanmu",array('QsID'=>$zid['zid']),array('fid'));
+        $zid=pdo_get("mask_goodmy",array('gID'=>$gid),array('zid'));
+        $getfid=pdo_get("mask_lanmu",array('QsID'=>$zid['zid']),array('fid'));
         $data=array();
         $resarr=array();
         $state=$_GPC['state'];
@@ -695,23 +695,23 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['fid']=$getfid['fid'];
             $data['uniacid']=$_W['uniacid'];
             //先查询是否存在该商品相同规格和颜色了，如果存在就更新
-            $issave=pdo_get("pintuan_cart",array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
+            $issave=pdo_get("mask_cart",array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
             if($issave){
                 if($state){
                     if($v['qty']==0){
-                        pdo_delete('pintuan_cart',array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
+                        pdo_delete('mask_cart',array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
                     }else{
-                        $res=pdo_update('pintuan_cart',array('Qty'=>$v['qty']),array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
+                        $res=pdo_update('mask_cart',array('Qty'=>$v['qty']),array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
 
                     }
 
                 }else{
                     //添加购物车时如果已经存在就更新
-                    $res=pdo_update('pintuan_cart',array('Qty'=>($v['qty']+$issave['Qty'])),array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
+                    $res=pdo_update('mask_cart',array('Qty'=>($v['qty']+$issave['Qty'])),array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
                 }
             }else{
                 if(!empty($v['qty'])){
-                    $res=pdo_insert('pintuan_cart',$data);
+                    $res=pdo_insert('mask_cart',$data);
                 }
 
             }
@@ -735,7 +735,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $uid=$_GPC['uid'];
         $goodids=array();
         $data=array();
-        $gids=pdo_getall('pintuan_cart', array('cUid' => $uid), array('Itemid'));
+        $gids=pdo_getall('mask_cart', array('cUid' => $uid), array('Itemid'));
         foreach ($gids as $k=>$v){
             array_push($goodids,$v['Itemid']);
         }
@@ -745,7 +745,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['Data']['TotalAmount ']=$this->dototal($goodids,$uid);
         $data['Data']['TotalCount ']=$this->getTotalCount($uid);
         //查询所有商品的发货地点
-        $fids=pdo_getall('pintuan_cart', array('cUid' => $uid), array('fid'));
+        $fids=pdo_getall('mask_cart', array('cUid' => $uid), array('fid'));
         $fidarr=array();
         foreach ($fids as $k=>$v){
             array_push($fidarr,$v['fid']);
@@ -756,21 +756,21 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $items=array();//有效商品集合
         foreach ($fidarr as $k=>$v){
             $itemidarr=array();//剔除重复id
-            $Itemid=pdo_getall('pintuan_cart', array('fid' => $v,'cUid'=>$uid), array('Itemid'));
+            $Itemid=pdo_getall('mask_cart', array('fid' => $v,'cUid'=>$uid), array('Itemid'));
             foreach ($Itemid as $k1=>$v1){
                 array_push($itemidarr,$v1['Itemid']);
             }
             $dealitemid=array_unique($itemidarr);
             $Itemid=array_merge($dealitemid);
-            $getname=pdo_get('pintuan_warehome', array('fid' => $v), array('Name'));
+            $getname=pdo_get('mask_warehome', array('fid' => $v), array('Name'));
             foreach ($Itemid as $kk=>$vv){
-                $getgood=pdo_get('pintuan_goodmy', array('gID' => $vv));
+                $getgood=pdo_get('mask_goodmy', array('gID' => $vv));
                 $items[$k]['TimeList'][0]["Items"][$kk]['AgentItemID']=$vv;
                 $items[$k]['TimeList'][0]["Items"][$kk]['Cover']=$getgood['Itemcover'];
                 $items[$k]['TimeList'][0]["Items"][$kk]['Name']=$getgood['Title'];
                 $items[$k]['TimeList'][0]["Items"][$kk]['Price']=number_format($getgood['Price'],2);
                 $items[$k]['TimeList'][0]["Items"][$kk]['TotalQty']=$this->getoneTotalCount($uid,$vv);
-                $getgoodinfo=pdo_getall('pintuan_cart', array('Itemid' => $vv,'cUid'=>$uid));
+                $getgoodinfo=pdo_getall('mask_cart', array('Itemid' => $vv,'cUid'=>$uid));
                 foreach ($getgoodinfo as $kkk=>$vvv){
                     $items[$k]['TimeList'][0]["Items"][$kk]['Products'][$kkk]["Color"]=$vvv['Color'];
                     $items[$k]['TimeList'][0]["Items"][$kk]['Products'][$kkk]["Size"]=$vvv['Size'];
@@ -827,7 +827,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $uid=$_GPC['uid'];
         $data=array();
         foreach ($gidar as $k=>$v){
-            $res=pdo_delete('pintuan_cart',array('Itemid'=>$v,"cUid"=>$uid));
+            $res=pdo_delete('mask_cart',array('Itemid'=>$v,"cUid"=>$uid));
         }
         if($res){
             $data['Data']['Result']=1;
@@ -844,12 +844,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $gid=$_GPC['id'];
         $uid=$_GPC['uid'];
-        $good=pdo_get("pintuan_goodmy",array('gID'=>$gid));
+        $good=pdo_get("mask_goodmy",array('gID'=>$gid));
         //购物车部分
         $getcolors=explode('/',$good['Colors']);
         $getsizes=explode('/',$good['Sizes']);
-        $getcarcolor=pdo_getall("pintuan_cart",array('cUid'=>$uid,"Itemid"=>$gid),array("Color"));
-        $getcarsize=pdo_getall("pintuan_cart",array('cUid'=>$uid,"Itemid"=>$gid),array("Size"));
+        $getcarcolor=pdo_getall("mask_cart",array('cUid'=>$uid,"Itemid"=>$gid),array("Color"));
+        $getcarsize=pdo_getall("mask_cart",array('cUid'=>$uid,"Itemid"=>$gid),array("Size"));
         //处理重复数组
         //$getcarcolor=$this->dearRepArr($getcarcolor,"Color");
         // $getcarsize=$this->dearRepArr($getcarsize,"Size");
@@ -859,7 +859,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $SizeList=array();
         foreach ($getcolors as $k=>$v){
             foreach ($getsizes as $kk=>$vv){
-                $getqty=pdo_get("pintuan_cart",array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v,"Size"=>$vv),array("Qty"));
+                $getqty=pdo_get("mask_cart",array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v,"Size"=>$vv),array("Qty"));
                 $Sizes[$vv]=2000;
                 $SizeList[$kk]['Size']=$vv;
                 $SizeList[$kk]['Stock']=2000;
@@ -879,10 +879,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $uid=$_GPC['uid'];
         $data=array();
         //判断是否有地址
-        $ishave=pdo_get("pintuan_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid']));
+        $ishave=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid']));
         if ($ishave){
             //获取默认地址
-            $res=pdo_get("pintuan_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
+            $res=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
             if ($res){
                 $data['Data']=$res;
             }else{
@@ -907,11 +907,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $updatas['address']=$_GPC['address'];
         $updatas['uniacid']=$_W['uniacid'];
         $updatas['uid']=$uid;
-        $isdefault=pdo_get("pintuan_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
+        $isdefault=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
         if($isdefault){
             //已经有默认了
             if($_GPC['isDefault']){//此条地址是否设置默认
-                pdo_update('pintuan_address',array('isDefault'=>0),array('ID'=>$isdefault['ID']));
+                pdo_update('mask_address',array('isDefault'=>0),array('ID'=>$isdefault['ID']));
                 $updatas['isDefault']=1;
             }else{
                 $updatas['isDefault']=0;
@@ -920,12 +920,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             //还没有默认
             $updatas['isDefault']=1;
         }
-        $res=pdo_insert("pintuan_address",$updatas);
+        $res=pdo_insert("mask_address",$updatas);
         if($res){
             $data['Data']['state']=1;
             $data['Data']['msg']='添加成功';
         }else{
-            pdo_update('pintuan_address',array('isDefault'=>1),array('ID'=>$isdefault['ID']));
+            pdo_update('mask_address',array('isDefault'=>1),array('ID'=>$isdefault['ID']));
             $data['Data']['state']=0;
             $data['Data']['msg']='添加失败';
         }
@@ -942,11 +942,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['areaId']=$_GPC['areaId'];
         $data['address']=$_GPC['address'];
         $data['isDefault']=$_GPC['isDefault'];
-        $isdefault=pdo_get("pintuan_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
+        $isdefault=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
         if($isdefault){
             //已经有默认了
             if($_GPC['isDefault']){//此条地址是否设置默认
-                pdo_update('pintuan_address',array('isDefault'=>0),array('ID'=>$isdefault['ID']));
+                pdo_update('mask_address',array('isDefault'=>0),array('ID'=>$isdefault['ID']));
                 $data['isDefault']=1;
             }else{
                 $data['isDefault']=0;
@@ -955,12 +955,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             //还没有默认
             $data['isDefault']=1;
         }
-        $res=pdo_update('pintuan_address',$data,array('ID'=>$id));
+        $res=pdo_update('mask_address',$data,array('ID'=>$id));
         if($res){
             $resdata['Data']['state']=1;
             $resdata['Data']['msg']='修改成功';
         }else{
-            pdo_update('pintuan_address',array('isDefault'=>1),array('ID'=>$isdefault['ID']));
+            pdo_update('mask_address',array('isDefault'=>1),array('ID'=>$isdefault['ID']));
             $resdata['Data']['state']=0;
             $resdata['Data']['msg']='修改失败';
         }
@@ -971,7 +971,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $resdata=array();
         $id=$_GPC['ID'];
-        $res=pdo_delete('pintuan_address',array('ID'=>$id));
+        $res=pdo_delete('mask_address',array('ID'=>$id));
         if($res){
             $resdata['Data']['state']=1;
             $resdata['Data']['msg']='删除成功';
@@ -985,7 +985,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPagegetoneAdd(){
         global $_W, $_GPC;
         $ID=$_GPC['ID'];
-        $res=pdo_get('pintuan_address',array('ID'=>$ID));
+        $res=pdo_get('mask_address',array('ID'=>$ID));
         $data['Data']=$res;
         echo json_encode($data);
     }
@@ -993,7 +993,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageMyAddress(){
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
-        $res=pdo_getall('pintuan_address',array('uid'=>$uid), array() , '' , 'isDefault DESC');
+        $res=pdo_getall('mask_address',array('uid'=>$uid), array() , '' , 'isDefault DESC');
         $data['Data']=$res;
         echo json_encode($data);
     }
@@ -1010,7 +1010,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             array_push($gidsarr,$v['AgentItemID']);
         }
         foreach ($gidsarr as  $k=>$v){
-            $fid=pdo_get('pintuan_cart', array('Itemid' => $v), array('fid'));
+            $fid=pdo_get('mask_cart', array('Itemid' => $v), array('fid'));
             array_push($fidarr,$fid['fid']);
         }
         $Orders=array();//购物车商品集
@@ -1018,12 +1018,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $fidarr=array_merge($fidarr);
       
         foreach ($fidarr as $k=>$v){
-            $getname=pdo_get('pintuan_warehome', array('fid' => $v), array('Name'));
+            $getname=pdo_get('mask_warehome', array('fid' => $v), array('Name'));
           	$i=0;
             foreach ($gidsarr as $kk=>$vv){
-                $getgood=pdo_get('pintuan_goodmy', array('gID' => $vv));
+                $getgood=pdo_get('mask_goodmy', array('gID' => $vv));
                //查找商品下的发货地
-                $fid=pdo_get('pintuan_lanmu',array('QsID'=>$getgood['zid']),array('fid'));
+                $fid=pdo_get('mask_lanmu',array('QsID'=>$getgood['zid']),array('fid'));
                if ($fid['fid']!=$v){
                  array_merge($gidsarr);
                   $i=0;
@@ -1036,7 +1036,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $Orders[$k]['Items'][$i]['Name']=$getgood['Title'];
                     $Orders[$k]['Items'][$i]['Price']=number_format($getgood['Price'],2);
                     $Orders[$k]['Items'][$i]['TotalQty']=$this->getoneTotalCount($uid,$vv);
-                    $getgoodinfo=pdo_getall('pintuan_cart', array('Itemid' => $vv,'cUid'=>$uid));
+                    $getgoodinfo=pdo_getall('mask_cart', array('Itemid' => $vv,'cUid'=>$uid));
                     foreach ($getgoodinfo as $kkk=>$vvv){
                         $Orders[$k]['Items'][$i]['Products'][$kkk]["Color"]=$vvv['Color'];
                         $Orders[$k]['Items'][$i]['Products'][$kkk]["Size"]=$vvv['Size'];
@@ -1046,13 +1046,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 }
             }
             //发货地下的所有商品数量
-            $sql="select  sum(Qty) as ftotal from" . tablename("pintuan_cart") ." where uniacid={$_W['uniacid']} and cUid=".$uid." and fid=".$v;
+            $sql="select  sum(Qty) as ftotal from" . tablename("mask_cart") ." where uniacid={$_W['uniacid']} and cUid=".$uid." and fid=".$v;
             //单商品的总数
             $fsum=pdo_fetchall($sql);
             $Orders[$k]['TotalQty']=$fsum[0]['ftotal'];
             $Orders[$k]['Name']=$getname['Name'];
             //运费
-            $emsprice=pdo_get("pintuan_warehome",array('fid'=>$v),array("emsprice"));
+            $emsprice=pdo_get("mask_warehome",array('fid'=>$v),array("emsprice"));
             array_push($PostFee,$emsprice['emsprice']*$fsum[0]['ftotal']);
         }
         $resarr['Data']['Orders']=$Orders;
@@ -1077,7 +1077,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $addid=$_GPC['aid'];//地址id
         $goodinfo=json_decode(htmlspecialchars_decode($_GPC['arr']),true);//商品信息数组
         //查询用户地址信息
-        $addinfo=pdo_get('pintuan_address',array('ID'=>$addid));
+        $addinfo=pdo_get('mask_address',array('ID'=>$addid));
         $data['user_id']=$uid;//用户id
         $data['name']=$addinfo['realName'];//姓名
         $data['address']=$addinfo['areaId'].' '.$addinfo['address'];//地址
@@ -1094,12 +1094,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             array_push($misc,$v['num']);
         }
         $data['Summary']='共'.$typenum.'款,'.array_sum($misc).'件,合计￥'.$_GPC['money'];//购买数量情况
-        $res=pdo_insert('pintuan_order',$data);
+        $res=pdo_insert('mask_order',$data);
         $order_id=pdo_insertid();
         $chidid=array();
             if($res){
                 foreach ($goodinfo as $k=>$v){
-                    $onegood=pdo_get('pintuan_goodmy',array('gID'=>$v['id']));
+                    $onegood=pdo_get('mask_goodmy',array('gID'=>$v['id']));
                     $data2['name']=$onegood['Title'];//商品名称
                     $data2['number']=$v['num'];//商品数量
                     $data2['money']=$v['price'];//商品单价
@@ -1110,13 +1110,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data2['uniacid']=$_W['uniacid'];//小程序id
                     $data2['order_id']=$order_id;
                     $data2['Code']=date('Ymd',time()).'-'.$this->randNum(8);
-                    $res2=pdo_insert('pintuan_order_goods',$data2);
+                    $res2=pdo_insert('mask_order_goods',$data2);
                    array_push($chidid,pdo_insertid());
                 }
                 if($res2){
                   //清除购物车
                     foreach ($goodinfo as $k=>$v){
-                        pdo_delete('pintuan_cart',array('Itemid'=>$v['id'],"cUid"=>$uid));
+                        pdo_delete('mask_cart',array('Itemid'=>$v['id'],"cUid"=>$uid));
                     }
                    $resdata['Data']['OrderIds']=implode(',',$chidid);
                    $resdata['Data']['orderid']=$order_id;
@@ -1151,9 +1151,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
        
         if ($statuid==0){
-            $getorder=pdo_getall('pintuan_order',array('user_id'=>$uid), array(), '', 'id DESC');
+            $getorder=pdo_getall('mask_order',array('user_id'=>$uid), array(), '', 'id DESC');
         }else{
-            $getorder=pdo_getall('pintuan_order',array('user_id'=>$uid,'state'=>$statuid), array(), '', 'id DESC');
+            $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state'=>$statuid), array(), '', 'id DESC');
         }
          
          
@@ -1175,8 +1175,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['Data']['OrderList'][$k]['Buttons']=$Buttons;
             $data['Data']['OrderList'][$k]['Code']=$v['order_num'];
             $data['Data']['OrderList'][$k]['ID']=$v['id'];
-            $getchid=pdo_getall('pintuan_order_goods',array('order_id'=>$v['id']), array('id'));
-            $getimg=pdo_getall('pintuan_order_goods',array('order_id'=>$v['id']), array(), '', 'id DESC', array(1,3));
+            $getchid=pdo_getall('mask_order_goods',array('order_id'=>$v['id']), array('id'));
+            $getimg=pdo_getall('mask_order_goods',array('order_id'=>$v['id']), array(), '', 'id DESC', array(1,3));
             $cid=array();
             $img=array();
             foreach ($getchid as $kk=>$vv){
@@ -1219,7 +1219,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
         $oid=$_GPC['orderid'];
-        $getorder=pdo_get('pintuan_order',array('id'=>$oid));
+        $getorder=pdo_get('mask_order',array('id'=>$oid));
         $Summary=$getorder['Summary'];
         $numandfont=explode(",合计",$Summary);
         $data=array();
@@ -1245,7 +1245,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['Data']['DiscountAmount']='0.00';
         $data['Data']['ID']=$getorder['id'];
         $data['Data']['Code']=$getorder['order_num'];
-        $getchid=pdo_getall('pintuan_order_goods',array('order_id'=>$getorder['id']), array('id'));
+        $getchid=pdo_getall('mask_order_goods',array('order_id'=>$getorder['id']), array('id'));
         $cid=array();
         foreach ($getchid as $kk=>$vv){
             array_push($cid,$vv['id']);
@@ -1281,8 +1281,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $data['Data']['Statu']='未知';
         }
         //各发货地下的商品
-        $allfid=pdo_getall('pintuan_order_goods',array('order_id'=>$oid),array('fid'));
-        $allgoodinfo=pdo_getall('pintuan_order_goods',array('order_id'=>$oid));
+        $allfid=pdo_getall('mask_order_goods',array('order_id'=>$oid),array('fid'));
+        $allgoodinfo=pdo_getall('mask_order_goods',array('order_id'=>$oid));
          $fids=array();//发货地id
          foreach ($allfid as $k=>$v){
              array_push($fids,$v['fid']);
@@ -1290,7 +1290,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
          $fids=array_unique($fids);
          $fids=array_merge($fids);
         foreach ($fids as $k=>$v){
-            $getname=pdo_get('pintuan_warehome', array('fid' => $v), array('Name'));
+            $getname=pdo_get('mask_warehome', array('fid' => $v), array('Name'));
             $i=0;
             foreach ($allgoodinfo as $kk=>$vv){
                 if ($vv['fid']!=$v){
@@ -1346,12 +1346,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //取消订单
     public function doPageCancelMyOrder(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['id']));
+        $res=pdo_update('mask_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['id']));
         if ($res){
           //取消所有子订单
-            $allchild=pdo_getall('pintuan_order_goods',array('order_id'=>$_GPC['id']));
+            $allchild=pdo_getall('mask_order_goods',array('order_id'=>$_GPC['id']));
             foreach ($allchild as $k=>$v){
-                pdo_update('pintuan_order_goods',array('Summary'=>5),array('id'=>$v['id']));
+                pdo_update('mask_order_goods',array('Summary'=>5),array('id'=>$v['id']));
             }
             $data['Result']=true;
         }else{
@@ -1362,14 +1362,14 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //取消子订单
     public function doPageCancelChildOrder(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_order_goods',array('Summary'=>5),array('id'=>$_GPC['childId']));
+        $res=pdo_update('mask_order_goods',array('Summary'=>5),array('id'=>$_GPC['childId']));
         if ($res){
             //修改价格floatval(str_replace(',','',$getorder['money']))
             //取消的价格
-            $chidorder=pdo_get('pintuan_order_goods',array('id'=>$_GPC['childId']));
-            $order=pdo_get('pintuan_order',array('id'=>$chidorder['order_id']),array('money','Summary','postfee'));
+            $chidorder=pdo_get('mask_order_goods',array('id'=>$_GPC['childId']));
+            $order=pdo_get('mask_order',array('id'=>$chidorder['order_id']),array('money','Summary','postfee'));
             //运费
-            $postfee=pdo_get('pintuan_warehome',array('fid'=>$chidorder['fid']),array('emsprice'));
+            $postfee=pdo_get('mask_warehome',array('fid'=>$chidorder['fid']),array('emsprice'));
             $newalltotal=floatval(str_replace(',','',$order['money']))-floatval(str_replace(',','',$chidorder['money'])*$chidorder['number'])-floatval($postfee['emsprice']*$chidorder['number']);
             $ordersummary=explode(',',$order['Summary']);
             //款数
@@ -1378,11 +1378,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $jshu=$this->findNum($ordersummary[1]);
             $newsummary='共'.($ks-1).'款,'.($jshu-$chidorder['number']).'件,合计￥'.$newalltotal;
 
-            $re=pdo_update('pintuan_order',array('money'=>$newalltotal,'Summary'=>$newsummary,'postfee'=>($order['postfee']-$postfee['emsprice']*$chidorder['number'])),array('id'=>$chidorder['order_id']));
+            $re=pdo_update('mask_order',array('money'=>$newalltotal,'Summary'=>$newsummary,'postfee'=>($order['postfee']-$postfee['emsprice']*$chidorder['number'])),array('id'=>$chidorder['order_id']));
 			if($re){
-                $newmoney=pdo_get('pintuan_order',array('id'=>$chidorder['order_id']),array('money'));
+                $newmoney=pdo_get('mask_order',array('id'=>$chidorder['order_id']),array('money'));
                 if ($newmoney['money']<=0){
-                    pdo_update('pintuan_order',array('state'=>5),array('id'=>$chidorder['order_id']));
+                    pdo_update('mask_order',array('state'=>5),array('id'=>$chidorder['order_id']));
                 }
             }
             $data['Result']=true;
@@ -1394,8 +1394,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
   //确认收货
     public function doPageOkMyOrder(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_order',array('state'=>4,'complete_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['id']));
-        $res2=pdo_update('pintuan_order_goods',array('Summary'=>4),array('order_id'=>$_GPC['id']));
+        $res=pdo_update('mask_order',array('state'=>4,'complete_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['id']));
+        $res2=pdo_update('mask_order_goods',array('Summary'=>4),array('order_id'=>$_GPC['id']));
         if($res&&$res2){
             $data['Result']=true;
             $data['Message']='签收成功';
@@ -1441,10 +1441,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $total=array();
         foreach ($data as $k=>$v){
-            $sql="select  sum(Qty) as total from" . tablename("pintuan_cart") ." where uniacid={$_W['uniacid']} and cUid=".$uid." and Itemid=".$v;
+            $sql="select  sum(Qty) as total from" . tablename("mask_cart") ." where uniacid={$_W['uniacid']} and cUid=".$uid." and Itemid=".$v;
             //单商品的总数
             $ressum=pdo_fetchall($sql);
-            $price=pdo_get('pintuan_goodmy', array('gID' =>$v),array("Price"));
+            $price=pdo_get('mask_goodmy', array('gID' =>$v),array("Price"));
             array_push($total,$ressum[0]['total']*$price['Price']);
         }
         return array_sum($total);
@@ -1453,7 +1453,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //获取购物车数量
     function getTotalCount($uid){
         global $_W, $_GPC;
-        $sql="select  sum(Qty) as total from " . tablename("pintuan_cart") ." where uniacid={$_W['uniacid']} and cUid=".$uid;
+        $sql="select  sum(Qty) as total from " . tablename("mask_cart") ." where uniacid={$_W['uniacid']} and cUid=".$uid;
         //单商品的总数
         $ressum=pdo_fetchall($sql);
         return $ressum[0]['total'];
@@ -1461,7 +1461,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //获取单商品购物车数量
     function getoneTotalCount($uid,$gid){
         global $_W, $_GPC;
-        $sql="select  sum(Qty) as total from" . tablename("pintuan_cart") ." where uniacid={$_W['uniacid']} and cUid=".$uid." and Itemid=".$gid;
+        $sql="select  sum(Qty) as total from" . tablename("mask_cart") ." where uniacid={$_W['uniacid']} and cUid=".$uid." and Itemid=".$gid;
         //单商品的总数
         $ressum=pdo_fetchall($sql);
         return $ressum[0]['total'];
@@ -1509,9 +1509,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
       //微信支付
     public function doPagedoPay(){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/wxpay.php';
-        $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-        $res2=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/wxpay.php';
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $res2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         if($res2['url_name']){
             $res2['url_name']=$res2['url_name'];
         }else{
@@ -1524,7 +1524,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $key=$res['wxkey'];
         $out_trade_no = $mch_id. time();
         $root=$_W['siteroot'];
-        pdo_update('pintuan_order',array('code'=>$out_trade_no),array('id'=>$_GPC['orderid']));
+        pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$_GPC['orderid']));
         $total_fee =$_GPC['money'];
         if(empty($total_fee)) //默认1分
         {
@@ -1543,23 +1543,23 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //通过用户id请求用户信息
     public function doPageUserInfo() {
         global $_W, $_GPC;
-        $res = pdo_get('pintuan_user', array('u_id' => $_GPC['uid']));
+        $res = pdo_get('mask_user', array('u_id' => $_GPC['uid']));
         echo json_encode($res);
     }
     //分类下菜品
     public function doPageDishes(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_goods',array('type_id'=>$_GPC['type_id'],'is_show'=>1,'type !='=>$_GPC['type']),array(),'',array('num asc'));
+        $res=pdo_getall('mask_goods',array('type_id'=>$_GPC['type_id'],'is_show'=>1,'type !='=>$_GPC['type']),array(),'',array('num asc'));
         echo json_encode($res);
     }
 
     //菜品列表
     public function doPageDishesList() {
         global $_W, $_GPC;
-        //  $type = pdo_getall('pintuan_type', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id'], 'is_open' => 1), array(), '', 'order_by ASC');
-        $sql=" select * from".tablename('pintuan_type')." where  uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} and is_open=1 and id in(select type_id from".tablename('pintuan_goods')." where uniacid={$_W['uniacid']} and is_show=1 and type !={$_GPC['type']} and store_id={$_GPC['store_id']}) order by order_by asc";
+        //  $type = pdo_getall('mask_type', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id'], 'is_open' => 1), array(), '', 'order_by ASC');
+        $sql=" select * from".tablename('mask_type')." where  uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} and is_open=1 and id in(select type_id from".tablename('mask_goods')." where uniacid={$_W['uniacid']} and is_show=1 and type !={$_GPC['type']} and store_id={$_GPC['store_id']}) order by order_by asc";
         $type=pdo_fetchall($sql);
-        $list = pdo_getall('pintuan_goods', array('uniacid' => $_W['uniacid'], 'is_show' => 1, 'type !=' => $_GPC['type'], 'store_id' => $_GPC['store_id']), array(), '', 'num ASC');
+        $list = pdo_getall('mask_goods', array('uniacid' => $_W['uniacid'], 'is_show' => 1, 'type !=' => $_GPC['type'], 'store_id' => $_GPC['store_id']), array(), '', 'num ASC');
         $data2 = array();
         for ($i = 0;$i < count($type);$i++) {
             $data = array();
@@ -1575,9 +1575,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //商品详情
     public function doPageGoodInfo(){
         global $_W, $_GPC;
-        $good=pdo_get('pintuan_goods',array('id'=>$_GPC['good_id'],'uniacid'=>$_W['uniacid']));
-        $spec=pdo_getall('pintuan_spec',array('good_id'=>$_GPC['good_id'],'uniacid'=>$_W['uniacid']),array(),'','num asc');
-        $specval=pdo_getall('pintuan_spec_val',array('uniacid'=>$_W['uniacid']),array(),'','num asc');
+        $good=pdo_get('mask_goods',array('id'=>$_GPC['good_id'],'uniacid'=>$_W['uniacid']));
+        $spec=pdo_getall('mask_spec',array('good_id'=>$_GPC['good_id'],'uniacid'=>$_W['uniacid']),array(),'','num asc');
+        $specval=pdo_getall('mask_spec_val',array('uniacid'=>$_W['uniacid']),array(),'','num asc');
         $data2=array();
         for($i=0;$i<count($spec);$i++){
             $data=array();
@@ -1603,8 +1603,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //规格组合
     public function doPageGgZh(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_spec_combination',array('combination'=>$_GPC['combination'],'good_id'=>$_GPC['good_id']));
-        $good=pdo_get('pintuan_goods',array('id'=>$_GPC['good_id']));
+        $res=pdo_get('mask_spec_combination',array('combination'=>$_GPC['combination'],'good_id'=>$_GPC['good_id']));
+        $good=pdo_get('mask_goods',array('id'=>$_GPC['good_id']));
         $res['box_money']=$good['box_money'];
         echo json_encode($res);
     }
@@ -1613,16 +1613,16 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         if($_GPC['type']==2){
             if($_GPC['son_id']){
-                $good=pdo_get('pintuan_shopcar',array('good_id'=>$_GPC['good_id'],'store_id'=>$_GPC['store_id'],'son_id'=>$_GPC['son_id'],'dr_id'=>$_GPC['dr_id'],'user_id'=>$_GPC['user_id'],'combination_id'=>$_GPC['combination_id'],'type'=>2));
+                $good=pdo_get('mask_shopcar',array('good_id'=>$_GPC['good_id'],'store_id'=>$_GPC['store_id'],'son_id'=>$_GPC['son_id'],'dr_id'=>$_GPC['dr_id'],'user_id'=>$_GPC['user_id'],'combination_id'=>$_GPC['combination_id'],'type'=>2));
             }else{
-                $good=pdo_get('pintuan_shopcar',array('good_id'=>$_GPC['good_id'],'store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id'],'combination_id'=>$_GPC['combination_id'],'son_id'=>0,'type'=>2));
+                $good=pdo_get('mask_shopcar',array('good_id'=>$_GPC['good_id'],'store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id'],'combination_id'=>$_GPC['combination_id'],'son_id'=>0,'type'=>2));
             }
         }else{
-            $good=pdo_get('pintuan_shopcar',array('good_id'=>$_GPC['good_id'],'store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id'],'combination_id'=>$_GPC['combination_id'],'type'=>1));
+            $good=pdo_get('mask_shopcar',array('good_id'=>$_GPC['good_id'],'store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id'],'combination_id'=>$_GPC['combination_id'],'type'=>1));
         }
 
-        $combination=pdo_get('pintuan_spec_combination',array('id'=>$_GPC['combination_id']));
-        $list=pdo_get('pintuan_goods',array('id'=>$_GPC['good_id']));
+        $combination=pdo_get('mask_spec_combination',array('id'=>$_GPC['combination_id']));
+        $list=pdo_get('mask_goods',array('id'=>$_GPC['good_id']));
         if($_GPC['combination_id']){
             $kc=$combination['number'];
         }else{
@@ -1637,7 +1637,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             }else{
                 if($good){
                     $data['num']=$_GPC['num']+$good['num'];
-                    $res=pdo_update('pintuan_shopcar',$data,array('id'=>$good['id']));
+                    $res=pdo_update('mask_shopcar',$data,array('id'=>$good['id']));
                 }else{
                     if($_GPC['type']==2){
                         $data['type']=$_GPC['type'];
@@ -1654,7 +1654,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data['spec']=$_GPC['spec'];
                     $data['money']=$_GPC['money'];
                     $data['combination_id']=$_GPC['combination_id'];
-                    $res=pdo_insert('pintuan_shopcar',$data);
+                    $res=pdo_insert('mask_shopcar',$data);
                 }
                 if($res){
                     echo  '1';
@@ -1671,7 +1671,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //抢购添加购物车
     public function doPageQgAddCar(){
         global $_W, $_GPC;
-        pdo_delete('pintuan_shopcar',array('store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id'],'is_qg'=>1));
+        pdo_delete('mask_shopcar',array('store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id'],'is_qg'=>1));
         $data['good_id']=$_GPC['good_id'];
         $data['store_id']=$_GPC['store_id'];
         $data['user_id']=$_GPC['user_id'];
@@ -1682,7 +1682,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['num']=1;
         $data['money']=$_GPC['money'];
         $data['combination_id']=$_GPC['combination_id'];
-        $res=pdo_insert('pintuan_shopcar',$data);
+        $res=pdo_insert('mask_shopcar',$data);
         if($res){
             echo  '1';
         }else{
@@ -1693,7 +1693,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //删除抢购菜品
     public function doPageQgDelCar(){
         global $_W, $_GPC;
-        $res=pdo_delete('pintuan_shopcar',array('id'=>$_GPC['id']));
+        $res=pdo_delete('mask_shopcar',array('id'=>$_GPC['id']));
         if($res){
             echo  '1';
         }else{
@@ -1706,13 +1706,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         if($_GPC['type']==2){
             if($_GPC['son_id']){
-                $res=pdo_delete('pintuan_shopcar',array('user_id'=>$_GPC['user_id'],'son_id'=>$_GPC['son_id'],'dr_id'=>$_GPC['dr_id'],'store_id'=>$_GPC['store_id'],'type'=>2));
+                $res=pdo_delete('mask_shopcar',array('user_id'=>$_GPC['user_id'],'son_id'=>$_GPC['son_id'],'dr_id'=>$_GPC['dr_id'],'store_id'=>$_GPC['store_id'],'type'=>2));
             }else{
-                $res=pdo_delete('pintuan_shopcar',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'type'=>2));
+                $res=pdo_delete('mask_shopcar',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'type'=>2));
             }
 
         }else{
-            $res=pdo_delete('pintuan_shopcar',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'type'=>1));
+            $res=pdo_delete('mask_shopcar',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'type'=>1));
         }
 
         if($res){
@@ -1724,9 +1724,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //修改购物车
     public function doPageUpdCar(){
         global $_W, $_GPC;
-        $car=pdo_get('pintuan_shopcar',array('id'=>$_GPC['id']));
-        $combination=pdo_get('pintuan_spec_combination',array('id'=>$car['combination_id']));
-        $list=pdo_get('pintuan_goods',array('id'=>$car['good_id']));
+        $car=pdo_get('mask_shopcar',array('id'=>$_GPC['id']));
+        $combination=pdo_get('mask_spec_combination',array('id'=>$car['combination_id']));
+        $list=pdo_get('mask_goods',array('id'=>$car['good_id']));
         if($car['combination_id']){
             $kc=$combination['number'];
         }else{
@@ -1740,14 +1740,14 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 echo '超出库存!';
             }else{
                 if($_GPC['num']==0){
-                    $res=pdo_delete('pintuan_shopcar',array('id'=>$_GPC['id']));
+                    $res=pdo_delete('mask_shopcar',array('id'=>$_GPC['id']));
                     if($res){
                         echo '1';
                     }else{
                         echo '2';
                     }
                 }else{
-                    $res=pdo_update('pintuan_shopcar',array('num'=>$_GPC['num']),array('id'=>$_GPC['id']));
+                    $res=pdo_update('mask_shopcar',array('num'=>$_GPC['num']),array('id'=>$_GPC['id']));
                     if($res){
                         echo '1';
                     }else{
@@ -1766,12 +1766,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         if($_GPC['type']==2){
             if($_GPC['son_id']){
-                $sql="select a.*,b.number,c.logo,c.name,c.inventory from " . tablename("pintuan_shopcar") . " a"  . " left join " . tablename("pintuan_spec_combination") . " b on b.id=a.combination_id " . " left join " . tablename("pintuan_goods") . " c on c.id=a.good_id  WHERE a.store_id=:store_id and a.user_id=:user_id and a.son_id={$_GPC['son_id']} and a.dr_id={$_GPC['dr_id']} and a.type=2 ";
+                $sql="select a.*,b.number,c.logo,c.name,c.inventory from " . tablename("mask_shopcar") . " a"  . " left join " . tablename("mask_spec_combination") . " b on b.id=a.combination_id " . " left join " . tablename("mask_goods") . " c on c.id=a.good_id  WHERE a.store_id=:store_id and a.user_id=:user_id and a.son_id={$_GPC['son_id']} and a.dr_id={$_GPC['dr_id']} and a.type=2 ";
             }else{
-                $sql="select a.*,b.number,c.logo,c.name,c.inventory from " . tablename("pintuan_shopcar") . " a"  . " left join " . tablename("pintuan_spec_combination") . " b on b.id=a.combination_id " . " left join " . tablename("pintuan_goods") . " c on c.id=a.good_id  WHERE a.store_id=:store_id and a.user_id=:user_id and a.son_id=0 and a.type=2 ";
+                $sql="select a.*,b.number,c.logo,c.name,c.inventory from " . tablename("mask_shopcar") . " a"  . " left join " . tablename("mask_spec_combination") . " b on b.id=a.combination_id " . " left join " . tablename("mask_goods") . " c on c.id=a.good_id  WHERE a.store_id=:store_id and a.user_id=:user_id and a.son_id=0 and a.type=2 ";
             }
         }else{
-            $sql="select a.*,b.number,c.logo,c.name,c.inventory from " . tablename("pintuan_shopcar") . " a"  . " left join " . tablename("pintuan_spec_combination") . " b on b.id=a.combination_id " . " left join " . tablename("pintuan_goods") . " c on c.id=a.good_id  WHERE a.store_id=:store_id and a.user_id=:user_id and a.type=1";
+            $sql="select a.*,b.number,c.logo,c.name,c.inventory from " . tablename("mask_shopcar") . " a"  . " left join " . tablename("mask_spec_combination") . " b on b.id=a.combination_id " . " left join " . tablename("mask_goods") . " c on c.id=a.good_id  WHERE a.store_id=:store_id and a.user_id=:user_id and a.type=1";
         }
 
         $res=pdo_fetchall($sql,array('store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id']));
@@ -1802,7 +1802,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //我的购物车
     public function doPageMyCar2(){
         global $_W, $_GPC;
-        $sql="select a.*,b.number,c.logo,c.name,c.inventory from " . tablename("pintuan_shopcar") . " a"  . " left join " . tablename("pintuan_spec_combination") . " b on b.id=a.combination_id " . " left join " . tablename("pintuan_goods") . " c on c.id=a.good_id  WHERE a.store_id=:store_id and a.user_id=:user_id  and a.type=2 ";
+        $sql="select a.*,b.number,c.logo,c.name,c.inventory from " . tablename("mask_shopcar") . " a"  . " left join " . tablename("mask_spec_combination") . " b on b.id=a.combination_id " . " left join " . tablename("mask_goods") . " c on c.id=a.good_id  WHERE a.store_id=:store_id and a.user_id=:user_id  and a.type=2 ";
         $res=pdo_fetchall($sql,array('store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id']));
         $num=0;
         $money=0;
@@ -1831,16 +1831,16 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //热销
     public function doPageHot(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_goods',array('store_id'=>$_GPC['store_id'],'uniacid'=>$_W['uniacid'],'is_hot'=>1,'is_show'=>1,'type !='=>$_GPC['type']));
+        $res=pdo_getall('mask_goods',array('store_id'=>$_GPC['store_id'],'uniacid'=>$_W['uniacid'],'is_hot'=>1,'is_show'=>1,'type !='=>$_GPC['type']));
         echo json_encode($res);
     }
     //商家列表
     public function doPageStoreList(){
         global $_W, $_GPC;
         $time=time();
-        $up="UPDATE ".tablename('pintuan_store')."SET state=4 where uniacid={$_W['uniacid']} and state=2 and UNIX_TIMESTAMP(rzdq_time)<={$time}";
+        $up="UPDATE ".tablename('mask_store')."SET state=4 where uniacid={$_W['uniacid']} and state=2 and UNIX_TIMESTAMP(rzdq_time)<={$time}";
         pdo_query($up);
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         // $lat="30.525980";
         //  $lng="114.353440";
         if($_GPC['lat']){
@@ -1879,9 +1879,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $_GPC['by']="number asc";
         }
         if($system['distance']!=0){
-            $sql="select xx.* from (SELECT a.*, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli ,b.money as ps_money,c.ps_mode,c.ps_time,c.xyh_open,c.xyh_money FROM ".tablename("pintuan_store") . " a left join (select min(money) as money,store_id from ".tablename("pintuan_distribution")." group by store_id) b on a.id=b.store_id " . " left join " . tablename("pintuan_storeset") . " c on c.store_id=a.id left join (select min(reduction) as money,store_id from ".tablename("pintuan_reduction")." ) d on a.id=d.store_id ".  $where ." ORDER BY ".$_GPC['by'].") xx where xx.juli<=".$system['distance'];
+            $sql="select xx.* from (SELECT a.*, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli ,b.money as ps_money,c.ps_mode,c.ps_time,c.xyh_open,c.xyh_money FROM ".tablename("mask_store") . " a left join (select min(money) as money,store_id from ".tablename("mask_distribution")." group by store_id) b on a.id=b.store_id " . " left join " . tablename("mask_storeset") . " c on c.store_id=a.id left join (select min(reduction) as money,store_id from ".tablename("mask_reduction")." ) d on a.id=d.store_id ".  $where ." ORDER BY ".$_GPC['by'].") xx where xx.juli<=".$system['distance'];
         }else{
-            $sql="SELECT a.*, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli ,b.money as ps_money,c.ps_mode,c.ps_time,c.xyh_open,c.xyh_money FROM ".tablename("pintuan_store") . " a left join (select min(money) as money,store_id from ".tablename("pintuan_distribution")." group by store_id) b on a.id=b.store_id " . " left join " . tablename("pintuan_storeset") . " c on c.store_id=a.id left join (select min(reduction) as money,store_id from ".tablename("pintuan_reduction")." ) d on a.id=d.store_id ".  $where ." ORDER BY ".$_GPC['by'];
+            $sql="SELECT a.*, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli ,b.money as ps_money,c.ps_mode,c.ps_time,c.xyh_open,c.xyh_money FROM ".tablename("mask_store") . " a left join (select min(money) as money,store_id from ".tablename("mask_distribution")." group by store_id) b on a.id=b.store_id " . " left join " . tablename("mask_storeset") . " c on c.store_id=a.id left join (select min(reduction) as money,store_id from ".tablename("mask_reduction")." ) d on a.id=d.store_id ".  $where ." ORDER BY ".$_GPC['by'];
         }
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 
@@ -1897,7 +1897,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             }else{
                 $list[$i]['is_yy']=2;
             }
-            $mj=pdo_getall('pintuan_reduction',array('store_id'=>$list[$i]['id']));
+            $mj=pdo_getall('mask_reduction',array('store_id'=>$list[$i]['id']));
             $list[$i]['mj']=$mj;
         }
         echo json_encode($list);
@@ -1905,12 +1905,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //商家详情
     public function doPageStoreInfo(){
         global $_W, $_GPC;
-        $call=pdo_get('pintuan_call',array('store_id'=>$_GPC['store_id']));
-        $store=pdo_get('pintuan_store',array('id'=>$_GPC['store_id']));
-        $storeset=pdo_get('pintuan_storeset',array('store_id'=>$_GPC['store_id']));
+        $call=pdo_get('mask_call',array('store_id'=>$_GPC['store_id']));
+        $store=pdo_get('mask_store',array('id'=>$_GPC['store_id']));
+        $storeset=pdo_get('mask_storeset',array('store_id'=>$_GPC['store_id']));
         $storeset['is_call']=$call['is_open'];
-        $reduction=pdo_getall('pintuan_reduction',array('store_id'=>$_GPC['store_id'],'type !='=>$_GPC['type']),array(),'','full ASC');
-        $psf=pdo_getall('pintuan_distribution',array('store_id'=>$_GPC['store_id']),array(),'','num asc');
+        $reduction=pdo_getall('mask_reduction',array('store_id'=>$_GPC['store_id'],'type !='=>$_GPC['type']),array(),'','full ASC');
+        $psf=pdo_getall('mask_distribution',array('store_id'=>$_GPC['store_id']),array(),'','num asc');
         if($store['environment']){
             if(strlen($store['environment'])>51){
                 $store['environment']= explode(',',$store['environment']);
@@ -1951,13 +1951,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['psf']=$psf;
         $data['storeset']=$storeset;
         echo json_encode($data);
-        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=UpdateGroup&m=pintuan&store_id=".$_GPC['store_id']);//模板
+        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=UpdateGroup&m=mask&store_id=".$_GPC['store_id']);//模板
 
     }
     //我的地址详情
     public function doPageMyAddressInfo(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_useradd',array('id'=>$_GPC['id']));
+        $res=pdo_get('mask_useradd',array('id'=>$_GPC['id']));
         $res['area']=explode(',',$res['area']);
         echo json_encode($res);
     }
@@ -1967,9 +1967,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageIsNew(){
         global $_W, $_GPC;
         if($_GPC['store_id']){
-            $res=pdo_get('pintuan_order',array('store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id']));
+            $res=pdo_get('mask_order',array('store_id'=>$_GPC['store_id'],'user_id'=>$_GPC['user_id']));
         }else{
-            $res=pdo_get('pintuan_order',array('user_id'=>$_GPC['user_id']));
+            $res=pdo_get('mask_order',array('user_id'=>$_GPC['user_id']));
         }
         if($res){
             echo '2';
@@ -1980,7 +1980,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //外卖下订单
     public function doPageAddOrder(){
         global $_W, $_GPC;
-        $storeset=pdo_get('pintuan_storeset',array('store_id'=>$_GPC['store_id']));
+        $storeset=pdo_get('mask_storeset',array('store_id'=>$_GPC['store_id']));
         $data['user_id']=$_GPC['user_id'];//用户id
         $data['store_id']=$_GPC['store_id'];//商家id
         $data['order_num']=date('YmdHis',time()).rand(1111,9999);//订单号
@@ -2020,7 +2020,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['delivery_time']=$_GPC['delivery_time'];//送达时间
         $data['order_type']=$_GPC['order_type'];//1.配送2.到店
         $data['pay_type']=$_GPC['pay_type'];//1.微信支付4.货到付款
-        $res=pdo_insert('pintuan_order',$data);
+        $res=pdo_insert('mask_order',$data);
         $order_id=pdo_insertid();
 
 
@@ -2030,10 +2030,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         // /print_r($sz);die;
         if($res){
             if($_GPC['coupon_id']){
-                pdo_update('pintuan_usercoupons',array('state'=>1),array('id'=>$_GPC['coupon_id']));
+                pdo_update('mask_usercoupons',array('state'=>1),array('id'=>$_GPC['coupon_id']));
             }
             if($_GPC['coupon_id2']){
-                pdo_update('pintuan_usercoupons',array('state'=>1),array('id'=>$_GPC['coupon_id2']));
+                pdo_update('mask_usercoupons',array('state'=>1),array('id'=>$_GPC['coupon_id2']));
             }
 
             for($i=0;$i<count($sz);$i++){
@@ -2047,35 +2047,35 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $data2['uniacid']=$_W['uniacid'];//小程序id
                 $data2['order_id']=$order_id;
                 if($sz[$i]['is_qg']==1){
-                    pdo_update('pintuan_qggoods',array('surplus -='=>1),array('id'=>$sz[$i]['dishes_id']));
+                    pdo_update('mask_qggoods',array('surplus -='=>1),array('id'=>$sz[$i]['dishes_id']));
                 }
-                $res2=pdo_insert('pintuan_order_goods',$data2);
+                $res2=pdo_insert('mask_order_goods',$data2);
             }
             if($_GPC['pay_type']==4 and $storeset['is_hdfk']==1){//货到付款
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=NewOrderMessage&m=pintuan&order_id=".$order_id);//模板消息
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=Message&m=pintuan&order_id=".$order_id);//模板消息
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=pintuan&order_id=".$order_id);//打印机
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=pintuan&order_id=".$order_id);//打印机
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=pintuan&type=1&store_id=".$_GPC['store_id']);//短信
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=NewOrderMessage&m=mask&order_id=".$order_id);//模板消息
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=Message&m=mask&order_id=".$order_id);//模板消息
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=mask&order_id=".$order_id);//打印机
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=mask&order_id=".$order_id);//打印机
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=1&store_id=".$_GPC['store_id']);//短信
             }
             if($_GPC['pay_type']==2){//余额支付
                 if($_GPC['money']>0){
-                    pdo_update('pintuan_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
+                    pdo_update('mask_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
                     $data4['money'] = $_GPC['money'];
                     $data4['user_id'] = $_GPC['user_id'];
                     $data4['type'] = 2;
                     $data4['note'] = '外卖订单';
                     $data4['time'] = date('Y-m-d H:i:s');
-                    pdo_insert('pintuan_qbmx', $data4);
+                    pdo_insert('mask_qbmx', $data4);
                 }
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=NewOrderMessage&m=pintuan&order_id=".$order_id);//模板消息
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=payorder&m=pintuan&order_id=".$order_id);
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=Message&m=pintuan&order_id=".$order_id);//模板消息
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=pintuan&order_id=".$order_id);//打印机
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=pintuan&order_id=".$order_id);//打印机
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=pintuan&type=1&store_id=".$_GPC['store_id']);//短信
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=NewOrderMessage&m=mask&order_id=".$order_id);//模板消息
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=payorder&m=mask&order_id=".$order_id);
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=Message&m=mask&order_id=".$order_id);//模板消息
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=mask&order_id=".$order_id);//打印机
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=mask&order_id=".$order_id);//打印机
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=1&store_id=".$_GPC['store_id']);//短信
             }
-            pdo_delete('pintuan_shopcar',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'type'=>1));
+            pdo_delete('mask_shopcar',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'type'=>1));
             echo $order_id;
         }else{
             echo '下单失败';
@@ -2087,8 +2087,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //店内下订单
     public function doPageAddDnOrder(){
         global $_W, $_GPC;
-        $table=pdo_get('pintuan_table',array('id'=>$_GPC['table_id']));
-        $store=pdo_get('pintuan_storeset',array('store_id'=>$_GPC['store_id']));
+        $table=pdo_get('mask_table',array('id'=>$_GPC['table_id']));
+        $store=pdo_get('mask_storeset',array('store_id'=>$_GPC['store_id']));
         if($store['is_czztpd']==2){
             $table['status']=0;
         }
@@ -2116,16 +2116,16 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['uniacid']=$_W['uniacid'];//小程序id
             $data['order_num']=date('YmdHis',time()).rand(1111,9999);//订单号
             $data['time']=date("Y-m-d H:i:s",time());//下单时间
-            $res=pdo_insert('pintuan_order',$data);
+            $res=pdo_insert('mask_order',$data);
             $order_id=pdo_insertid();
             $a=json_decode(html_entity_decode($_GPC['sz']));
             $sz=json_decode(json_encode($a),true);
             if($res){
                 if($_GPC['coupon_id']){
-                    pdo_update('pintuan_usercoupons',array('state'=>1),array('id'=>$_GPC['coupon_id']));
+                    pdo_update('mask_usercoupons',array('state'=>1),array('id'=>$_GPC['coupon_id']));
                 }
                 if($_GPC['coupon_id2']){
-                    pdo_update('pintuan_usercoupons',array('state'=>1),array('id'=>$_GPC['coupon_id2']));
+                    pdo_update('mask_usercoupons',array('state'=>1),array('id'=>$_GPC['coupon_id2']));
                 }
                 for($i=0;$i<count($sz);$i++){
                     $data2['name']=$sz[$i]['name'];//商品名称
@@ -2136,30 +2136,30 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data2['dishes_id']=$sz[$i]['dishes_id'];//商品id
                     $data2['uniacid']=$_W['uniacid'];//小程序id
                     $data2['order_id']=$order_id;
-                    $res2=pdo_insert('pintuan_order_goods',$data2);
+                    $res2=pdo_insert('mask_order_goods',$data2);
                 }
-                pdo_delete('pintuan_shopcar',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'type'=>2));
-                pdo_update('pintuan_table',array('status'=>1),array('id'=>$_GPC['table_id']));
+                pdo_delete('mask_shopcar',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'type'=>2));
+                pdo_update('mask_table',array('status'=>1),array('id'=>$_GPC['table_id']));
                 if($_GPC['pay_type']==5){
-                    //file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=Message&m=pintuan&order_id=".$order_id);//模板消息
-                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=pintuan&type=2&store_id=".$_GPC['store_id']);//短信
-                    $res=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=pintuan&order_id=".$order_id);//打印机
-                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=pintuan&order_id=".$order_id);//打印机
+                    //file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=Message&m=mask&order_id=".$order_id);//模板消息
+                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=2&store_id=".$_GPC['store_id']);//短信
+                    $res=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=mask&order_id=".$order_id);//打印机
+                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=mask&order_id=".$order_id);//打印机
                 }
                 if($_GPC['pay_type']==2){
                     if($_GPC['money']>0){
-                        pdo_update('pintuan_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
+                        pdo_update('mask_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
                         $data4['money'] = $_GPC['money'];
                         $data4['user_id'] = $_GPC['user_id'];
                         $data4['type'] = 2;
                         $data4['note'] = '店内订单';
                         $data4['time'] = date('Y-m-d H:i:s');
-                        pdo_insert('pintuan_qbmx', $data4);
+                        pdo_insert('mask_qbmx', $data4);
                     }
 
-                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=pintuan&type=2&store_id=".$_GPC['store_id']);//短信
-                    $res=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=pintuan&order_id=".$order_id);//打印机
-                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=pintuan&order_id=".$order_id);//打印机
+                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=2&store_id=".$_GPC['store_id']);//短信
+                    $res=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=mask&order_id=".$order_id);//打印机
+                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=mask&order_id=".$order_id);//打印机
                 }
                 echo $order_id;
             }else{
@@ -2189,27 +2189,27 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['uniacid']=$_W['uniacid'];
         if($_GPC['money']==0){
             $data['yy_state']=2;//已付款
-            file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=pintuan&type=3&store_id=".$_GPC['store_id']);//短信
+            file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=3&store_id=".$_GPC['store_id']);//短信
         }else{
             $data['yy_state']=1;//待付款
         }
         if($_GPC['pay_type']==2){//余额支付
             if($_GPC['money']>0){
-                pdo_update('pintuan_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
+                pdo_update('mask_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
                 $data4['money'] = $_GPC['money'];
                 $data4['user_id'] = $_GPC['user_id'];
                 $data4['type'] = 2;
                 $data4['note'] = '店内订单';
                 $data4['time'] = date('Y-m-d H:i:s');
-                pdo_insert('pintuan_qbmx', $data4);
+                pdo_insert('mask_qbmx', $data4);
             }
             $data['yy_state']=2;//已付款
-            file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=pintuan&type=3&store_id=".$_GPC['store_id']);//短信
+            file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=3&store_id=".$_GPC['store_id']);//短信
         }
 
 
         $data['type']=3;//预约
-        $res=pdo_insert('pintuan_order',$data);
+        $res=pdo_insert('mask_order',$data);
         $order_id=pdo_insertid();
         $a=json_decode(html_entity_decode($_GPC['sz']));
         $sz=json_decode(json_encode($a),true);
@@ -2223,7 +2223,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $data2['dishes_id']=$sz[$i]['dishes_id'];//商品id
                 $data2['uniacid']=$_W['uniacid'];//小程序id
                 $data2['order_id']=$order_id;
-                $res2=pdo_insert('pintuan_order_goods',$data2);
+                $res2=pdo_insert('mask_order_goods',$data2);
             }
             echo $order_id;
         }else{
@@ -2244,22 +2244,22 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['uniacid'] = $_W['uniacid'];
         $data['time'] = date('Y-m-d H:i:s');
         $data['dm_state'] = 1;
-        $res = pdo_insert('pintuan_order', $data);
+        $res = pdo_insert('mask_order', $data);
         $order_id = pdo_insertid();
         if ($res) {
             if($_GPC['pay_type']==2){
-                pdo_update('pintuan_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
+                pdo_update('mask_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
                 $data4['money'] = $_GPC['money'];
                 $data4['user_id'] = $_GPC['user_id'];
                 $data4['type'] = 2;
                 $data4['note'] = '当面付订单';
                 $data4['time'] = date('Y-m-d H:i:s');
-                pdo_insert('pintuan_qbmx', $data4);
-                pdo_update('pintuan_order',array('dm_state'=>2),array('id'=>$order_id));
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=NewDmOrderMessage&m=pintuan&order_id=".$order_id);//短信
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=pintuan&type=2&store_id=".$_GPC['store_id']);//短信
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=pintuan&order_id=".$order_id);//打印机
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=addintegral&m=pintuan&type=5&order_id=".$order_id);//短信
+                pdo_insert('mask_qbmx', $data4);
+                pdo_update('mask_order',array('dm_state'=>2),array('id'=>$order_id));
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=NewDmOrderMessage&m=mask&order_id=".$order_id);//短信
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=2&store_id=".$_GPC['store_id']);//短信
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=mask&order_id=".$order_id);//打印机
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=addintegral&m=mask&type=5&order_id=".$order_id);//短信
             }
             echo $order_id;
         } else {
@@ -2283,16 +2283,16 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['uniacid']=$_W['uniacid'];//小程序id
             $data['order_id']=$_GPC['order_id'];
             $data['is_jc']=1;
-            $res2=pdo_insert('pintuan_order_goods',$data);
+            $res2=pdo_insert('mask_order_goods',$data);
             $id[]=pdo_insertid();
         }
         $id=implode(",",$id);
 //$id=json_encode($id);
-        $res=pdo_update('pintuan_order',array('money +='=>$_GPC['money']),array('id'=>$_GPC['order_id']));
-        $order=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        pdo_delete('pintuan_shopcar',array('user_id'=>$order['user_id'],'store_id'=>$order['store_id'],'type'=>2));
-        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=JcPrint&m=pintuan&order_id=".$_GPC['order_id']."&money=".$_GPC['money']."&good=".$id);
-        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=JcPrint2&m=pintuan&order_id=".$_GPC['order_id']."&money=".$_GPC['money']."&good=".$id);
+        $res=pdo_update('mask_order',array('money +='=>$_GPC['money']),array('id'=>$_GPC['order_id']));
+        $order=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        pdo_delete('mask_shopcar',array('user_id'=>$order['user_id'],'store_id'=>$order['store_id'],'type'=>2));
+        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=JcPrint&m=mask&order_id=".$_GPC['order_id']."&money=".$_GPC['money']."&good=".$id);
+        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=JcPrint2&m=mask&order_id=".$_GPC['order_id']."&money=".$_GPC['money']."&good=".$id);
         if($res){
             echo '1';
         }else{
@@ -2304,9 +2304,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //支付
     public function doPagePay(){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/wxpay.php';
-        $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-        $res2=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/wxpay.php';
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $res2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         if($res2['url_name']){
             $res2['url_name']=$res2['url_name'];
         }else{
@@ -2319,11 +2319,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $out_trade_no = $mch_id. time();
         $root=$_W['siteroot'];
         if($_GPC['type']==2){
-            pdo_update('pintuan_czorder',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
+            pdo_update('mask_czorder',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
         }elseif($_GPC['type']==3){
-            pdo_update('pintuan_hyorder',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
+            pdo_update('mask_hyorder',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
         }else{
-            pdo_update('pintuan_order',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
+            pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
         }
         $total_fee =$_GPC['money'];
         if(empty($total_fee)) //押金
@@ -2342,31 +2342,31 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //改变订单状态
     public function doPagePayOrder(){
         global $_W, $_GPC;
-        $order=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        $store=pdo_get('pintuan_storeset',array('store_id'=>$order['store_id']));
-        $sys=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']),'ps_name');
+        $order=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        $store=pdo_get('mask_storeset',array('store_id'=>$order['store_id']));
+        $sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),'ps_name');
         $ps_name=empty($sys['ps_name'])?'超级跑腿':$sys['ps_name'];
         if($order['type']==1){//外卖
             if($store['is_jd']==1){
                 $data['state']=3;
                 $data['pay_time']=date('Y-m-d H:i:s');
                 $data['jd_time']=date('Y-m-d H:i:s');
-                $res=pdo_update('pintuan_order',$data,array('id'=>$_GPC['order_id']));
+                $res=pdo_update('mask_order',$data,array('id'=>$_GPC['order_id']));
             }else{
                 $data['state']=2;
                 $data['pay_time']=date('Y-m-d H:i:s');
-                $res=pdo_update('pintuan_order',$data,array('id'=>$_GPC['order_id']));
+                $res=pdo_update('mask_order',$data,array('id'=>$_GPC['order_id']));
             }
             if($store['is_jd']==1&&$order['order_type']==1){//自动接单
                 if( $store['ps_mode']=='达达配送'){
-                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=TestDada&m=pintuan&order_id=".$_GPC['order_id']);//达达
+                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=TestDada&m=mask&order_id=".$_GPC['order_id']);//达达
                 }
                 if( $store['ps_mode']=='快服务配送'){
-                    $res=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=kfw&m=pintuan&order_id=".$_GPC['order_id']);//快服务
+                    $res=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=kfw&m=mask&order_id=".$_GPC['order_id']);//快服务
                     $data['ship_id']=$res;
                 }
                 if( $store['ps_mode']==$ps_name){
-                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=cjpt&m=pintuan&order_id=".$_GPC['order_id']);//跑腿
+                    file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=cjpt&m=mask&order_id=".$_GPC['order_id']);//跑腿
                 }
             }
 
@@ -2374,15 +2374,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }elseif($order['type']==2){//店内
             $data['dn_state']=2;
             $data['pay_time']=date('Y-m-d H:i:s');
-            $res=pdo_update('pintuan_order',$data,array('id'=>$_GPC['order_id']));
+            $res=pdo_update('mask_order',$data,array('id'=>$_GPC['order_id']));
         }
 
         if($res){
-            pdo_update('pintuan_store',array('score +='=>1),array('id'=>$order['store_id']));
-            $good=pdo_getall('pintuan_order_goods',array('order_id'=>$_GPC['order_id']));
+            pdo_update('mask_store',array('score +='=>1),array('id'=>$order['store_id']));
+            $good=pdo_getall('mask_order_goods',array('order_id'=>$_GPC['order_id']));
             for($i=0;$i<count($good);$i++){
-                pdo_update('pintuan_goods', array('inventory -=' => $good[$i]['number']), array('id' => $good[$i]['dishes_id']));
-                pdo_update('pintuan_goods', array('sales +=' => $good[$i]['number']), array('id' => $good[$i]['dishes_id']));
+                pdo_update('mask_goods', array('inventory -=' => $good[$i]['number']), array('id' => $good[$i]['dishes_id']));
+                pdo_update('mask_goods', array('sales +=' => $good[$i]['number']), array('id' => $good[$i]['dishes_id']));
             }
             echo '1';
         }else{
@@ -2399,10 +2399,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select  a.*,b.name as store_name,b.logo,b.tel as store_tel  from " . tablename("pintuan_order")  . " a"  . " left join " . tablename("pintuan_store") . " b on b.id=a.store_id ".$where." order by a.id DESC";
+        $sql="select  a.*,b.name as store_name,b.logo,b.tel as store_tel  from " . tablename("mask_order")  . " a"  . " left join " . tablename("mask_store") . " b on b.id=a.store_id ".$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql);
-        $good=pdo_getall('pintuan_order_goods',array('uniacid'=>$_W['uniacid']));
+        $good=pdo_getall('mask_order_goods',array('uniacid'=>$_W['uniacid']));
         $data2=array();
         for($i=0;$i<count($list);$i++){
             $data=array();
@@ -2434,11 +2434,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $where=" WHERE a.user_id=".$_GPC['user_id']." and a.type=3  and a.yy_state in (".$_GPC['yy_state'].")  and a.del=2";
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select  a.*,b.name as store_name,b.logo,b.tel as store_tel  from " . tablename("pintuan_order")  . " a"  . " left join " . tablename("pintuan_store") . " b on b.id=a.store_id ".$where." order by a.id DESC";
+        $sql="select  a.*,b.name as store_name,b.logo,b.tel as store_tel  from " . tablename("mask_order")  . " a"  . " left join " . tablename("mask_store") . " b on b.id=a.store_id ".$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql);
 
-        $good=pdo_getall('pintuan_order_goods',array('uniacid'=>$_W['uniacid']));
+        $good=pdo_getall('mask_order_goods',array('uniacid'=>$_W['uniacid']));
         $data2=array();
         for($i=0;$i<count($list);$i++){
             $data=array();
@@ -2467,15 +2467,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //订单详情
     public function doPageOrderInfo(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        $res2=pdo_getall('pintuan_order_goods',array('order_id'=>$_GPC['order_id']));
-        $res3=pdo_get('pintuan_store',array('id'=>$res['store_id']));
-        $res4=pdo_get('pintuan_storeset',array('store_id'=>$res['store_id']));
-        $sql="select  a.*,b.name as type_name from " . tablename("pintuan_table")  . " a"  . " left join " . tablename("pintuan_table_type") . " b on b.id=a.type_id where a.id=".$res['table_id'];
+        $res=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        $res2=pdo_getall('mask_order_goods',array('order_id'=>$_GPC['order_id']));
+        $res3=pdo_get('mask_store',array('id'=>$res['store_id']));
+        $res4=pdo_get('mask_storeset',array('store_id'=>$res['store_id']));
+        $sql="select  a.*,b.name as type_name from " . tablename("mask_table")  . " a"  . " left join " . tablename("mask_table_type") . " b on b.id=a.type_id where a.id=".$res['table_id'];
         $res5=pdo_fetch($sql);
-        $res6=pdo_get('pintuan_table_type',array('id'=>$res['table_id']));
-        $store=pdo_get('pintuan_store',array('id'=>$res['store_id']));
-        $storetype=pdo_get('pintuan_storetype',array('id'=>$store['md_type']));
+        $res6=pdo_get('mask_table_type',array('id'=>$res['table_id']));
+        $store=pdo_get('mask_store',array('id'=>$res['store_id']));
+        $storetype=pdo_get('mask_storetype',array('id'=>$store['md_type']));
         $res['yj_money']=$res['money']-$storetype['poundage']*$res['money']/100;
         $data['order']=$res;
         $data['good']=$res2;
@@ -2488,21 +2488,21 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //取消订单
     public function doPageCancelOrder(){
         global $_W, $_GPC;
-        $order=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
+        $order=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
         if($order['type']==1){
-            $res=pdo_update('pintuan_order',array('state'=>6,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['order_id']));
+            $res=pdo_update('mask_order',array('state'=>6,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['order_id']));
         }elseif($order['type']==2){
-            $res=pdo_update('pintuan_order',array('dn_state'=>3,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['order_id']));
+            $res=pdo_update('mask_order',array('dn_state'=>3,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['order_id']));
         }
         if($res){
             if($order['type']==2){
-                pdo_update('pintuan_table',array('status'=>0),array('id'=>$order['table_id']));
+                pdo_update('mask_table',array('status'=>0),array('id'=>$order['table_id']));
             }
             if($order['coupon_id']){
-                pdo_update('pintuan_usercoupons',array('state'=>2),array('id'=>$order['coupon_id']));
+                pdo_update('mask_usercoupons',array('state'=>2),array('id'=>$order['coupon_id']));
             }
             if($order['coupon_id2']){
-                pdo_update('pintuan_usercoupons',array('state'=>2),array('id'=>$order['coupon_id2']));
+                pdo_update('mask_usercoupons',array('state'=>2),array('id'=>$order['coupon_id2']));
             }
             echo  '1';
         }else{
@@ -2514,7 +2514,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //申请退款
     public function doPageTkOrder(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_order',array('state'=>8),array('id'=>$_GPC['order_id']));
+        $res=pdo_update('mask_order',array('state'=>8),array('id'=>$_GPC['order_id']));
         if($res){
             echo  '1';
         }else{
@@ -2524,7 +2524,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //删除订单
     public function doPageDelOrder(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_order',array('del'=>1),array('id'=>$_GPC['order_id']));
+        $res=pdo_update('mask_order',array('del'=>1),array('id'=>$_GPC['order_id']));
         if($res){
             echo  '1';
         }else{
@@ -2534,10 +2534,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //确认收货
     public function doPageOkOrder(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_order',array('state'=>4,'complete_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['order_id']));
-        $res2=pdo_update('pintuan_earnings',array('state'=>2),array('order_id'=>$_GPC['order_id']));
+        $res=pdo_update('mask_order',array('state'=>4,'complete_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['order_id']));
+        $res2=pdo_update('mask_earnings',array('state'=>2),array('order_id'=>$_GPC['order_id']));
         if($res){
-            file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=addintegral&m=pintuan&type=1&order_id=".$_GPC['order_id']);//短信
+            file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=addintegral&m=mask&type=1&order_id=".$_GPC['order_id']);//短信
             echo  '1';
         }else{
             echo '2';
@@ -2546,28 +2546,28 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //导航
     public function doPageNav(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_nav',array('uniacid'=>$_W['uniacid'],'state'=>1),array(),'','num asc');
+        $res=pdo_getall('mask_nav',array('uniacid'=>$_W['uniacid'],'state'=>1),array(),'','num asc');
         echo  json_encode($res);
     }
     //分类导航
     public function doPageTypeAd(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_typead',array('uniacid'=>$_W['uniacid'],'status'=>1),array(),'','orderby asc');
+        $res=pdo_getall('mask_typead',array('uniacid'=>$_W['uniacid'],'status'=>1),array(),'','orderby asc');
         echo  json_encode($res);
     }
     //商家轮播图
     public function doPageStoreAd(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_storead',array('store_id'=>$_GPC['store_id'],'status'=>1),array(),'','orderby asc');
+        $res=pdo_getall('mask_storead',array('store_id'=>$_GPC['store_id'],'status'=>1),array(),'','orderby asc');
         echo  json_encode($res);
     }
     //轮播图
     public function doPageAd(){
         global $_W, $_GPC;
         if($_GPC['type']){
-            $res=pdo_getall('pintuan_ad',array('uniacid'=>$_W['uniacid'],'status'=>1,'type'=>$_GPC['type']),array(),'','orderby asc');
+            $res=pdo_getall('mask_ad',array('uniacid'=>$_W['uniacid'],'status'=>1,'type'=>$_GPC['type']),array(),'','orderby asc');
         }else{
-            $res=pdo_getall('pintuan_ad',array('uniacid'=>$_W['uniacid'],'status'=>1),array(),'','orderby asc');
+            $res=pdo_getall('mask_ad',array('uniacid'=>$_W['uniacid'],'status'=>1),array(),'','orderby asc');
         }
 
         echo  json_encode($res);
@@ -2576,7 +2576,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageMessage(){
         global $_W, $_GPC;
         function getaccess_token($_W){
-            $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $appid=$res['appid'];
             $secret=$res['appsecret'];
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -2592,16 +2592,16 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         //设置与发送模板信息
         function set_msg($_W){
             $access_token = getaccess_token($_W);
-            $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-            $res2=pdo_get('pintuan_order',array('id'=>$_GET['order_id']));
-            $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
+            $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+            $res2=pdo_get('mask_order',array('id'=>$_GET['order_id']));
+            $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
             if(!$res2['pay_time']){
                 $res2['pay_time']=$res2['time'];
             }
             $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["xd_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$res2['form_id'].'",
            "data": {
              "keyword1": {
@@ -2647,10 +2647,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //充值模板消息
     public function doPageCzMessage(){
         global $_W, $_GPC;
-        pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+        pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
         ///////////////模板消息拒绝///////////////////
         function getaccess_token($_W){
-            $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $appid=$res['appid'];
             $secret=$res['appsecret'];
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -2666,15 +2666,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         //设置与发送模板信息
         function set_msg($_W){
             $access_token = getaccess_token($_W);
-            $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-            $res2=pdo_get('pintuan_czorder',array('id'=>$_GET['order_id']));
-            $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-            $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-            $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+            $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+            $res2=pdo_get('mask_czorder',array('id'=>$_GET['order_id']));
+            $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+            $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+            $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
             $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["cz_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -2707,7 +2707,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data = curl_exec($ch);
             curl_close($ch);
             // return $data;
-            pdo_delete('pintuan_formid',array('id'=>$form['id']));
+            pdo_delete('mask_formid',array('id'=>$form['id']));
         }
         echo set_msg($_W);
     }
@@ -2727,10 +2727,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //达达
     public function doPageTestDada(){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/peisong/peisong.php';
-        $order=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        $set=pdo_get('pintuan_psset',array('store_id'=>$order['store_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/peisong/peisong.php';
+        $order=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        $set=pdo_get('mask_psset',array('store_id'=>$order['store_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 //*********************配置项*************************
         $config = array();
         $config['app_key'] = $system['dada_key'];
@@ -2764,7 +2764,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             // 'receiver_tel'=> '18599999999',
             'receiver_lat'=> $order['lat'],
             'receiver_lng'=> $order['lng'],
-            'callback'=>$_W['siteroot']."addons/pintuan/payment/peisong/notify.php"
+            'callback'=>$_W['siteroot']."addons/mask/payment/peisong/notify.php"
         );
         $result= Peisong::requestMethod($config,$data2);
 
@@ -2775,31 +2775,31 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //帮助中心
     public function doPageGetHelp(){
         global $_W, $_GPC;
-        $res= pdo_getall('pintuan_help',array('uniacid'=>$_W['uniacid']),array() , '' , 'sort ASC');
+        $res= pdo_getall('mask_help',array('uniacid'=>$_W['uniacid']),array() , '' , 'sort ASC');
         echo json_encode($res);
     }
 //品质优选
     public function doPageBrand(){
         global $_W, $_GPC;
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         $lat=$_GPC['lat'];
         $lng=$_GPC['lng'];
         if($system['distance']!=0){
-            $sql="select xx.* from (SELECT *, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli  FROM ".tablename("pintuan_store") . " where uniacid={$_W['uniacid']} and is_brand=1 and state=2 ORDER BY number ASC) xx where xx.juli<=".$system['distance'];
+            $sql="select xx.* from (SELECT *, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli  FROM ".tablename("mask_store") . " where uniacid={$_W['uniacid']} and is_brand=1 and state=2 ORDER BY number ASC) xx where xx.juli<=".$system['distance'];
         }else{
-            $sql="SELECT *, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli  FROM ".tablename("pintuan_store") . " where uniacid={$_W['uniacid']} and is_brand=1 and state=2  ORDER BY number ASC";
+            $sql="SELECT *, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli  FROM ".tablename("mask_store") . " where uniacid={$_W['uniacid']} and is_brand=1 and state=2  ORDER BY number ASC";
         }
         $res=pdo_fetchall($sql);
-        // $res= pdo_getall('pintuan_store',array('uniacid'=>$_W['uniacid'],'is_brand'=>1,'state'=>2),array() , '' , 'number ASC');
+        // $res= pdo_getall('mask_store',array('uniacid'=>$_W['uniacid'],'is_brand'=>1,'state'=>2),array() , '' , 'number ASC');
         echo json_encode($res);
     }
 //周边吃啥
     public function doPageZbOrder(){
         global $_W, $_GPC;
-        $sql="select  * from " . tablename("pintuan_order") ." where uniacid={$_W['uniacid']} and state in(2,3,4,5) order by id DESC LIMIT 0,10";
+        $sql="select  * from " . tablename("mask_order") ." where uniacid={$_W['uniacid']} and state in(2,3,4,5) order by id DESC LIMIT 0,10";
         $res=pdo_fetchall($sql);
         for($i=0;$i<count($res);$i++){
-            $good=pdo_get('pintuan_order_goods',array('order_id'=>$res[$i]['id']));
+            $good=pdo_get('mask_order_goods',array('order_id'=>$res[$i]['id']));
             $res[$i]['goods_name']=$good['name'];
             $time=time()-strtotime($res[$i]['time']);
 
@@ -2819,11 +2819,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageCoupons(){
         global $_W, $_GPC;
         $time=strtotime(date("Y-m-d"));
-        $sql="select  * from " . tablename("pintuan_coupons") ." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} and UNIX_TIMESTAMP(start_time)<={$time} and  UNIX_TIMESTAMP(end_time)>={$time} order by id DESC";
+        $sql="select  * from " . tablename("mask_coupons") ." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} and UNIX_TIMESTAMP(start_time)<={$time} and  UNIX_TIMESTAMP(end_time)>={$time} order by id DESC";
         $coupons=pdo_fetchall($sql);
-        //$coupons=pdo_getall('pintuan_coupons',array('uniacid'=>$_W['uniacid'],'store_id'=>$_GPC['store_id']));
-        $type=pdo_getall('pintuan_storetype',array('uniacid'=>$_W['uniacid']));
-        $usercoupons=pdo_getall('pintuan_usercoupons',array('user_id'=>$_GPC['user_id']));
+        //$coupons=pdo_getall('mask_coupons',array('uniacid'=>$_W['uniacid'],'store_id'=>$_GPC['store_id']));
+        $type=pdo_getall('mask_storetype',array('uniacid'=>$_W['uniacid']));
+        $usercoupons=pdo_getall('mask_usercoupons',array('user_id'=>$_GPC['user_id']));
         for($i=0;$i<count($coupons);$i++){
             $coupons[$i]['state']=2;
             for($j=0;$j<count($type);$j++){
@@ -2856,12 +2856,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $time=strtotime(date("Y-m-d"));
         if($_GPC['store_id']){
-            $store=pdo_get('pintuan_store',array('id'=>$_GPC['store_id']));
+            $store=pdo_get('mask_store',array('id'=>$_GPC['store_id']));
             $where=" and (b.store_id=".$_GPC['store_id']." || b.store_id=0) and  (find_in_set('{$store['md_type']}',type_id) || type_id=0)";
         }
-        $sql="select a.*,b.full,b.reduce,b.instruction,b.store_id,b.name,b.type_id,b.type as coupon_type,b.end_time,d.name as store_name,d.logo from " . tablename("pintuan_usercoupons") . " a"  . " left join " . tablename("pintuan_coupons") . " b on b.id=a.coupon_id " . "  left join " . tablename("pintuan_store") . " d on d.id=b.store_id  WHERE  UNIX_TIMESTAMP(b.start_time)<={$time} and  UNIX_TIMESTAMP(b.end_time)>={$time} and a.state=2 and  a.user_id={$_GPC['user_id']}".$where;
+        $sql="select a.*,b.full,b.reduce,b.instruction,b.store_id,b.name,b.type_id,b.type as coupon_type,b.end_time,d.name as store_name,d.logo from " . tablename("mask_usercoupons") . " a"  . " left join " . tablename("mask_coupons") . " b on b.id=a.coupon_id " . "  left join " . tablename("mask_store") . " d on d.id=b.store_id  WHERE  UNIX_TIMESTAMP(b.start_time)<={$time} and  UNIX_TIMESTAMP(b.end_time)>={$time} and a.state=2 and  a.user_id={$_GPC['user_id']}".$where;
         $res=pdo_fetchall($sql);
-        $type=pdo_getall('pintuan_storetype',array('uniacid'=>$_W['uniacid']));
+        $type=pdo_getall('mask_storetype',array('uniacid'=>$_W['uniacid']));
         for($i=0;$i<count($res);$i++){
             $data=array();
             for($j=0;$j<count($type);$j++){
@@ -2885,16 +2885,16 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //领取优惠券
     public function doPageLqCoupons(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_coupons',array('id'=>$_GPC['coupon_id']));
+        $res=pdo_get('mask_coupons',array('id'=>$_GPC['coupon_id']));
         if($res['stock']>0){
             $data['user_id']=$_GPC['user_id'];
             $data['coupon_id']=$_GPC['coupon_id'];
             $data['uniacid']=$_W['uniacid'];
             $data['time']=date('Y-m-d H:i:s');
             $data['type']=1;//手动领取
-            $res=pdo_insert('pintuan_usercoupons',$data);
+            $res=pdo_insert('mask_usercoupons',$data);
             if($res){//领取成功
-                pdo_update('pintuan_coupons',array('stock -='=>1),array('id'=>$_GPC['coupon_id']));
+                pdo_update('mask_coupons',array('stock -='=>1),array('id'=>$_GPC['coupon_id']));
                 echo '1';
             }else{
                 echo '2';
@@ -2907,19 +2907,19 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //天降红包
     public function doPageTjCoupons(){
         global $_W, $_GPC;
-        //$usercoupons=pdo_getall('pintuan_usercoupons',array('user_id'=>$_GPC['user_id']));
+        //$usercoupons=pdo_getall('mask_usercoupons',array('user_id'=>$_GPC['user_id']));
         $jt=date('Y-m-d');
         $where="'%$jt%'";
-        $sql="select  * from " . tablename("pintuan_usercoupons") ." where user_id={$_GPC['user_id']} and time LIKE {$where} and type=2";
+        $sql="select  * from " . tablename("mask_usercoupons") ." where user_id={$_GPC['user_id']} and time LIKE {$where} and type=2";
         $usercoupons=pdo_fetch($sql);
         // print_r($usercoupons);die;
         if(!$usercoupons){
             $time=strtotime(date("Y-m-d"));
-            $sql="select  * from " . tablename("pintuan_coupons")."  where id not in(select coupon_id from " . tablename("pintuan_usercoupons")." where user_id={$_GPC['user_id']}) and uniacid={$_W['uniacid']} and store_id=0  and UNIX_TIMESTAMP(start_time)<={$time} and  UNIX_TIMESTAMP(end_time)>={$time} and stock>0 order by id DESC";
+            $sql="select  * from " . tablename("mask_coupons")."  where id not in(select coupon_id from " . tablename("mask_usercoupons")." where user_id={$_GPC['user_id']}) and uniacid={$_W['uniacid']} and store_id=0  and UNIX_TIMESTAMP(start_time)<={$time} and  UNIX_TIMESTAMP(end_time)>={$time} and stock>0 order by id DESC";
             $coupons=pdo_fetchall($sql);
 
             if(count($coupons)>0){
-                $couponset=pdo_get('pintuan_couponset',array('uniacid'=>$_W['uniacid']));//查看天降红包数量
+                $couponset=pdo_get('mask_couponset',array('uniacid'=>$_W['uniacid']));//查看天降红包数量
                 if($couponset['number']>count($coupons)){
                     $number=count($coupons);
                 }else{
@@ -2929,8 +2929,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
                 if($number==1){//只有一个红包
 
-                    $coupons3=pdo_getall('pintuan_coupons',array('id'=>$coupons[$coupons2]['id']));
-                    $type=pdo_getall('pintuan_storetype',array('uniacid'=>$_W['uniacid']));
+                    $coupons3=pdo_getall('mask_coupons',array('id'=>$coupons[$coupons2]['id']));
+                    $type=pdo_getall('mask_storetype',array('uniacid'=>$_W['uniacid']));
                     for($i=0;$i<count($coupons3);$i++){
                         for($j=0;$j<count($type);$j++){
                             if($coupons3[$i]['type_id']){
@@ -2956,8 +2956,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data2['uniacid']=$_W['uniacid'];
                     $data2['time']=date('Y-m-d H:i:s');
                     $data2['type']=2;//自动领取
-                    pdo_insert('pintuan_usercoupons',$data2);
-                    pdo_update('pintuan_coupons',array('stock -='=>1),array('id'=>$coupons[$coupons2]['id']));
+                    pdo_insert('mask_usercoupons',$data2);
+                    pdo_update('mask_coupons',array('stock -='=>1),array('id'=>$coupons[$coupons2]['id']));
                     echo json_encode($coupons3);
                 }else{
                     $cid=array();
@@ -2966,8 +2966,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     }
 
                     //	print_R($cid);die;
-                    $coupons3=pdo_getall('pintuan_coupons',array('id'=>$cid));
-                    $type=pdo_getall('pintuan_storetype',array('uniacid'=>$_W['uniacid']));
+                    $coupons3=pdo_getall('mask_coupons',array('id'=>$cid));
+                    $type=pdo_getall('mask_storetype',array('uniacid'=>$_W['uniacid']));
                     for($i=0;$i<count($coupons3);$i++){
                         for($j=0;$j<count($type);$j++){
                             if($coupons3[$i]['type_id']){
@@ -2994,8 +2994,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                         $data2['uniacid']=$_W['uniacid'];
                         $data2['time']=date('Y-m-d H:i:s');
                         $data2['type']=2;//自动领取
-                        pdo_insert('pintuan_usercoupons',$data2);
-                        pdo_update('pintuan_coupons',array('stock -='=>1),array('id'=>$cid[$m]));
+                        pdo_insert('mask_usercoupons',$data2);
+                        pdo_update('mask_coupons',array('stock -='=>1),array('id'=>$cid[$m]));
                     }
                     echo json_encode($coupons3);
                 }
@@ -3011,7 +3011,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //红包设置
     public function doPageCouponSet(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_couponset',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_couponset',array('uniacid'=>$_W['uniacid']));
         echo json_encode($res);
     }
 //评论
@@ -3026,24 +3026,24 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['user_id'] = $_GPC['user_id']; //用户id
         $data['uniacid'] = $_W['uniacid']; //小程序id
         $data['state'] = 1; //未回复
-        $res = pdo_insert('pintuan_assess', $data);
-        $order = pdo_get('pintuan_order', array('id' => $_GPC['order_id']));
+        $res = pdo_insert('mask_assess', $data);
+        $order = pdo_get('mask_order', array('id' => $_GPC['order_id']));
         if ($res) {
-            $total = pdo_get('pintuan_assess', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id']), array('sum(stars) as total'));
-            $count = pdo_get('pintuan_assess', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id']), array('count(id) as count'));
+            $total = pdo_get('mask_assess', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id']), array('sum(stars) as total'));
+            $count = pdo_get('mask_assess', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id']), array('count(id) as count'));
             if ($total['total'] > 0 and $count['count'] > 0) {
                 $pf = ($total['total'] / $count['count']);
                 $pf = number_format($pf, 1);
             } else {
                 $pf = 0;
             }
-            pdo_update('pintuan_store', array('sales' => $pf), array('id' => $_GPC['store_id']));
+            pdo_update('mask_store', array('sales' => $pf), array('id' => $_GPC['store_id']));
             // echo $order['type'];die;
             if ($order['type'] == 1) {
                 $data2['state'] = 5;
             }
-            pdo_update('pintuan_order', $data2, array('id' => $_GPC['order_id']));
-            file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=addintegral&m=pintuan&type=3&order_id=".$_GPC['order_id']);//短信
+            pdo_update('mask_order', $data2, array('id' => $_GPC['order_id']));
+            file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=addintegral&m=mask&type=3&order_id=".$_GPC['order_id']);//短信
             echo '1';
         } else {
             echo '2';
@@ -3052,9 +3052,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //查看评论
     public function doPageAssessList(){
         global $_W, $_GPC;
-        $res=count(pdo_getall('pintuan_assess',array('store_id'=>$_GPC['store_id'])));
-        $res2=count(pdo_getall('pintuan_assess',array('store_id'=>$_GPC['store_id'],'stars >='=>4)));
-        $res3=count(pdo_getall('pintuan_assess',array('store_id'=>$_GPC['store_id'],'stars <='=>2)));
+        $res=count(pdo_getall('mask_assess',array('store_id'=>$_GPC['store_id'])));
+        $res2=count(pdo_getall('mask_assess',array('store_id'=>$_GPC['store_id'],'stars >='=>4)));
+        $res3=count(pdo_getall('mask_assess',array('store_id'=>$_GPC['store_id'],'stars <='=>2)));
         $data['all']=$res;
         $data['ok']=$res2;
         $data['no']=$res3;
@@ -3069,7 +3069,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select  a.*,b.name ,b.img as user_img  from " . tablename("pintuan_assess")  . " a"  . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id ".$where." order by a.id DESC";
+        $sql="select  a.*,b.name ,b.img as user_img  from " . tablename("mask_assess")  . " a"  . " left join " . tablename("mask_user") . " b on b.id=a.user_id ".$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql);
         for($i=0;$i<count($list);$i++){
@@ -3089,7 +3089,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //推荐菜
     public function doPageTjGoods(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_goods',array('is_tj'=>1,'is_show'=>1,'store_id'=>$_GPC['store_id']));
+        $res=pdo_getall('mask_goods',array('is_tj'=>1,'is_show'=>1,'store_id'=>$_GPC['store_id']));
         echo json_encode($res);
     }
 
@@ -3107,7 +3107,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             'video/mp4'
         );
         $max_file_size=2000000;     //上传文件大小限制, 单位BYTE
-        $destination_folder="../attachment/pintuan/".date(Y)."/".date(m)."/".date(d)."/"; //上传文件路径
+        $destination_folder="../attachment/mask/".date(Y)."/".date(m)."/".date(d)."/"; //上传文件路径
         //$destination_folder="../attachment/"; //上传文件路径
         $watermark=2;      //是否附加水印(1为加水印,其他为不加水印);
         $watertype=1;      //水印类型(1为文字,2为图片)
@@ -3154,7 +3154,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             exit;
         }
         $pinfo=pathinfo($destination);
-        $fname="pintuan/".date(Y)."/".date(m)."/".date(d)."/".$pinfo['basename'];
+        $fname="mask/".date(Y)."/".date(m)."/".date(d)."/".$pinfo['basename'];
         echo $fname;
         @require_once (IA_ROOT . '/framework/function/file.func.php');
         @$filename=$fname;
@@ -3167,13 +3167,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //桌位类型
     public function doPageTableType() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_table_type', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id']));
+        $res = pdo_getall('mask_table_type', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id']));
         echo json_encode($res);
     }
 //桌号
     public function doPageTable() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_table', array('uniacid' => $_W['uniacid'], 'type_id' => $_GPC['type_id'], 'status' => 0));
+        $res = pdo_getall('mask_table', array('uniacid' => $_W['uniacid'], 'type_id' => $_GPC['type_id'], 'status' => 0));
         echo json_encode($res);
     }
 //桌号
@@ -3182,13 +3182,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         if($_GPC['type_id']){
             $pageindex = max(1, intval($_GPC['page']));
             $pagesize=$_GPC['pagesize'];
-            $sql="select  *  from " . tablename("pintuan_table")  . " where uniacid={$_W['uniacid']} and type_id={$_GPC['type_id']} and store_id={$_GPC['store_id']} order by orderby ASC";
+            $sql="select  *  from " . tablename("mask_table")  . " where uniacid={$_W['uniacid']} and type_id={$_GPC['type_id']} and store_id={$_GPC['store_id']} order by orderby ASC";
             $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
             $res = pdo_fetchall($select_sql);
         }else{
             $pageindex = max(1, intval($_GPC['page']));
             $pagesize=$_GPC['pagesize'];
-            $sql="select  *  from " . tablename("pintuan_table")  . " where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} order by orderby ASC";
+            $sql="select  *  from " . tablename("mask_table")  . " where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} order by orderby ASC";
             $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
             $res = pdo_fetchall($select_sql);
         }
@@ -3199,8 +3199,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //通过桌号查桌子名称和类型
     public function doPageZhuohao() {
         global $_W, $_GPC;
-        $res = pdo_get('pintuan_table', array('id' => $_GPC['id']));
-        $res2 = pdo_get('pintuan_table_type', array('id' => $res['type_id']));
+        $res = pdo_get('mask_table', array('id' => $_GPC['id']));
+        $res2 = pdo_get('mask_table_type', array('id' => $res['type_id']));
         $data['table_name'] = $res['name'];
         $data['type_name'] = $res2['name'];
         $data['status'] = $res['status'];
@@ -3264,16 +3264,16 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
     public function doPageQtPrint(){ //前台打印
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/print/dyj.php';
-        $res=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        $store=pdo_get('pintuan_store',array('id'=>$res['store_id']),'name');
-        $print=pdo_get('pintuan_storeset',array('store_id'=>$res['store_id']),array('is_jd','print_mode'));
+        include IA_ROOT.'/addons/mask/print/dyj.php';
+        $res=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        $store=pdo_get('mask_store',array('id'=>$res['store_id']),'name');
+        $print=pdo_get('mask_storeset',array('store_id'=>$res['store_id']),array('is_jd','print_mode'));
         if(($print['is_jd']==1)or($print['print_mode']==1&&$res['state']==2) or ($print['print_mode']==1&&($res['dn_state']==1 or $res['dn_state']==2)) or $_GPC['type']==1){//type==1前台打印订单
-            $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>1));
-            $res2=pdo_getall('pintuan_order_goods',array('order_id'=>$_GPC['order_id']));
+            $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>1));
+            $res2=pdo_getall('mask_order_goods',array('order_id'=>$_GPC['order_id']));
             if($res['type']==2){
-                //$table = pdo_get('pintuan_table', array('id' => $res['table_id']));
-                $sql=" select a.name,b.name as type_name from ".tablename('pintuan_table')." a left join ".tablename('pintuan_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
+                //$table = pdo_get('mask_table', array('id' => $res['table_id']));
+                $sql=" select a.name,b.name as type_name from ".tablename('mask_table')." a left join ".tablename('mask_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
                 $table=pdo_fetch($sql);
             }
             if($res['pay_type']==1){
@@ -3310,7 +3310,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $content = "^N".$value['num'];
                 }
                 if($res['type']==4){
-                    $user=pdo_get('pintuan_user',array('id'=>$res['user_id']),'name');
+                    $user=pdo_get('mask_user',array('id'=>$res['user_id']),'name');
                     $content.= "              收银台".$style.$style.$style;
                     $content.= "--------------------------------".$style;
                     $content.= "金额    ：" . $res['money'] . "元".$style;
@@ -3443,22 +3443,22 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
     public function doPageHcPrint(){ //后厨打印
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/print/hcdyj.php';
-        $res=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        $sql="select a.*,b.label_id from".tablename('pintuan_order_goods')."a left join ".tablename('pintuan_goods')." b on a.dishes_id=b.id  where a.order_id={$_GPC['order_id']}";
+        include IA_ROOT.'/addons/mask/print/hcdyj.php';
+        $res=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        $sql="select a.*,b.label_id from".tablename('mask_order_goods')."a left join ".tablename('mask_goods')." b on a.dishes_id=b.id  where a.order_id={$_GPC['order_id']}";
         $res2=pdo_fetchall($sql);
         if($res['type']==2){
-            //$table = pdo_get('pintuan_table', array('id' => $res['table_id']));
-            $sql=" select a.name,b.name as type_name from ".tablename('pintuan_table')." a left join ".tablename('pintuan_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
+            //$table = pdo_get('mask_table', array('id' => $res['table_id']));
+            $sql=" select a.name,b.name as type_name from ".tablename('mask_table')." a left join ".tablename('mask_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
             $table=pdo_fetch($sql);
         }
-        $print=pdo_get('pintuan_storeset',array('store_id'=>$res['store_id']),array('is_jd','print_mode'));
+        $print=pdo_get('mask_storeset',array('store_id'=>$res['store_id']),array('is_jd','print_mode'));
 
         if(($print['is_jd']==1)or($print['print_mode']==1&&$res['state']==2) or ($print['print_mode']==1&&($res['dn_state']==1 or $res['dn_state']==2))){
             $result =   array();
 
             //判断打印类型
-            $type=pdo_get('pintuan_storeset',array('store_id'=>$res['store_id']));
+            $type=pdo_get('mask_storeset',array('store_id'=>$res['store_id']));
             if($type['print_type']==2){
                 //按相同标签组成新的数组
                 foreach($res2 as $k=>$v){
@@ -3466,7 +3466,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 }
                 foreach ($result as $key => $value) {
                     $content1='';
-                    $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2,'tag_id'=>$key));
+                    $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2,'tag_id'=>$key));
                     $content1 .= "         订单编号  #".$_GPC['order_id']."\n\n";
 
                     $content1 .= "       ".$res3[0]['dyj_title']."\n\n";
@@ -3514,8 +3514,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 }
 
             }else{
-                $store=pdo_get('pintuan_store',array('id'=>$res['store_id']),'name');
-                $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2));
+                $store=pdo_get('mask_store',array('id'=>$res['store_id']),'name');
+                $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2));
                 if($res['pay_type']==1){
                     $is_yue="微信支付";
                 }elseif($res['pay_type']==2){
@@ -3657,11 +3657,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //快服务
     public function doPagekfw(){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/peisong/peisong.php';
-        $order=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        $set=pdo_get('pintuan_kfwset',array('store_id'=>$order['store_id']));
-        $storeInfo=pdo_get('pintuan_store',array('id'=>$order['store_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/peisong/peisong.php';
+        $order=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        $set=pdo_get('mask_kfwset',array('store_id'=>$order['store_id']));
+        $storeInfo=pdo_get('mask_store',array('id'=>$order['store_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         $city=explode(',',$order['area']);
         $city=$city['1'];
         if(!$set['access_token']){//绑定商户
@@ -3669,8 +3669,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $res=json_decode($res);
             $data['access_token']=$res->data->access_token;
             $data['openid']=$res->data->openid;
-            pdo_update('pintuan_kfwset',$data,array('store_id'=>$order['store_id']));
-            $set=pdo_get('pintuan_kfwset',array('store_id'=>$order['store_id']));
+            pdo_update('mask_kfwset',$data,array('store_id'=>$order['store_id']));
+            $set=pdo_get('mask_kfwset',array('store_id'=>$order['store_id']));
         }
         $sender_zb=explode(',',$storeInfo['coordinates']);
         $sender_zb=peisong::coordinate_switchf($sender_zb[0],$sender_zb[1]);
@@ -3715,8 +3715,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $store_id=$_GPC['store_id'];
         $id=$_GPC['id'];
-        $store=pdo_get('pintuan_call',array('store_id'=>$store_id));
-        $table=pdo_get('pintuan_table',array('id'=>$id));
+        $store=pdo_get('mask_call',array('store_id'=>$store_id));
+        $table=pdo_get('mask_table',array('id'=>$id));
         $appid=$store['appid'];
         $appkey=$store['apikey'];
         //var_dump($store);die;
@@ -3728,11 +3728,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         //echo $content;die;
         //$content=$number."呼叫服务员".$number."呼叫服务员";
-        $src=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=voiceTts&m=pintuan&content=".$content."&appid=".$appid."&appkey=".$appkey."&id=".$id);
+        $src=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=voiceTts&m=mask&content=".$content."&appid=".$appid."&appkey=".$appkey."&id=".$id);
         //var_dump($src);die;
-        pdo_update('pintuan_call',array('src'=>$src),array('store_id'=>$_GPC['store_id']));
-        //$src2=file_get_contents("{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=newcall&m=pintuan&src={$src}&type=2&store_id={$store_id}");
-        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=SaveCallLog&m=pintuan&id={$id}&store_id={$store_id}");
+        pdo_update('mask_call',array('src'=>$src),array('store_id'=>$_GPC['store_id']));
+        //$src2=file_get_contents("{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=newcall&m=mask&src={$src}&type=2&store_id={$store_id}");
+        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=SaveCallLog&m=mask&id={$id}&store_id={$store_id}");
         //var_dump($src2);die;
         //echo "<audio id='myaudio' src='{$src}' autoplay='autoplay' controls='controls'  hidden='true' ></audio>";
         return $src;
@@ -3746,7 +3746,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $appid=$_GPC['appid'];
         $appkey=$_GPC['appkey'];
         $id=$_GPC['id'];
-        $output_path="../addons/pintuan/call/test".$id.".wav";
+        $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
             'auf' => 'audio/L16;rate=16000',
             'aue' => 'raw',
@@ -3794,7 +3794,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['state']=1;
         $data['time']=time();
         $data['uniacid']=$_W['uniacid'];
-        $res=pdo_insert('pintuan_calllog',$data);
+        $res=pdo_insert('mask_calllog',$data);
     }
 
 
@@ -3802,13 +3802,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageGetTable(){
         global $_W, $_GPC;
         $time=strtotime(date("Y-m-d"));
-        $del="delete from ".tablename('pintuan_number')." where uniacid={$_W['uniacid']} and unix_timestamp(time)< {$time}";
+        $del="delete from ".tablename('mask_number')." where uniacid={$_W['uniacid']} and unix_timestamp(time)< {$time}";
         pdo_query($del);
-        $sql=" select * from ".tablename('pintuan_numbertype')." where store_id={$_GPC['store_id']} and uniacid={$_W['uniacid']} order by sort asc";
+        $sql=" select * from ".tablename('mask_numbertype')." where store_id={$_GPC['store_id']} and uniacid={$_W['uniacid']} order by sort asc";
         $list=pdo_fetchall($sql);
         foreach($list as $key => $value){
             $num=$value['typename'];
-            $newsql=" select count(id) as total from ".tablename('pintuan_number')." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']}  and num='{$num}' and state=1  order by id asc";
+            $newsql=" select count(id) as total from ".tablename('mask_number')." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']}  and num='{$num}' and state=1  order by id asc";
             $res=pdo_fetch($newsql);
             $list[$key]['wait']=$res['total'];
 
@@ -3821,7 +3821,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageSaveNumber(){
         global $_W, $_GPC;
         //判断是否可以取号
-        $mynumber=pdo_get('pintuan_number',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id']));
+        $mynumber=pdo_get('mask_number',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id']));
         if($mynumber['state']!=1 or !$mynumber ){
             $time=date("Y-m-d",time());
             $data['store_id']=$_GPC['store_id'];
@@ -3831,7 +3831,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['state']=1;
             $data['time']=date('Y-m-d H:i:s');
             $data['uniacid']=$_W['uniacid'];
-            $sql=" select id,code from".tablename('pintuan_number')." where  store_id={$_GPC['store_id']} and time LIKE '%{$time}%' order by id desc ";
+            $sql=" select id,code from".tablename('mask_number')." where  store_id={$_GPC['store_id']} and time LIKE '%{$time}%' order by id desc ";
             $rst=pdo_fetch($sql);
             if($rst){
                 $str=substr($rst['code'],1);
@@ -3843,10 +3843,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             }else{
                 $data['code']="A0001";
             }
-            $res=pdo_insert('pintuan_number',$data);
+            $res=pdo_insert('mask_number',$data);
             $num_id=pdo_insertid();
             if($res){
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=NumberMessage&m=pintuan&num_id=".$num_id);//模板消息
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=NumberMessage&m=mask&num_id=".$num_id);//模板消息
                 echo $num_id;
             }else{
                 echo '取号失败';
@@ -3861,7 +3861,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //判断是否取号
     public  function doPageIsReceive(){
         global $_W, $_GPC;
-        $mynumber=pdo_getall('pintuan_number',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'state !='=>4),array(),'','id desc');
+        $mynumber=pdo_getall('mask_number',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'state !='=>4),array(),'','id desc');
         echo json_encode($mynumber[0]);
     }
 
@@ -3869,9 +3869,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //号详情
     public function doPageNumberDetails(){
         global $_W, $_GPC;
-        $sql=" select a.id,a.code,a.num,a.time,a.state,a.people,a.store_id,b.name as store_name  from".tablename('pintuan_number')." a left join".tablename('pintuan_store')."b on a.store_id=b.id  where  a.id={$_GPC['num_id']}  ";
+        $sql=" select a.id,a.code,a.num,a.time,a.state,a.people,a.store_id,b.name as store_name  from".tablename('mask_number')." a left join".tablename('mask_store')."b on a.store_id=b.id  where  a.id={$_GPC['num_id']}  ";
         $details=pdo_fetch($sql);
-        $newsql=" select count(id) as count from  ".tablename('pintuan_number')." where uniacid={$_W['uniacid']} and store_id={$details['store_id']}  and num='{$details['num']}' and state=1  and id<{$_GPC['num_id']}";
+        $newsql=" select count(id) as count from  ".tablename('mask_number')." where uniacid={$_W['uniacid']} and store_id={$details['store_id']}  and num='{$details['num']}' and state=1  and id<{$_GPC['num_id']}";
         $res=pdo_fetch($newsql);
         $details['wait']=$res['count'];
         echo json_encode($details);
@@ -3881,7 +3881,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //删除号码
     public function doPageDelNumber(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_number',array('state'=>4),array('id'=>$_GPC['num_id']));
+        $res=pdo_update('mask_number',array('state'=>4),array('id'=>$_GPC['num_id']));
         echo json_encode($res);
 
 
@@ -3891,7 +3891,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //下订单发短信
     public function doPageSms(){
         global $_W, $_GPC;
-        $res = pdo_get('pintuan_sms', array('store_id' => $_GPC['store_id']));
+        $res = pdo_get('mask_sms', array('store_id' => $_GPC['store_id']));
         if($res['item']==1){
             if($_GPC['type']==1){//外卖
                 $tpl_id = $res['wm_tid'];
@@ -3912,7 +3912,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             }
         }
         if($res['item']==2){
-            include IA_ROOT.'/addons/pintuan/txsms/SmsSingleSender.php';
+            include IA_ROOT.'/addons/mask/txsms/SmsSingleSender.php';
             $appid = $res['appid'];; // 1400开头
             $appkey = $res['tx_appkey'];;
             $phoneNumbers = $res['tel'];;
@@ -3955,7 +3955,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['state']=1;//开启
         $data['time']=date('Y-m-d H:i:s');
         $data['uniacid']=$_W['uniacid'];
-        $res=pdo_insert('pintuan_drorder',$data);
+        $res=pdo_insert('mask_drorder',$data);
         $id=pdo_insertid();
         if($res){
             echo  $id;
@@ -3966,7 +3966,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //完成多人点菜
     public function doPageWcDrShop(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_drorder',array('state'=>3),array('id'=>$_GPC['id']));
+        $res=pdo_update('mask_drorder',array('state'=>3),array('id'=>$_GPC['id']));
         if($res){
             echo '1';
         }else{
@@ -3976,7 +3976,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //锁定多人点菜
     public function doPageSdDrShop(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_drorder',array('state'=>2),array('id'=>$_GPC['id']));
+        $res=pdo_update('mask_drorder',array('state'=>2),array('id'=>$_GPC['id']));
         if($res){
             echo '1';
         }else{
@@ -3986,7 +3986,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //解锁多人点菜
     public function doPageJsDrShop(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_drorder',array('state'=>1),array('id'=>$_GPC['id']));
+        $res=pdo_update('mask_drorder',array('state'=>1),array('id'=>$_GPC['id']));
         if($res){
             echo '1';
         }else{
@@ -3996,8 +3996,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //多人点菜列表
     public function doPageDrShopList(){
         global $_W, $_GPC;
-        $user=pdo_get('pintuan_user',array('id'=>$_GPC['user_id']));
-        $sql="select a.*,b.name,b.logo from".tablename('pintuan_shopcar')." a"  . " left join " . tablename("pintuan_goods") . " b on b.id=a.good_id where  a.store_id={$_GPC['store_id']} and a.user_id={$_GPC['user_id']} and a.son_id=0 and a.type=2";
+        $user=pdo_get('mask_user',array('id'=>$_GPC['user_id']));
+        $sql="select a.*,b.name,b.logo from".tablename('mask_shopcar')." a"  . " left join " . tablename("mask_goods") . " b on b.id=a.good_id where  a.store_id={$_GPC['store_id']} and a.user_id={$_GPC['user_id']} and a.son_id=0 and a.type=2";
         $res=pdo_fetchall($sql);
         $num2=0;
         $money2=0;
@@ -4011,9 +4011,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             'good'=>$res
         );
 
-        $sql2=" select distinct son_id from".tablename('pintuan_shopcar')." where  store_id={$_GPC['store_id']} and dr_id={$_GPC['dr_id']} and user_id={$_GPC['user_id']} and son_id !=0 and type=2";
+        $sql2=" select distinct son_id from".tablename('mask_shopcar')." where  store_id={$_GPC['store_id']} and dr_id={$_GPC['dr_id']} and user_id={$_GPC['user_id']} and son_id !=0 and type=2";
         $res2=pdo_fetchall($sql2);
-        $sql4=" select * from".tablename('pintuan_shopcar')." where  store_id={$_GPC['store_id']} and dr_id={$_GPC['dr_id']} and user_id={$_GPC['user_id']} and son_id !=0 and type=2";
+        $sql4=" select * from".tablename('mask_shopcar')." where  store_id={$_GPC['store_id']} and dr_id={$_GPC['dr_id']} and user_id={$_GPC['user_id']} and son_id !=0 and type=2";
         $res4=pdo_fetchall($sql4);
         $data2=array();
         $num=0;
@@ -4025,8 +4025,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         for($i=0;$i<count($res2);$i++){
             $money=$res2[$i]['num']*$res2[$i]['money']+$money;
             $num=$res2[$i]['num']+$num;
-            $user2=pdo_get('pintuan_user',array('id'=>$res2[$i]['son_id']));
-            $sql3="select a.*,b.name,b.logo from".tablename('pintuan_shopcar')." a"  . " left join " . tablename("pintuan_goods") . " b on b.id=a.good_id where  a.store_id={$_GPC['store_id']} and a.user_id={$_GPC['user_id']} and a.son_id={$res2[$i]['son_id']} and a.dr_id={$_GPC['dr_id']} and a.type=2";
+            $user2=pdo_get('mask_user',array('id'=>$res2[$i]['son_id']));
+            $sql3="select a.*,b.name,b.logo from".tablename('mask_shopcar')." a"  . " left join " . tablename("mask_goods") . " b on b.id=a.good_id where  a.store_id={$_GPC['store_id']} and a.user_id={$_GPC['user_id']} and a.son_id={$res2[$i]['son_id']} and a.dr_id={$_GPC['dr_id']} and a.type=2";
             $res3=pdo_fetchall($sql3);
             $data2[]=array(
                 'user_name'=>$user2['name'],
@@ -4035,7 +4035,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 'good'=>$res3
             );
         }
-        $dr=pdo_get('pintuan_drorder',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'state !='=>3));
+        $dr=pdo_get('mask_drorder',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'state !='=>3));
         $data3=array(
             'user'=>$data,
             'son'=>$data2,
@@ -4050,7 +4050,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //查看我的多人点菜
     public function doPageIsDr(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_drorder',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'state !='=>3));
+        $res=pdo_get('mask_drorder',array('user_id'=>$_GPC['user_id'],'store_id'=>$_GPC['store_id'],'state !='=>3));
         if($res){
             echo $res['id'];
         }else{
@@ -4061,9 +4061,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //入驻支付
     public function doPageRzPay(){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/wxpay.php';
-        $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-        $res2=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/wxpay.php';
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $res2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         if($res2['url_name']){
             $res2['url_name']=$res2['url_name'];
         }else{
@@ -4075,7 +4075,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $key=$res['wxkey'];
         $out_trade_no = $mch_id. time();
         $root=$_W['siteroot'];
-        pdo_update('pintuan_store',array('code'=>$out_trade_no),array('id'=>$_GPC['rz_id']));
+        pdo_update('mask_store',array('code'=>$out_trade_no),array('id'=>$_GPC['rz_id']));
         $total_fee =$_GPC['money'];
         if(empty($total_fee)) //押金
         {
@@ -4093,7 +4093,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //入驻期限
     public function doPageGetRzqx(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_rzqx',array('uniacid'=>$_W['uniacid']),array(),'','num ASC');
+        $res=pdo_getall('mask_rzqx',array('uniacid'=>$_W['uniacid']),array(),'','num ASC');
         echo json_encode($res);
     }
 
@@ -4101,7 +4101,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //门店入驻
     public function doPageSaveRzsq(){
         global $_W, $_GPC;
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']),array('md_sh','md_sf'));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),array('md_sh','md_sf'));
         $data['name'] = $_GPC['name'];
         $data['sq_id'] = $_GPC['user_id'];
         $data['user_id'] = $_GPC['user_id'];
@@ -4132,10 +4132,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             }else{
                 $data['zf_state'] = 2;
             }
-            $res = pdo_insert('pintuan_store', $data);
+            $res = pdo_insert('mask_store', $data);
             $rz_id = pdo_insertid();
         }else{
-            $res = pdo_update('pintuan_store', $data,array('id'=>$_GPC['id']));
+            $res = pdo_update('mask_store', $data,array('id'=>$_GPC['id']));
         }
         if ($res) {
             echo $rz_id;
@@ -4153,7 +4153,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['time'] = time();
         $data['note']='入驻';
         $data['uniacid'] = $_W['uniacid'];
-        $res = pdo_insert('pintuan_rzlog', $data);
+        $res = pdo_insert('mask_rzlog', $data);
         if($res){
             echo '1';
         }else{
@@ -4164,7 +4164,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //短信验证码
     public function doPageSms2(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
         if($res['item']==1){
             $tpl_id=$res['tpl_id'];
             $tel=$_GPC['tel'];
@@ -4175,7 +4175,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             print_r($data);
         }
         if($res['item']==2){
-            include IA_ROOT.'/addons/pintuan/txsms/SmsSingleSender.php';
+            include IA_ROOT.'/addons/mask/txsms/SmsSingleSender.php';
             $appid = $res['appid'];; // 1400开头
             $appkey = $res['tx_appkey'];;
             $phoneNumbers = $_GPC['tel'];;
@@ -4198,7 +4198,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //是否入住
     public function doPageCheckRz(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_store',array('uniacid'=>$_W['uniacid'],'sq_id'=>$_GPC['user_id'],'zf_state'=>2));
+        $res=pdo_get('mask_store',array('uniacid'=>$_W['uniacid'],'sq_id'=>$_GPC['user_id'],'zf_state'=>2));
         echo json_encode($res);
     }
 
@@ -4206,7 +4206,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //是否开启短息
     public function doPageCheckSms(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']),'is_dxyz');
+        $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']),'is_dxyz');
         echo json_encode($res);
     }
 
@@ -4216,7 +4216,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageRzMessage(){
         global $_W, $_GPC;
         function getaccess_token($_W){
-            $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $appid=$res['appid'];
             $secret=$res['appsecret'];
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -4232,15 +4232,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         //设置与发送模板信息
         function set_msg($_W){
             $access_token = getaccess_token($_W);
-            $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-            $res2=pdo_get('pintuan_store',array('id'=>$_GET['sh_id']));
-            $user=pdo_get('pintuan_user',array('id'=>$res2['sq_id']));
+            $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+            $res2=pdo_get('mask_store',array('id'=>$_GET['sh_id']));
+            $user=pdo_get('mask_user',array('id'=>$res2['sq_id']));
             $state="等待审核";
             $note="1-3日完成审核";
             $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["rzsh_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$_GET['form_id'].'",
            "data": {
              "keyword1": {
@@ -4285,13 +4285,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
     public function doPageJcPrint(){ //前台打印
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/print/dyj.php';
-        $res=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        $store=pdo_get('pintuan_store',array('id'=>$res['store_id']),'name');
-        $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>1));
+        include IA_ROOT.'/addons/mask/print/dyj.php';
+        $res=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        $store=pdo_get('mask_store',array('id'=>$res['store_id']),'name');
+        $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>1));
         $ids=explode(',',$_GPC['good']);
-        $res2=pdo_getall('pintuan_order_goods',array('id'=>$ids));
-        $sql=" select a.name,b.name as type_name from ".tablename('pintuan_table')." a left join ".tablename('pintuan_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
+        $res2=pdo_getall('mask_order_goods',array('id'=>$ids));
+        $sql=" select a.name,b.name as type_name from ".tablename('mask_table')." a left join ".tablename('mask_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
         $table=pdo_fetch($sql);
         foreach ($res3 as $key => $value) {
             $style="\n";
@@ -4359,26 +4359,26 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
     public function doPageJcPrint2(){ //后厨打印
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/print/hcdyj.php';
-        $res=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
+        include IA_ROOT.'/addons/mask/print/hcdyj.php';
+        $res=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
         $ids=$_GPC['good'];
         //echo $ids;die;
-        $sql="select a.*,b.label_id from".tablename('pintuan_order_goods')." a left join ".tablename('pintuan_goods')." b on a.dishes_id=b.id  where a.id in  ($ids)";
+        $sql="select a.*,b.label_id from".tablename('mask_order_goods')." a left join ".tablename('mask_goods')." b on a.dishes_id=b.id  where a.id in  ($ids)";
         $res2=pdo_fetchall($sql);
-        $sql=" select a.name,b.name as type_name from ".tablename('pintuan_table')." a left join ".tablename('pintuan_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
+        $sql=" select a.name,b.name as type_name from ".tablename('mask_table')." a left join ".tablename('mask_table_type')." b on a.type_id=b.id where a.id={$res['table_id']}";
         $table=pdo_fetch($sql);
 
-        $print=pdo_get('pintuan_storeset',array('store_id'=>$res['store_id']),array('is_jd','print_mode'));
+        $print=pdo_get('mask_storeset',array('store_id'=>$res['store_id']),array('is_jd','print_mode'));
         $result =   array();
         //判断打印类型
-        $type=pdo_get('pintuan_storeset',array('store_id'=>$res['store_id']));
+        $type=pdo_get('mask_storeset',array('store_id'=>$res['store_id']));
         if($type['print_type']==2){
             //按相同标签组成新的数组
             foreach($res2 as $k=>$v){
                 $result[$v['label_id']][]    =   $v;
             }
             foreach ($result as $key => $value) {
-                $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2,'tag_id'=>$key));
+                $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2,'tag_id'=>$key));
                 $content1 .= "         订单编号  #".$_GPC['order_id']."\n\n";
                 $content1 .= "          ".$res3[0]['dyj_title']."\n\n";
                 $content1 .= "下单时间：".$res['time']."\n\n";
@@ -4421,8 +4421,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             }
 
         }else{
-            $store=pdo_get('pintuan_store',array('id'=>$res['store_id']),'name');
-            $res3=pdo_getall('pintuan_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2));
+            $store=pdo_get('mask_store',array('id'=>$res['store_id']),'name');
+            $res3=pdo_getall('mask_dyj',array('store_id'=>$res['store_id'],'state'=>1,'location'=>2));
             $content .= "         ".$store['name']."\n\n";
             $content .= "         订单编号  #".$res['id']."\n\n";
             $content .= "--------------------------------"."\n";
@@ -4487,7 +4487,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $member['password'] = $_GPC['password'];
         $record = user_single($member);
         if(!empty($record)) {
-            $account = pdo_fetch("SELECT * FROM " . tablename("pintuan_account") . " WHERE status=2 AND uid=:uid ORDER BY id DESC LIMIT 1", array(':uid' => $record['uid']));
+            $account = pdo_fetch("SELECT * FROM " . tablename("mask_account") . " WHERE status=2 AND uid=:uid ORDER BY id DESC LIMIT 1", array(':uid' => $record['uid']));
             if (!empty($account)) {
                 echo json_encode($account);
             } else {
@@ -4500,7 +4500,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //商家微信登录
     public function doPageStoreWxLogin(){
         global $_GPC, $_W;
-        $res=pdo_get('pintuan_store',array('admin_id'=>$_GPC['user_id'],'state'=>2));
+        $res=pdo_get('mask_store',array('admin_id'=>$_GPC['user_id'],'state'=>2));
         if($res){
             echo json_encode($res);
         }else{
@@ -4520,10 +4520,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=empty($_GPC['pagesize'])?10:$_GPC['pagesize'];
-        $sql="select  a.*,b.ps_mode  from " . tablename("pintuan_order") ." a left join ".tablename('pintuan_storeset')." b on a.store_id=b.store_id".$where." order by a.id DESC";
+        $sql="select  a.*,b.ps_mode  from " . tablename("mask_order") ." a left join ".tablename('mask_storeset')." b on a.store_id=b.store_id".$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql);
-        $good=pdo_getall('pintuan_order_goods',array('uniacid'=>$_W['uniacid']));
+        $good=pdo_getall('mask_order_goods',array('uniacid'=>$_W['uniacid']));
         $data2=array();
         for($i=0;$i<count($list);$i++){
             $data=array();
@@ -4581,10 +4581,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select  a.*,b.name as table_name,c.name as table_typename,b.status  from " . tablename("pintuan_order") ." a left join ".tablename('pintuan_table')." b on a.table_id=b.id left join ".tablename('pintuan_table_type')." c on b.type_id=c.id ".$where." order by a.id DESC";
+        $sql="select  a.*,b.name as table_name,c.name as table_typename,b.status  from " . tablename("mask_order") ." a left join ".tablename('mask_table')." b on a.table_id=b.id left join ".tablename('mask_table_type')." c on b.type_id=c.id ".$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql);
-        $good=pdo_getall('pintuan_order_goods',array('uniacid'=>$_W['uniacid']));
+        $good=pdo_getall('mask_order_goods',array('uniacid'=>$_W['uniacid']));
         $data2=array();
         for($i=0;$i<count($list);$i++){
             $data=array();
@@ -4640,7 +4640,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select  a.*,b.name as user_name,b.img as user_img from " . tablename("pintuan_order") ." a left join ".tablename('pintuan_user')." b on a.user_id=b.id ".$where." order by a.id DESC";
+        $sql="select  a.*,b.name as user_name,b.img as user_img from " . tablename("mask_order") ." a left join ".tablename('mask_user')." b on a.user_id=b.id ".$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql);
         echo  json_encode($list);
@@ -4649,9 +4649,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageDnClose(){
         global $_GPC, $_W;
         $id=$_GPC['order_id'];
-        $res= pdo_update('pintuan_order',array('dn_state'=>3), array('id'=>$id));
+        $res= pdo_update('mask_order',array('dn_state'=>3), array('id'=>$id));
         if($res){
-            pdo_update('pintuan_table',array('status'=>0), array('id'=>$res['table_id']));
+            pdo_update('mask_table',array('status'=>0), array('id'=>$res['table_id']));
             echo '1';
         }else{
             echo '2';
@@ -4661,7 +4661,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageDnReceivables(){
         global $_GPC, $_W;
         $id=$_GPC['order_id'];
-        $result = pdo_update('pintuan_order',array('dn_state'=>2,'pay_time'=>date("Y-m-d H:i:s")), array('id'=>$id));
+        $result = pdo_update('mask_order',array('dn_state'=>2,'pay_time'=>date("Y-m-d H:i:s")), array('id'=>$id));
         if($result){
             echo '1';
         }else{
@@ -4673,7 +4673,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_GPC, $_W;
         $table_id=$_GPC['table_id'];
         $data2['status']=$_GPC['status'];
-        $result = pdo_update('pintuan_table',$data2, array('id'=>$table_id));
+        $result = pdo_update('mask_table',$data2, array('id'=>$table_id));
         if($result){
             echo '1';
         }else{
@@ -4684,7 +4684,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //修改商家信息
     public function doPageUpdStoreInfo(){
         global $_GPC, $_W;
-        $store=pdo_get('pintuan_store',array('id'=>$_GPC['id']));
+        $store=pdo_get('mask_store',array('id'=>$_GPC['id']));
         if($_GPC['logo']!=$store['logo']){
             $data['logo']=$_W['attachurl'].$_GPC['logo'];
         }
@@ -4699,8 +4699,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['environment']=$_GPC['environment'];
         $data2['xyh_open']=$_GPC['xyh_open'];
         $data2['xyh_money']=$_GPC['xyh_money'];
-        $res=pdo_update('pintuan_store',$data,array('id'=>$_GPC['id']));
-        $res2=pdo_update('pintuan_storeset',$data2,array('store_id'=>$_GPC['id']));
+        $res=pdo_update('mask_store',$data,array('id'=>$_GPC['id']));
+        $res2=pdo_update('mask_storeset',$data2,array('store_id'=>$_GPC['id']));
         if($res || $res2){
             echo '1';
         }else{
@@ -4715,39 +4715,39 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $order_id=$_GPC['order_id'];
         $data2['state']=3;
         $data2['jd_time']=date('Y-m-d H:i:s');
-        $sql=" select ps_mode,is_jd,print_mode from".tablename('pintuan_storeset')." where store_id=(select store_id from".tablename('pintuan_order')."where id={$_GPC['order_id']})";
+        $sql=" select ps_mode,is_jd,print_mode from".tablename('mask_storeset')." where store_id=(select store_id from".tablename('mask_order')."where id={$_GPC['order_id']})";
         $store=pdo_fetch($sql);
 
-        $orderInfo=pdo_get('pintuan_order',array('id'=>$order_id),'order_type');
-        $sys=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']),'ps_name');
+        $orderInfo=pdo_get('mask_order',array('id'=>$order_id),'order_type');
+        $sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),'ps_name');
         $ps_name=empty($sys['ps_name'])?'超级跑腿':$sys['ps_name'];
         if($orderInfo['order_type']==1){
             if($store['ps_mode']=='商家配送'){
-                $res=pdo_update('pintuan_order',$data2,array('id'=>$order_id));
+                $res=pdo_update('mask_order',$data2,array('id'=>$order_id));
             }
             if($store['ps_mode']=='达达配送'){
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=TestDada&m=pintuan&order_id=".$_GPC['order_id']);//达达
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=TestDada&m=mask&order_id=".$_GPC['order_id']);//达达
                 //$result=$result['fee'];
-                $res=pdo_update('pintuan_order',$data2,array('id'=>$order_id));
+                $res=pdo_update('mask_order',$data2,array('id'=>$order_id));
             }
             if($store['ps_mode']=='快服务配送'){
-                $res=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=kfw&m=pintuan&order_id=".$_GPC['order_id']);//快服务
+                $res=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=kfw&m=mask&order_id=".$_GPC['order_id']);//快服务
                 $data2['ship_id']=$res;
-                $res=pdo_update('pintuan_order',$data2,array('id'=>$order_id));
+                $res=pdo_update('mask_order',$data2,array('id'=>$order_id));
             }
             if($store['ps_mode']==$ps_name){
-                $result=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=cjpt&m=pintuan&order_id=".$_GPC['order_id']);//跑腿
+                $result=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=cjpt&m=mask&order_id=".$_GPC['order_id']);//跑腿
                 if(json_decode($result)->code=='200'){
-                    $res=pdo_update('pintuan_order',$data2,array('id'=>$order_id));
+                    $res=pdo_update('mask_order',$data2,array('id'=>$order_id));
                 }
             }
         }else{
-            $res=pdo_update('pintuan_order',$data2,array('id'=>$order_id));
+            $res=pdo_update('mask_order',$data2,array('id'=>$order_id));
         }
 
         ///////////////模板消息///////////////////
         function getaccess_token($_W){
-            $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $appid=$res['appid'];
             $secret=$res['appsecret'];
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -4763,8 +4763,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         //设置与发送模板信息
         function set_msg($_W){
             $access_token = getaccess_token($_W);
-            $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-            $res2=pdo_get('pintuan_order',array('id'=>$_GET['order_id']));
+            $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+            $res2=pdo_get('mask_order',array('id'=>$_GET['order_id']));
             if($res2['order_type']==1){
                 $yjsd="预计".$storeset['ps_time']."送达";
                 $ddxx="外卖订单";
@@ -4772,13 +4772,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $yjsd="请按时去店内取货";
                 $ddxx="自提订单";
             }
-            $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-            $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-            $storeset=pdo_get('pintuan_storeset',array('store_id'=>$res2['store_id']));
+            $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+            $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+            $storeset=pdo_get('mask_storeset',array('store_id'=>$res2['store_id']));
             $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["jd_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$res2['form_id2'].'",
            "data": {
              "keyword1": {
@@ -4820,8 +4820,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         if($res){
             //判断商家打印方式
             if($store['print_mode']==2){
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=pintuan&order_id=".$order_id);//打印机
-                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=pintuan&order_id=".$order_id);//打印机
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=mask&order_id=".$order_id);//打印机
+                file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=mask&order_id=".$order_id);//打印机
             }
             echo '1';
         }else{
@@ -4835,21 +4835,21 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageJjOrder(){
         global $_GPC, $_W;
         $data2['state']=7;
-        $type=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
+        $type=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
         /////////////////////////////////////
         function wxrefund($order_id){
             global $_W, $_GPC;
-            include_once IA_ROOT . '/addons/pintuan/cert/WxPay.Api.php';
+            include_once IA_ROOT . '/addons/mask/cert/WxPay.Api.php';
             load()->model('account');
             load()->func('communication');
-            $refund_order =pdo_get('pintuan_order',array('id'=>$order_id));
+            $refund_order =pdo_get('mask_order',array('id'=>$order_id));
             $WxPayApi = new WxPayApi();
             $input = new WxPayRefund();
-            $path_cert = IA_ROOT . "/addons/pintuan/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
-            $path_key = IA_ROOT . "/addons/pintuan/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
+            $path_cert = IA_ROOT . "/addons/mask/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
+            $path_key = IA_ROOT . "/addons/mask/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
             $account_info = $_W['account'];
-            $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-            $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+            $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 
             $appid=$system['appid'];
             $key=$res['wxkey'];
@@ -4874,7 +4874,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $result=wxrefund($_GPC['order_id']);
             }
             if($type['pay_type']==2){//余额退款
-                $rst=pdo_get('pintuan_qbmx',array('user_id'=>$type['user_id'],'order_id'=>$type['id']));
+                $rst=pdo_get('mask_qbmx',array('user_id'=>$type['user_id'],'order_id'=>$type['id']));
                 if(!$rst){
                     $tk['money'] = $type['money'];
                     $tk['order_id'] = $type['id'];
@@ -4882,24 +4882,24 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $tk['type'] = 1;
                     $tk['note'] = '订单退款';
                     $tk['time'] = date('Y-m-d H:i:s');
-                    $tkres = pdo_insert('pintuan_qbmx', $tk);
-                    pdo_update('pintuan_user', array('wallet +=' => $type['money']), array('id' => $type['user_id']));
+                    $tkres = pdo_insert('mask_qbmx', $tk);
+                    pdo_update('mask_user', array('wallet +=' => $type['money']), array('id' => $type['user_id']));
                 }
             }
             if ($result['result_code'] == 'SUCCESS' || $tkres) {//退款成功
                 //更改订单操作
-                pdo_update('pintuan_order',array('state'=>7),array('id'=>$_GPC['order_id']));
+                pdo_update('mask_order',array('state'=>7),array('id'=>$_GPC['order_id']));
                 if($type['coupon_id']){
-                    pdo_update('pintuan_usercoupons',array('state'=>2),array('id'=>$type['coupon_id']));
+                    pdo_update('mask_usercoupons',array('state'=>2),array('id'=>$type['coupon_id']));
                 }
                 if($type['coupon_id2']){
-                    pdo_update('pintuan_usercoupons',array('state'=>2),array('id'=>$type['coupon_id2']));
+                    pdo_update('mask_usercoupons',array('state'=>2),array('id'=>$type['coupon_id2']));
                 }
-                pdo_update('pintuan_earnings',array('state'=>3),array('order_id'=>$_GPC['order_id']));
-                pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+                pdo_update('mask_earnings',array('state'=>3),array('order_id'=>$_GPC['order_id']));
+                pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
                 ///////////////模板消息拒绝///////////////////
                 function getaccess_token($_W){
-                    $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+                    $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
                     $appid=$res['appid'];
                     $secret=$res['appsecret'];
                     $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -4915,15 +4915,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 //设置与发送模板信息
                 function set_msg($_W){
                     $access_token = getaccess_token($_W);
-                    $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-                    $res2=pdo_get('pintuan_order',array('id'=>$_GET['order_id']));
-                    $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-                    $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-                    $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+                    $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+                    $res2=pdo_get('mask_order',array('id'=>$_GET['order_id']));
+                    $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+                    $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+                    $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
                     $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["jj_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -4968,14 +4968,14 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data = curl_exec($ch);
                     curl_close($ch);
                     // return $data;
-                    pdo_delete('pintuan_formid',array('id'=>$form['id']));
+                    pdo_delete('mask_formid',array('id'=>$form['id']));
                 }
                 echo set_msg($_W);
                 ///////////////模板消息///////////////////
                 ///
                 ///////////////模板消息退款///////////////////
                 function getaccess_token2($_W){
-                    $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+                    $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
                     $appid=$res['appid'];
                     $secret=$res['appsecret'];
                     $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -4991,20 +4991,20 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 //设置与发送模板信息
                 function set_msg2($_W){
                     $access_token = getaccess_token2($_W);
-                    $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-                    $res2=pdo_get('pintuan_order',array('id'=>$_GET['order_id']));
+                    $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+                    $res2=pdo_get('mask_order',array('id'=>$_GET['order_id']));
                     if($res2['pay_type']==1){
                         $note='微信钱包';
                     }elseif($res2['pay_type']==2){
                         $note='余额钱包';
                     }
-                    $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-                    $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-                    $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+                    $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+                    $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+                    $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
                     $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["tk_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -5041,7 +5041,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data = curl_exec($ch);
                     curl_close($ch);
                     // return $data;
-                    pdo_delete('pintuan_formid',array('id'=>$form['id']));
+                    pdo_delete('mask_formid',array('id'=>$form['id']));
                 }
                 echo set_msg2($_W);
                 ///////////////模板消息///////////////////
@@ -5051,20 +5051,20 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 echo '2';
             }
         }else{
-            $rst=pdo_update('pintuan_order',array('state'=>7),array('id'=>$_GPC['order_id']));
+            $rst=pdo_update('mask_order',array('state'=>7),array('id'=>$_GPC['order_id']));
             if($rst){
 
                 if($type['coupon_id']){
-                    pdo_update('pintuan_usercoupons',array('state'=>2),array('id'=>$type['coupon_id']));
+                    pdo_update('mask_usercoupons',array('state'=>2),array('id'=>$type['coupon_id']));
                 }
                 if($type['coupon_id2']){
-                    pdo_update('pintuan_usercoupons',array('state'=>2),array('id'=>$type['coupon_id2']));
+                    pdo_update('mask_usercoupons',array('state'=>2),array('id'=>$type['coupon_id2']));
                 }
 
 
                 ///////////////模板消息拒绝///////////////////
                 function getaccess_token($_W){
-                    $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+                    $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
                     $appid=$res['appid'];
                     $secret=$res['appsecret'];
                     $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -5080,15 +5080,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 //设置与发送模板信息
                 function set_msg($_W){
                     $access_token = getaccess_token($_W);
-                    $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-                    $res2=pdo_get('pintuan_order',array('id'=>$_GET['order_id']));
-                    $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-                    $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-                    $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+                    $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+                    $res2=pdo_get('mask_order',array('id'=>$_GET['order_id']));
+                    $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+                    $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+                    $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
                     $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["jj_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -5132,7 +5132,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     curl_setopt($ch, CURLOPT_POSTFIELDS,$formwork);
                     $data = curl_exec($ch);
                     curl_close($ch);
-                    pdo_delete('pintuan_formid',array('id'=>$form['id']));
+                    pdo_delete('mask_formid',array('id'=>$form['id']));
                     //return $data;
                 }
                 echo set_msg($_W);
@@ -5147,7 +5147,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
     public function doPageJjTk(){
         global $_GPC, $_W;
-        $rst=pdo_update('pintuan_order',array('state'=>10),array('id'=>$_GPC['order_id']));
+        $rst=pdo_update('mask_order',array('state'=>10),array('id'=>$_GPC['order_id']));
         if($rst){
             echo '1';
         }else{
@@ -5156,21 +5156,21 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     }
     public function doPageTkTg(){
         global $_GPC, $_W;
-        $type=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
+        $type=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
         ////////////////////////////////////////
         function wxrefund($order_id){
             global $_W, $_GPC;
-            include_once IA_ROOT . '/addons/pintuan/cert/WxPay.Api.php';
+            include_once IA_ROOT . '/addons/mask/cert/WxPay.Api.php';
             load()->model('account');
             load()->func('communication');
-            $refund_order =pdo_get('pintuan_order',array('id'=>$order_id));
+            $refund_order =pdo_get('mask_order',array('id'=>$order_id));
             $WxPayApi = new WxPayApi();
             $input = new WxPayRefund();
-            $path_cert = IA_ROOT . "/addons/pintuan/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
-            $path_key = IA_ROOT . "/addons/pintuan/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
+            $path_cert = IA_ROOT . "/addons/mask/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
+            $path_key = IA_ROOT . "/addons/mask/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
             $account_info = $_W['account'];
-            $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-            $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+            $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 
             $appid=$system['appid'];
             $key=$res['wxkey'];
@@ -5193,11 +5193,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
         function qxkfw($order_id){
             global $_W, $_GPC;
-            include IA_ROOT.'/addons/pintuan/peisong/peisong.php';
-            $order=pdo_get('pintuan_order',array('id'=>$order_id));
-            $set=pdo_get('pintuan_kfwset',array('store_id'=>$order['store_id']));
-            $storeInfo=pdo_get('pintuan_store',array('id'=>$order['store_id']));
-            $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            include IA_ROOT.'/addons/mask/peisong/peisong.php';
+            $order=pdo_get('mask_order',array('id'=>$order_id));
+            $set=pdo_get('mask_kfwset',array('store_id'=>$order['store_id']));
+            $storeInfo=pdo_get('mask_store',array('id'=>$order['store_id']));
+            $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             //下订单
             $data = array(
                 'app_id'=>  $system['kfw_appid'],
@@ -5222,7 +5222,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $result=wxrefund($_GPC['order_id']);
         }
         if($type['pay_type']==2){//余额退款
-            $rst=pdo_get('pintuan_qbmx',array('user_id'=>$type['user_id'],'order_id'=>$type['id']));
+            $rst=pdo_get('mask_qbmx',array('user_id'=>$type['user_id'],'order_id'=>$type['id']));
             if(!$rst){
                 $tk['money'] = $type['money'];
                 $tk['order_id'] = $type['id'];
@@ -5230,20 +5230,20 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $tk['type'] = 1;
                 $tk['note'] = '订单退款';
                 $tk['time'] = date('Y-m-d H:i:s');
-                $tkres = pdo_insert('pintuan_qbmx', $tk);
-                pdo_update('pintuan_user', array('wallet +=' => $type['money']), array('id' => $type['user_id']));
+                $tkres = pdo_insert('mask_qbmx', $tk);
+                pdo_update('mask_user', array('wallet +=' => $type['money']), array('id' => $type['user_id']));
             }
         }
 
         if ($result['result_code'] == 'SUCCESS' || $tkres) {//退款成功
             //更改订单操作
-            pdo_update('pintuan_order',array('state'=>9),array('id'=>$_GPC['order_id']));
+            pdo_update('mask_order',array('state'=>9),array('id'=>$_GPC['order_id']));
             $result=qxkfw($_GPC['order_id']);
 
-            pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+            pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
             ///////////////模板消息退款///////////////////
             function getaccess_token($_W){
-                $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+                $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
                 $appid=$res['appid'];
                 $secret=$res['appsecret'];
                 $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -5259,20 +5259,20 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             //设置与发送模板信息
             function set_msg($_W){
                 $access_token = getaccess_token($_W);
-                $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-                $res2=pdo_get('pintuan_order',array('id'=>$_GET['order_id']));
+                $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+                $res2=pdo_get('mask_order',array('id'=>$_GET['order_id']));
                 if($res2['pay_type']==1){
                     $note='微信钱包';
                 }elseif($res2['pay_type']==2){
                     $note='余额钱包';
                 }
-                $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-                $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-                $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+                $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+                $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+                $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
                 $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["tk_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -5309,7 +5309,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $data = curl_exec($ch);
                 curl_close($ch);
                 // return $data;
-                pdo_delete('pintuan_formid',array('id'=>$form['id']));
+                pdo_delete('mask_formid',array('id'=>$form['id']));
             }
             echo set_msg($_W);
             ///////////////模板消息///////////////////
@@ -5351,10 +5351,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
 
         if($data){
-            $res=pdo_update('pintuan_store', $data, array('id' => $storeid));
+            $res=pdo_update('mask_store', $data, array('id' => $storeid));
         }
         if($data2){
-            $res2=pdo_update('pintuan_storeset', $data2, array('store_id' => $storeid));
+            $res2=pdo_update('mask_storeset', $data2, array('store_id' => $storeid));
         }
 
         if($res || $res2){
@@ -5371,7 +5371,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         function  getCoade($storeid,$order_id){
             function getaccess_token(){
                 global $_W, $_GPC;
-                $res=pdo_get('pintuan_system',array('uniacid' => $_W['uniacid']));
+                $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
                 $appid=$res['appid'];
                 $secret=$res['appsecret'];
                 // print_r($res);die;
@@ -5389,7 +5389,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $access_token = getaccess_token();
                 $data2=array(
                     "scene"=>$storeid.",".$order_id,
-                    "page"=>"pintuan/pages/sjzx/hx",
+                    "page"=>"mask/pages/sjzx/hx",
                     "width"=>400
                 );
                 $data2 = json_encode($data2);
@@ -5416,40 +5416,40 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $time = date("Y-m-d");
         $time = "'%$time%'";
-        $wm = "select sum(money) as total from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1";
+        $wm = "select sum(money) as total from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1";
         $wm = pdo_fetch($wm);//今天的外卖销售额
-        $wmnum = pdo_fetch("select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1");//今天的外卖单数
-        $wxwmnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1 and pay_type=1";
+        $wmnum = pdo_fetch("select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1");//今天的外卖单数
+        $wxwmnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1 and pay_type=1";
         $wxwmnum = pdo_fetch($wxwmnum);//今天的微信外卖单数
-        $ztwmnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1 and order_type=2";
+        $ztwmnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1 and order_type=2";
         $ztwmnum = pdo_fetch($ztwmnum);//今天的到店自提外卖单数
-        $hdwmnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1 and pay_type=4";
+        $hdwmnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1 and pay_type=4";
         $hdwmnum = pdo_fetch($hdwmnum);//今天的货到付款外卖单数
-        $yuewmnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1 and pay_type=2";
+        $yuewmnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and state in (2,3,4,5,10) and type=1 and pay_type=2";
         $yuewmnum = pdo_fetch($yuewmnum);//今天的余额外卖单数
         $wm=empty($wm['total'])?'0.00':$wm['total'];
 
 
-        $dn="select sum(money) as total from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2";
+        $dn="select sum(money) as total from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2";
         $dn = pdo_fetch($dn);//今天的店内销售额
         $dn=empty($dn['total'])?'0.00':$dn['total'];
-        $dnnum = pdo_fetch("select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2");//今天的店内单数
-        $wxdnnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2 and pay_type=1";
+        $dnnum = pdo_fetch("select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2");//今天的店内单数
+        $wxdnnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2 and pay_type=1";
         $wxdnnum = pdo_fetch($wxdnnum);//今天的微信店内单数
-        $yuednnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2 and pay_type=2";
+        $yuednnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2 and pay_type=2";
         $yuednnum = pdo_fetch($yuednnum);//今天的余额店内单数
-        $chdnnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2 and pay_type=5";
+        $chdnnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dn_state=2 and type=2 and pay_type=5";
         $chdnnum = pdo_fetch($chdnnum);//今天的餐后店内单数
 
 
 
-        $dm="select sum(money) as total from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dm_state=2 and type=4";
+        $dm="select sum(money) as total from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dm_state=2 and type=4";
         $dm = pdo_fetch($dm);//今天的当面付销售额
         $dm=empty($dm['total'])?'0.00':$dm['total'];
-        $dmnum = pdo_fetch("select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dm_state=2 and type=4");//今天的当面付单数
-        $wxdmnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dm_state=2 and type=4 and pay_type=1";
+        $dmnum = pdo_fetch("select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dm_state=2 and type=4");//今天的当面付单数
+        $wxdmnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dm_state=2 and type=4 and pay_type=1";
         $wxdmnum = pdo_fetch($wxdmnum);//今天的微信当面付单数
-        $yuedmnum = "select count(id) as count from " . tablename("pintuan_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dm_state=2 and type=4 and pay_type=2";
+        $yuedmnum = "select count(id) as count from " . tablename("mask_order") . " WHERE time LIKE " . $time . " and store_id=" . $_GPC['store_id'] . " and dm_state=2 and type=4 and pay_type=2";
         $yuedmnum = pdo_fetch($yuedmnum);//今天的余额当面付单数
 
 
@@ -5497,21 +5497,21 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //是否开启分销商
     public function doPageCheckRetail(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_fxset',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_fxset',array('uniacid'=>$_W['uniacid']));
         echo json_encode($res);
     }
 
     //查看我的申请
     public function doPageMyDistribution() {
         global $_W, $_GPC;
-        $res = pdo_get('pintuan_retail', array('user_id' => $_GPC['user_id']));
+        $res = pdo_get('mask_retail', array('user_id' => $_GPC['user_id']));
         echo json_encode($res);
     }
 
 //分销商申请
     public function doPageSaveRetail(){
         global $_W, $_GPC;
-        $fx_set=pdo_get('pintuan_fxset',array('uniacid'=>$_W['uniacid']),'is_check');
+        $fx_set=pdo_get('mask_fxset',array('uniacid'=>$_W['uniacid']),'is_check');
         $data['user_id'] = $_GPC['user_id'];
         $data['user_name'] = $_GPC['user_name'];
         $data['user_tel'] = $_GPC['user_tel'];
@@ -5523,7 +5523,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['sh_time'] = time();
         }
         $data['uniacid'] = $_W['uniacid'];
-        $res = pdo_insert('pintuan_retail', $data);
+        $res = pdo_insert('mask_retail', $data);
         if ($res) {
             echo '1';
         } else {
@@ -5534,9 +5534,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //分销数据
     public function doPageGetFxData(){
         global $_W, $_GPC;
-        $sql2="select sum( case when state=1 then money else 0 end) as djyj, sum( case when state=2 then money else 0 end) as yxjy from  ".tablename('pintuan_earnings')." where user_id={$_GPC['user_id']}";
+        $sql2="select sum( case when state=1 then money else 0 end) as djyj, sum( case when state=2 then money else 0 end) as yxjy from  ".tablename('mask_earnings')." where user_id={$_GPC['user_id']}";
         $yj=pdo_fetch($sql2);
-        $xjrs=pdo_get('pintuan_fxuser', array('user_id'=>$_GPC['user_id']), array('count(id) as count'));
+        $xjrs=pdo_get('mask_fxuser', array('user_id'=>$_GPC['user_id']), array('count(id) as count'));
         $data['djsyj']=0;
         $data['ljyj']=0;
         $data['rs']=0;
@@ -5561,10 +5561,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //查看我的上线
     public function doPageMySx() {
         global $_W, $_GPC;
-        $sql = "select a.* ,b.name,b.img from " . tablename("pintuan_fxuser") . " a" . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id   WHERE a.fx_user=:fx_user ";
+        $sql = "select a.* ,b.name,b.img from " . tablename("mask_fxuser") . " a" . " left join " . tablename("mask_user") . " b on b.id=a.user_id   WHERE a.fx_user=:fx_user ";
         $res = pdo_fetch($sql, array(':fx_user' => $_GPC['user_id']));
         if($res['user_id']==0){
-            $sys=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']),'link_logo');
+            $sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),'link_logo');
             $res['name']='总店';
             $res['img']=$sys['link_logo'];
         }
@@ -5573,7 +5573,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //查看我的佣金收益
     public function doPageEarnings() {
         global $_W, $_GPC;
-        $sql = "select a.* ,b.name,b.img from " . tablename("pintuan_earnings") . " a" . " left join " . tablename("pintuan_user") . " b on b.id=a.son_id   WHERE a.user_id=:user_id  order by id DESC";
+        $sql = "select a.* ,b.name,b.img from " . tablename("mask_earnings") . " a" . " left join " . tablename("mask_user") . " b on b.id=a.son_id   WHERE a.user_id=:user_id  order by id DESC";
         $res = pdo_fetchall($sql, array(':user_id' => $_GPC['user_id']));
         echo json_encode($res);
     }
@@ -5583,7 +5583,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         function getCoade($user_id) {
             function getaccess_token() {
                 global $_W, $_GPC;
-                $res = pdo_get('pintuan_system', array('uniacid' => $_W['uniacid']));
+                $res = pdo_get('mask_system', array('uniacid' => $_W['uniacid']));
                 $appid = $res['appid'];
                 $secret = $res['appsecret'];
                 // print_r($res);die;
@@ -5600,7 +5600,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                    "page"=>"pintuan/pages/Liar/loginindex",
+                    "page"=>"mask/pages/Liar/loginindex",
                     "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
@@ -5621,7 +5621,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $base64_image_content="data:image/jpeg;base64,".getCoade($_GPC['user_id']);
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)){
             $type = $result[2];
-            $new_file = IA_ROOT ."/addons/pintuan/img/";
+            $new_file = IA_ROOT ."/addons/mask/img/";
             if(!file_exists($new_file))
             {
                 //检查是否有该文件夹，如果没有就创建，并给予最高权限
@@ -5632,7 +5632,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $new_file = $new_file.$wname;
             file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)));
         }
-        echo  $_W['siteroot']."/addons/pintuan/img/".$wname;
+        echo  $_W['siteroot']."/addons/mask/img/".$wname;
 
     }
     //佣金提现
@@ -5646,9 +5646,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['state'] = 1;
         $data['time'] = time();
         $data['uniacid'] = $_W['uniacid'];
-        $res = pdo_insert('pintuan_commission_withdrawal', $data);
+        $res = pdo_insert('mask_commission_withdrawal', $data);
         if ($res) {
-            //pdo_update('pintuan_user', array('commission -=' => $_GPC['tx_cost']), array('id' => $_GPC['user_id']));
+            //pdo_update('mask_user', array('commission -=' => $_GPC['tx_cost']), array('id' => $_GPC['user_id']));
             echo '1';
         } else {
             echo '2';
@@ -5657,22 +5657,22 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //提现明细
     public function doPageYjtxList() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_commission_withdrawal', array('user_id' => $_GPC['user_id']), array(), '', 'id DESC');
+        $res = pdo_getall('mask_commission_withdrawal', array('user_id' => $_GPC['user_id']), array(), '', 'id DESC');
         echo json_encode($res);
     }
     //绑定分销商
     public function doPageBinding() {
         global $_W, $_GPC;
-        $set = pdo_get('pintuan_fxset', array('uniacid' => $_W['uniacid']));
-        $res = pdo_get('pintuan_fxuser', array('fx_user' => $_GPC['fx_user']));
-        $res2 = pdo_get('pintuan_fxuser', array('user_id' => $_GPC['fx_user'], 'fx_user' => $_GPC['user_id']));
+        $set = pdo_get('mask_fxset', array('uniacid' => $_W['uniacid']));
+        $res = pdo_get('mask_fxuser', array('fx_user' => $_GPC['fx_user']));
+        $res2 = pdo_get('mask_fxuser', array('user_id' => $_GPC['fx_user'], 'fx_user' => $_GPC['user_id']));
         if ($set['is_open'] == 1) {
             if ($_GPC['user_id'] == $_GPC['fx_user']) {
                 echo '自己不能绑定自己';
             } elseif ($res || $res2) {
                 echo '不能重复绑定';
             } else {
-                $res3 = pdo_insert('pintuan_fxuser', array('user_id' => $_GPC['user_id'], 'fx_user' => $_GPC['fx_user'], 'time' => date('Y-m-d H:i:s',time())));
+                $res3 = pdo_insert('mask_fxuser', array('user_id' => $_GPC['user_id'], 'fx_user' => $_GPC['fx_user'], 'time' => date('Y-m-d H:i:s',time())));
                 if ($res3) {
                     echo '1';
                 } else {
@@ -5684,11 +5684,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //查看我的团队
     public function doPageMyTeam() {
         global $_W, $_GPC;
-        $sql = "select a.* ,b.name,b.img from " . tablename("pintuan_fxuser") . " a" . " left join " . tablename("pintuan_user") . " b on b.id=a.fx_user   WHERE a.user_id=:user_id order by id DESC";
+        $sql = "select a.* ,b.name,b.img from " . tablename("mask_fxuser") . " a" . " left join " . tablename("mask_user") . " b on b.id=a.fx_user   WHERE a.user_id=:user_id order by id DESC";
         $res = pdo_fetchall($sql, array(':user_id' => $_GPC['user_id']));
         $res2 = array();
         for ($i = 0;$i < count($res);$i++) {
-            $sql2 = "select a.* ,b.name,b.img from " . tablename("pintuan_fxuser") . " a" . " left join " . tablename("pintuan_user") . " b on b.id=a.fx_user   WHERE a.user_id=:user_id order by id DESC";
+            $sql2 = "select a.* ,b.name,b.img from " . tablename("mask_fxuser") . " a" . " left join " . tablename("mask_user") . " b on b.id=a.fx_user   WHERE a.user_id=:user_id order by id DESC";
             $res3 = pdo_fetchall($sql2, array(':user_id' => $res[$i]['fx_user']));
             $res2[] = $res3;
         }
@@ -5699,16 +5699,16 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             }
         }
         // foreach ($res as $key => $value) {
-        // 	$sql11=" select count(id) as count from ".tablename('pintuan_earnings')." where son_id={$value['fx_user']} group by order_id";
+        // 	$sql11=" select count(id) as count from ".tablename('mask_earnings')." where son_id={$value['fx_user']} group by order_id";
         // 	$rst1=pdo_fetch($sql11);
-        // 	$rst2=pdo_get('pintuan_earnings', array('son_id'=>$value['fx_user']), array('sum(money) as total_money'));
+        // 	$rst2=pdo_get('mask_earnings', array('son_id'=>$value['fx_user']), array('sum(money) as total_money'));
         // 	$res[$key]['dd']=empty($rst1['count'])?0:$rst1['count'];
         // 	$res[$key]['money']=empty($rst2['money'])?0:$rst2['money'];
         // }
         // foreach ($res4 as $key => $value2) {
-        // 	$sql12=" select count(id) as count from ".tablename('pintuan_earnings')." where son_id={$value2['fx_user']} group by order_id";
+        // 	$sql12=" select count(id) as count from ".tablename('mask_earnings')." where son_id={$value2['fx_user']} group by order_id";
         // 	$rst3=pdo_fetch($sql12);
-        // 	$rst4=pdo_get('pintuan_earnings', array('son_id'=>$value2['fx_user']), array('sum(money) as total_money'));
+        // 	$rst4=pdo_get('mask_earnings', array('son_id'=>$value2['fx_user']), array('sum(money) as total_money'));
         // 	$res4[$key]['dd']=empty($rst3['count'])?0:$rst3['count'];
         // 	$res4[$key]['money']=empty($rst4['money'])?0:$rst4['money'];
         // }
@@ -5720,13 +5720,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //查看佣金
     public function doPageMyCommission() {
         global $_W, $_GPC;
-        $sq = "select sum(tx_cost) as tx_cost from " . tablename("pintuan_commission_withdrawal") . " WHERE state=1 and user_id=" . $_GPC['user_id'];
+        $sq = "select sum(tx_cost) as tx_cost from " . tablename("mask_commission_withdrawal") . " WHERE state=1 and user_id=" . $_GPC['user_id'];
         $sq = pdo_fetch($sq);
         $sq = empty($sq['tx_cost'])?0:$sq['tx_cost'];
-        $cg = "select sum(tx_cost) as tx_cost from " . tablename("pintuan_commission_withdrawal") . " WHERE  state=2 and user_id=" . $_GPC['user_id'];
+        $cg = "select sum(tx_cost) as tx_cost from " . tablename("mask_commission_withdrawal") . " WHERE  state=2 and user_id=" . $_GPC['user_id'];
         $cg = pdo_fetch($cg);
         $cg = empty($cg['tx_cost'])?0:$cg['tx_cost'];
-        $lei = "select sum(money) as tx_cost from " . tablename("pintuan_earnings") . " WHERE  state=2 and user_id=" . $_GPC['user_id'] ;
+        $lei = "select sum(money) as tx_cost from " . tablename("mask_earnings") . " WHERE  state=2 and user_id=" . $_GPC['user_id'] ;
         $lei = pdo_fetch($lei);
         $lei = empty($lei['tx_cost'])?0:$lei['tx_cost'];
         $data['ktxyj'] = $lei-$sq-$cg;
@@ -5741,7 +5741,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_GPC, $_W;
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select a.id,a.order_id,a.state,a.money,a.note,a.time,b.order_num,b.type  from " . tablename("pintuan_earnings") ."a left join".tablename('pintuan_order')."b on a.order_id=b.id where a.user_id={$_GPC['user_id']} and a.state={$_GPC['type']} order by a.id  desc ";
+        $sql="select a.id,a.order_id,a.state,a.money,a.note,a.time,b.order_num,b.type  from " . tablename("mask_earnings") ."a left join".tablename('mask_order')."b on a.order_id=b.id where a.user_id={$_GPC['user_id']} and a.state={$_GPC['type']} order by a.id  desc ";
         $select_sql=$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list=pdo_fetchall($select_sql,$data);
         echo json_encode($list);
@@ -5751,9 +5751,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function  doPageJsCommission(){
         global $_W, $_GPC;
         //订单类型
-        $order=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']),array('type','money','user_id'));
+        $order=pdo_get('mask_order',array('id'=>$_GPC['order_id']),array('type','money','user_id'));
         //获取佣金比例
-        $commission=pdo_get('pintuan_fxset',array('uniacid'=>$_W['uniacid']));
+        $commission=pdo_get('mask_fxset',array('uniacid'=>$_W['uniacid']));
         if ($commission['is_open'] == 1) { //开启分销
             if(($commission['type'] == 1&&$order['type']!=1) or ($commission['type']==2&&$order['type']==1) or($commission['type']==3)){
                 if($order['type']==1 or $order['type']==3){
@@ -5761,7 +5761,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 }else{
                     $state=2;
                 }
-                $user = pdo_get('pintuan_fxuser', array('fx_user' => $order['user_id']));
+                $user = pdo_get('mask_fxuser', array('fx_user' => $order['user_id']));
                 // var_dump($user);die;
                 if ($user['user_id']) {
                     if($order['type']==1){
@@ -5769,7 +5769,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     }else{
                         $money = $order['money'] * ($commission['dn_yj'] / 100); //一级佣金
                     }
-                    // pdo_update('pintuan_user', array('commission +=' => $money), array('id' => $userid));
+                    // pdo_update('mask_user', array('commission +=' => $money), array('id' => $userid));
                     $userid = $user['user_id']; //上线id
                     $data6['user_id'] = $userid; //上线id
                     $data6['son_id'] = $order['user_id']; //下线id
@@ -5779,10 +5779,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data6['state'] = $state;
                     $data6['note'] = '一级佣金';
                     $data6['uniacid'] = $_W['uniacid'];
-                    pdo_insert('pintuan_earnings', $data6);
+                    pdo_insert('mask_earnings', $data6);
                 }
                 if ($commission['is_ej'] == 2) { //开启二级分销
-                    $user2 = pdo_get('pintuan_fxuser', array('fx_user' => $user['user_id'])); //上线的上线
+                    $user2 = pdo_get('mask_fxuser', array('fx_user' => $user['user_id'])); //上线的上线
                     if ($user2['user_id']) {
                         if($order['type']==1){
                             $money = $order['money'] * ($commission['wm_ej'] / 100); //一级佣金
@@ -5798,7 +5798,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                         $data7['state'] = $state;
                         $data7['note'] = '二级佣金';
                         $data7['uniacid'] = $_W['uniacid'];
-                        pdo_insert('pintuan_earnings', $data7);
+                        pdo_insert('mask_earnings', $data7);
                     }
                 }
             }
@@ -5811,8 +5811,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //加积分
     public function doPageAddIntegral(){
         global $_W, $_GPC;
-        $order=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $order=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         $score=ceil($order['money']*$system['integral2']/100);
         if($_GPC['type']==1){
             $note='外卖消费';
@@ -5834,34 +5834,34 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['cerated_time']=date("Y-m-d H:i:s");
             $data['uniacid']=$_W['uniacid'];
             $data['note']=$note;
-            $res=pdo_insert('pintuan_integral',$data);
+            $res=pdo_insert('mask_integral',$data);
             if($res){
-                pdo_update('pintuan_user',array('total_score +='=>$score),array('id'=>$order['user_id']));
+                pdo_update('mask_user',array('total_score +='=>$score),array('id'=>$order['user_id']));
             }
         }
     }
 //商品分类
     public function doPageJftype() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_jftype', array('uniacid' => $_W['uniacid']), array(), '', 'num asc');
+        $res = pdo_getall('mask_jftype', array('uniacid' => $_W['uniacid']), array(), '', 'num asc');
         echo json_encode($res);
     }
     //商品列表
     public function doPageJfGoods() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_jfgoods', array('uniacid' => $_W['uniacid'], 'is_open' => 1), array(), '', 'num asc');
+        $res = pdo_getall('mask_jfgoods', array('uniacid' => $_W['uniacid'], 'is_open' => 1), array(), '', 'num asc');
         echo json_encode($res);
     }
     //商品详情
     public function doPageJfGoodsInfo() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_jfgoods', array('id' => $_GPC['id']));
+        $res = pdo_getall('mask_jfgoods', array('id' => $_GPC['id']));
         echo json_encode($res);
     }
     //分类下的商品
     public function doPageJftypeGoods() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_jfgoods', array('type_id' => $_GPC['type_id'], 'is_open' => 1), array(), '', 'num asc');
+        $res = pdo_getall('mask_jfgoods', array('type_id' => $_GPC['type_id'], 'is_open' => 1), array(), '', 'num asc');
         echo json_encode($res);
     }
 
@@ -5869,7 +5869,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //积分明细
     public function doPageJfmx() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_integral', array('user_id' => $_GPC['user_id']), array(), '', 'id DESC');
+        $res = pdo_getall('mask_integral', array('user_id' => $_GPC['user_id']), array(), '', 'id DESC');
         echo json_encode($res);
     }
     //兑换商品
@@ -5884,17 +5884,17 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['good_name'] = $_GPC['good_name']; //商品名称
         $data['good_img'] = $_GPC['good_img']; //商品图片
         $data['time'] = date("Y-m-d H:i:s");
-        $res = pdo_insert('pintuan_jfrecord', $data);
+        $res = pdo_insert('mask_jfrecord', $data);
         if ($res) {
-            pdo_update('pintuan_jfgoods', array('number -=' => 1), array('id' => $_GPC['good_id']));
+            pdo_update('mask_jfgoods', array('number -=' => 1), array('id' => $_GPC['good_id']));
             $data3['score'] = $_GPC['integral'];
             $data3['user_id'] = $_GPC['user_id'];
             $data3['note'] = '兑换商品';
             $data3['type'] = 2;
             $data3['cerated_time'] = date('Y-m-d H:i:s');
             $data3['uniacid'] = $_W['uniacid']; //小程序id
-            pdo_insert('pintuan_integral', $data3);
-            pdo_update('pintuan_user', array('total_score -=' => $_GPC['integral']), array('id' => $_GPC['user_id']));
+            pdo_insert('mask_integral', $data3);
+            pdo_update('mask_user', array('total_score -=' => $_GPC['integral']), array('id' => $_GPC['user_id']));
             echo '1';
         } else {
             echo '2';
@@ -5903,7 +5903,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //兑换明细
     public function doPageDhmx() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_jfrecord', array('user_id' => $_GPC['user_id']), array(), '', 'id DESC');
+        $res = pdo_getall('mask_jfrecord', array('user_id' => $_GPC['user_id']), array(), '', 'id DESC');
         echo json_encode($res);
     }
 
@@ -5912,11 +5912,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPagecjpt(){
         global $_W, $_GPC;
         $order_id=$_GPC['order_id'];
-        include IA_ROOT.'/addons/pintuan/peisong/cjpt.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
-        $store=pdo_get('pintuan_store',array('id'=>$order['store_id']),array('name','address','tel','coordinates','logo'));
+        include IA_ROOT.'/addons/mask/peisong/cjpt.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
+        $store=pdo_get('mask_store',array('id'=>$order['store_id']),array('name','address','tel','coordinates','logo'));
         $zb= explode (",", $store['coordinates']);
-        $goods=pdo_getall('pintuan_order_goods',array('order_id'=>$order_id));
+        $goods=pdo_getall('mask_order_goods',array('order_id'=>$order_id));
         $bind=pdo_get('cjpt_bind',array('cy_uniacid'=>$_W['uniacid']));
         $goods_info='';
         foreach ($goods as $key => $value) {
@@ -5962,7 +5962,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //会员期限
     public function doPageGetHyqx(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_hyqx',array('uniacid'=>$_W['uniacid']),array(),'','num ASC');
+        $res=pdo_getall('mask_hyqx',array('uniacid'=>$_W['uniacid']),array(),'','num ASC');
         echo json_encode($res);
     }
 
@@ -5970,34 +5970,34 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //钱包明细
     public function doPageQbmx() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_qbmx', array('user_id' => $_GPC['user_id']), array(), '', 'id DESC');
+        $res = pdo_getall('mask_qbmx', array('user_id' => $_GPC['user_id']), array(), '', 'id DESC');
         echo json_encode($res);
     }
     //充值活动
     public function doPageCzhd() {
         global $_W, $_GPC;
-        $res = pdo_getall('pintuan_czhd', array('uniacid' => $_W['uniacid']), array(), '', 'full DESC');
+        $res = pdo_getall('mask_czhd', array('uniacid' => $_W['uniacid']), array(), '', 'full DESC');
         echo json_encode($res);
     }
     //充值
     public function doPageRecharge() {
         global $_W, $_GPC;
         $money=$_GPC['money']+$_GPC['money2'];
-        $res = pdo_update('pintuan_user', array('wallet +=' => $money), array('id' => $_GPC['user_id']));
+        $res = pdo_update('mask_user', array('wallet +=' => $money), array('id' => $_GPC['user_id']));
         if ($res) {
             $data['money'] = $_GPC['money'];
             $data['user_id'] = $_GPC['user_id'];
             $data['type'] = 1;
             $data['note'] = '在线充值';
             $data['time'] = date('Y-m-d H:i:s');
-            $res2 = pdo_insert('pintuan_qbmx', $data);
+            $res2 = pdo_insert('mask_qbmx', $data);
 
             $data2['money'] = $_GPC['money2'];
             $data2['user_id'] = $_GPC['user_id'];
             $data2['type'] = 1;
             $data2['note'] = '充值赠送';
             $data2['time'] = date('Y-m-d H:i:s');
-            $res3 = pdo_insert('pintuan_qbmx', $data2);
+            $res3 = pdo_insert('mask_qbmx', $data2);
             if ($res2) {
                 echo '1';
             } else {
@@ -6015,7 +6015,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['state'] = 1;
         $data['uniacid'] = $_W['uniacid'];
         $data['time'] = date("Y-m-d H:i:s");
-        $res = pdo_insert('pintuan_czorder', $data);
+        $res = pdo_insert('mask_czorder', $data);
         $order_id = pdo_insertid();
         if ($res) {
             echo $order_id;
@@ -6039,21 +6039,21 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['time']=date('Y-m-d H:i:s');
         }
         $data['pay_type']=$_GPC['pay_type'];
-        $res=pdo_insert('pintuan_hyorder',$data);
+        $res=pdo_insert('mask_hyorder',$data);
         $orderid=pdo_insertid();
         if($res){
             if($_GPC['pay_type']==2 and  $_GPC['money']>0){
-                pdo_update('pintuan_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
+                pdo_update('mask_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
                 $data4['money'] = $_GPC['money'];
                 $data4['user_id'] = $_GPC['user_id'];
                 $data4['type'] = 2;
                 $data4['note'] = '购买会员';
                 $data4['time'] = date('Y-m-d H:i:s');
-                pdo_insert('pintuan_qbmx', $data4);
+                pdo_insert('mask_qbmx', $data4);
             }
             if($_GPC['pay_type']==2 || $_GPC['money']==0){
 
-                pdo_update('pintuan_user',array('dq_time'=>date('Y-m-d',strtotime("+".$_GPC['month']." month")),'hy_day'=>date('d'),'user_name'=>$_GPC['user_name'],'user_tel'=>$_GPC['user_tel']),array('id'=>$_GPC['user_id']));
+                pdo_update('mask_user',array('dq_time'=>date('Y-m-d',strtotime("+".$_GPC['month']." month")),'hy_day'=>date('d'),'user_name'=>$_GPC['user_name'],'user_tel'=>$_GPC['user_tel']),array('id'=>$_GPC['user_id']));
             }
             echo  $orderid;
         }else{
@@ -6067,7 +6067,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select  *  from " . tablename("pintuan_cptj") ." where uniacid={$_W['uniacid']} order by num asc";
+        $sql="select  *  from " . tablename("mask_cptj") ." where uniacid={$_W['uniacid']} order by num asc";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql);
         echo json_encode($list);
@@ -6075,7 +6075,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //菜品推荐
     public function doPageCptjInfo(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_cptj',array('id'=>$_GPC['id']));
+        $res=pdo_get('mask_cptj',array('id'=>$_GPC['id']));
         echo json_encode($res);
     }
 
@@ -6086,10 +6086,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $time=time();
         $time2=$time-10;
         $store_id=$_GPC['store_id'];
-        $res=pdo_get('pintuan_order',array('state'=>2,'store_id'=>$store_id,'type'=>1));//外卖
-        $sql=" select 1 from ".tablename('pintuan_order')." where type=2 and store_id={$store_id} and UNIX_TIMESTAMP(time)>={$time2}";
+        $res=pdo_get('mask_order',array('state'=>2,'store_id'=>$store_id,'type'=>1));//外卖
+        $sql=" select 1 from ".tablename('mask_order')." where type=2 and store_id={$store_id} and UNIX_TIMESTAMP(time)>={$time2}";
         $res2=pdo_fetch($sql);
-        $res3=pdo_get('pintuan_order',array('yy_state'=>2,'store_id'=>$store_id,'type'=>3));//预约
+        $res3=pdo_get('mask_order',array('yy_state'=>2,'store_id'=>$store_id,'type'=>3));//预约
         if($res){
             echo 1;
         }elseif($res2){
@@ -6108,14 +6108,14 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['form_id']=$_GPC['form_id'];
             $data['uniacid']=$_W['uniacid'];
             $data['time']=time();
-            $res=pdo_insert('pintuan_formid',$data);
+            $res=pdo_insert('mask_formid',$data);
         }
     }
 //查看我的formid
     public function doPageMyFormId(){
         global $_W,$_GPC;
         $time=time()-60*60*24*7;
-        $sql="select  count(*) as count  from " . tablename("pintuan_formid") ." where user_id={$_GPC['admin_id']} and time>={$time}";
+        $sql="select  count(*) as count  from " . tablename("mask_formid") ." where user_id={$_GPC['admin_id']} and time>={$time}";
         $res=pdo_fetch($sql);
         echo  $res['count'];
     }
@@ -6123,9 +6123,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //新订单模板消息
     public function doPageNewOrderMessage(){
         global $_W, $_GPC;
-        pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+        pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
         function getaccess_token($_W,$_GPC){
-            $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $appid=$res['appid'];
             $secret=$res['appsecret'];
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -6141,12 +6141,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         //设置与发送模板信息
         function set_msg($_W,$_GPC){
             $access_token = getaccess_token($_W,$_GPC);
-            $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-            $res2=pdo_get('pintuan_order',array('id'=>$_GPC['order_id']));
-            //$store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
+            $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+            $res2=pdo_get('mask_order',array('id'=>$_GPC['order_id']));
+            //$store=pdo_get('mask_store',array('id'=>$res2['store_id']));
             $ordertype='天天拼团';
-            $user=pdo_get('pintuan_user',array('u_id'=>$res2['user_id']));
-            $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7),array(),'','time desc');
+            $user=pdo_get('mask_user',array('u_id'=>$res2['user_id']));
+            $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7),array(),'','time desc');
             $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["xd_tid"].'",
@@ -6195,7 +6195,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data = curl_exec($ch);
             curl_close($ch);
             // return $data;
-            //pdo_delete('pintuan_formid',array('id'=>$form['id']));
+            //pdo_delete('mask_formid',array('id'=>$form['id']));
         }
         echo set_msg($_W,$_GPC);
     }
@@ -6204,9 +6204,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //新订单模板消息
     public function doPageNewDmOrderMessage(){
         global $_W, $_GPC;
-        pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+        pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
         function getaccess_token($_W){
-            $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $appid=$res['appid'];
             $secret=$res['appsecret'];
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -6222,21 +6222,21 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         //设置与发送模板信息
         function set_msg($_W){
             $access_token = getaccess_token($_W);
-            $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-            $res2=pdo_get('pintuan_order',array('id'=>$_GET['order_id']));
-            $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-            $yh=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
+            $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+            $res2=pdo_get('mask_order',array('id'=>$_GET['order_id']));
+            $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+            $yh=pdo_get('mask_user',array('id'=>$res2['user_id']));
             if($res2['pay_type']==1){
                 $pay_type='微信支付';
             }elseif($res2['pay_type']==2){
                 $pay_type='余额支付';
             }
-            $user=pdo_get('pintuan_user',array('id'=>$store['admin_id']));
-            $form=pdo_get('pintuan_formid',array('user_id'=>$store['admin_id'],'time >='=>time()-60*60*24*7),array(),'','id asc');
+            $user=pdo_get('mask_user',array('id'=>$store['admin_id']));
+            $form=pdo_get('mask_formid',array('user_id'=>$store['admin_id'],'time >='=>time()-60*60*24*7),array(),'','id asc');
             $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["xdd_tid2"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
            	"keyword1": {
@@ -6272,7 +6272,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data = curl_exec($ch);
             curl_close($ch);
             // return $data;
-            pdo_delete('pintuan_formid',array('id'=>$form['id']));
+            pdo_delete('mask_formid',array('id'=>$form['id']));
         }
         echo set_msg($_W);
     }
@@ -6282,7 +6282,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //商品分类列表
     public function doPageGoodsType(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_type',array('store_id'=>$_GPC['store_id']),array(),'','order_by asc');
+        $res=pdo_getall('mask_type',array('store_id'=>$_GPC['store_id']),array(),'','order_by asc');
         echo  json_encode($res);
     }
 //分类修改
@@ -6298,11 +6298,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['is_open']=$_GPC['is_open'];
         }
         if($_GPC['id']){
-            $res=pdo_update('pintuan_type',$data,array('id'=>$_GPC['id']));
+            $res=pdo_update('mask_type',$data,array('id'=>$_GPC['id']));
         }else{
             $data['store_id']=$_GPC['store_id'];
             $data['uniacid']=$_W['uniacid'];
-            $res=pdo_insert('pintuan_type',$data);
+            $res=pdo_insert('mask_type',$data);
         }
 
         if($res){
@@ -6314,7 +6314,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //分类删除
     public function doPageDelGoodsType(){
         global $_W, $_GPC;
-        $res=pdo_delete('pintuan_type',array('id'=>$_GPC['id']));
+        $res=pdo_delete('mask_type',array('id'=>$_GPC['id']));
         if($res){
             echo '1';
         }else{
@@ -6324,9 +6324,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //菜品列表
     public function doPageAppDishes() {
         global $_W, $_GPC;
-        $sql=" select * from".tablename('pintuan_type')." where  uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} and id in(select type_id from".tablename('pintuan_goods')." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']})";
+        $sql=" select * from".tablename('mask_type')." where  uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} and id in(select type_id from".tablename('mask_goods')." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']})";
         $type=pdo_fetchall($sql);
-        $list = pdo_getall('pintuan_goods', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id']), array(), '', 'num ASC');
+        $list = pdo_getall('mask_goods', array('uniacid' => $_W['uniacid'], 'store_id' => $_GPC['store_id']), array(), '', 'num ASC');
         $data2 = array();
         for ($i = 0;$i < count($type);$i++) {
             $data = array();
@@ -6342,19 +6342,19 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //商家分类下菜品
     public function doPageStoreDishes(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_goods',array('type_id'=>$_GPC['type_id']));
+        $res=pdo_getall('mask_goods',array('type_id'=>$_GPC['type_id']));
         echo json_encode($res);
     }
 //商品详情
     public function doPageStoreDishesInfo(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_goods',array('id'=>$_GPC['id']));
+        $res=pdo_get('mask_goods',array('id'=>$_GPC['id']));
         echo json_encode($res);
     }
 //添加/编辑商品
     public function doPageAddStoreDishes(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_goods',array('id'=>$_GPC['id']));
+        $res=pdo_get('mask_goods',array('id'=>$_GPC['id']));
         if(isset($_GPC['name'])){
             $data['name']=$_GPC['name'];
         }
@@ -6414,12 +6414,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['restrict_num']=$_GPC['restrict_num'];
         }
         if($_GPC['id']){
-            $res=pdo_update('pintuan_goods',$data,array('id'=>$_GPC['id']));
+            $res=pdo_update('mask_goods',$data,array('id'=>$_GPC['id']));
         }else{
             $data['is_gg']=1;
             $data['store_id']=$_GPC['store_id'];
             $data['uniacid']=$_W['uniacid'];
-            $res=pdo_insert('pintuan_goods',$data);
+            $res=pdo_insert('mask_goods',$data);
         }
         if($res){
             echo '1';
@@ -6429,7 +6429,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     }
     public function doPageDelStoreGood(){
         global $_W, $_GPC;
-        $res=pdo_delete('pintuan_goods',array('id'=>$_GPC['id']));
+        $res=pdo_delete('mask_goods',array('id'=>$_GPC['id']));
         echo json_encode($res);
     }
 
@@ -6437,7 +6437,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //抢购分类
     public function doPageQgType(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_qgtype',array('uniacid'=>$_W['uniacid'],'state'=>1));
+        $res=pdo_getall('mask_qgtype',array('uniacid'=>$_W['uniacid'],'state'=>1));
         echo json_encode($res);
     }
 //抢购商品
@@ -6454,9 +6454,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
         if($_GPC['type']==1){
-            $sql="select a.*,b.name as store_name,b.address,b.tel from " . tablename("pintuan_qggoods") . " a"  . " left join " . tablename("pintuan_store") . " b on b.id=a.store_id  where a.uniacid={$_W['uniacid']} and UNIX_TIMESTAMP(a.start_time)<={$time} and UNIX_TIMESTAMP(a.end_time)>{$time} and a.state=1 and a.state2=1 ".$where." order by a.num asc";
+            $sql="select a.*,b.name as store_name,b.address,b.tel from " . tablename("mask_qggoods") . " a"  . " left join " . tablename("mask_store") . " b on b.id=a.store_id  where a.uniacid={$_W['uniacid']} and UNIX_TIMESTAMP(a.start_time)<={$time} and UNIX_TIMESTAMP(a.end_time)>{$time} and a.state=1 and a.state2=1 ".$where." order by a.num asc";
         }else{
-            $sql="select a.*,b.name as store_name,b.address,b.tel from " . tablename("pintuan_qggoods") . " a"  . " left join " . tablename("pintuan_store") . " b on b.id=a.store_id  where a.uniacid={$_W['uniacid']} and UNIX_TIMESTAMP(a.start_time)<={$time} and UNIX_TIMESTAMP(a.end_time)>{$time} and a.state=1 ".$where." order by a.num asc";
+            $sql="select a.*,b.name as store_name,b.address,b.tel from " . tablename("mask_qggoods") . " a"  . " left join " . tablename("mask_store") . " b on b.id=a.store_id  where a.uniacid={$_W['uniacid']} and UNIX_TIMESTAMP(a.start_time)<={$time} and UNIX_TIMESTAMP(a.end_time)>{$time} and a.state=1 ".$where." order by a.num asc";
         }
 
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
@@ -6467,8 +6467,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //商品详情
     public function doPageQgGoodInfo(){
         global $_W, $_GPC;
-        pdo_update('pintuan_qggoods',array('hot +='=>1),array('id'=>$_GPC['id']));
-        $sql="select a.*,b.name as store_name,b.address,b.tel from " . tablename("pintuan_qggoods") . " a"  . " left join " . tablename("pintuan_store") . " b on b.id=a.store_id  where a.id={$_GPC['id']} order by a.num asc";
+        pdo_update('mask_qggoods',array('hot +='=>1),array('id'=>$_GPC['id']));
+        $sql="select a.*,b.name as store_name,b.address,b.tel from " . tablename("mask_qggoods") . " a"  . " left join " . tablename("mask_store") . " b on b.id=a.store_id  where a.id={$_GPC['id']} order by a.num asc";
         $res=pdo_fetch($sql);
         $res['start_time']=strtotime($res['start_time']);
         $res['end_time']=strtotime($res['end_time']);
@@ -6477,14 +6477,14 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //查看购买人数
     public function doPageQgPeople(){
         global $_W, $_GPC;
-        $sql="select a.pay_time,b.name as user_name,b.img as user_img from " . tablename("pintuan_qgorder") . " a"  . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id  where a.good_id={$_GPC['good_id']} and a.state in(2,3) order by a.id DESC";
+        $sql="select a.pay_time,b.name as user_name,b.img as user_img from " . tablename("mask_qgorder") . " a"  . " left join " . tablename("mask_user") . " b on b.id=a.user_id  where a.good_id={$_GPC['good_id']} and a.state in(2,3) order by a.id DESC";
         $res=pdo_fetchall($sql);
         echo json_encode($res);
     }
 //抢购下单
     public function doPageQgOrder(){
         global $_W, $_GPC;
-        $good=pdo_get('pintuan_qggoods',array('id'=>$_GPC['good_id']));
+        $good=pdo_get('mask_qggoods',array('id'=>$_GPC['good_id']));
         if($good['surplus']>0){//还有剩余
             $data['order_num']=date('YmdHis',time()).rand(1111,9999);//订单号
             $data['user_id']=$_GPC['user_id'];
@@ -6499,22 +6499,22 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['uniacid']=$_W['uniacid'];
             $data['state']=1;
             $data['note']=$_GPC['note'];
-            $res=pdo_insert('pintuan_qgorder',$data);
+            $res=pdo_insert('mask_qgorder',$data);
             $id=pdo_insertid();
             if($res){
                 if($_GPC['pay_type']==2){//余额支付
                     $time=time();
                     $dq_time=$time+$good['consumption_time']*60*60*24;
-                    pdo_update('pintuan_qgorder',array('state'=>2,'dq_time'=>$dq_time,'pay_time'=>date('Y-m-d H:i:s',$time)),array('id'=>$id));
-                    pdo_update('pintuan_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
+                    pdo_update('mask_qgorder',array('state'=>2,'dq_time'=>$dq_time,'pay_time'=>date('Y-m-d H:i:s',$time)),array('id'=>$id));
+                    pdo_update('mask_user', array('wallet -=' => $_GPC['money']), array('id' => $_GPC['user_id']));
                     $data4['money'] = $_GPC['money'];
                     $data4['user_id'] = $_GPC['user_id'];
                     $data4['type'] = 2;
                     $data4['note'] = '抢购订单';
                     $data4['time'] = date('Y-m-d H:i:s');
-                    pdo_insert('pintuan_qbmx', $data4);
+                    pdo_insert('mask_qbmx', $data4);
                 }
-                pdo_update('pintuan_qggoods',array('surplus -='=>1),array('id'=>$_GPC['good_id']));
+                pdo_update('mask_qggoods',array('surplus -='=>1),array('id'=>$_GPC['good_id']));
                 echo $id;
             }else{
                 echo '下单失败';
@@ -6527,9 +6527,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //抢购支付
     public function doPageQgPay(){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/wxpay.php';
-        $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-        $res2=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/wxpay.php';
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $res2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         if($res2['url_name']){
             $res2['url_name']=$res2['url_name'];
         }else{
@@ -6541,7 +6541,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $key=$res['wxkey'];
         $out_trade_no = $mch_id. time();
         $root=$_W['siteroot'];
-        pdo_update('pintuan_qgorder',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
+        pdo_update('mask_qgorder',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
         $total_fee =$_GPC['money'];
         if(empty($total_fee)) //押金
         {
@@ -6567,7 +6567,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select a.*,b.name as store_name,b.address,b.tel,b.logo as store_logo from " . tablename("pintuan_qgorder") . " a"  . " left join " . tablename("pintuan_store") . " b on b.id=a.store_id  where a.uniacid={$_W['uniacid']} and a.user_id={$_GPC['user_id']} and a.state!=1 and a.del=2 ".$where." order by a.id DESC";
+        $sql="select a.*,b.name as store_name,b.address,b.tel,b.logo as store_logo from " . tablename("mask_qgorder") . " a"  . " left join " . tablename("mask_store") . " b on b.id=a.store_id  where a.uniacid={$_W['uniacid']} and a.user_id={$_GPC['user_id']} and a.state!=1 and a.del=2 ".$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $res=pdo_fetchall($select_sql);
         echo json_encode($res);
@@ -6576,10 +6576,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //查看是否购买
     public function doPageIsPay(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_qgorder',array('user_id'=>$_GPC['user_id'],'good_id'=>$_GPC['good_id']));
-        $good=pdo_get('pintuan_qggoods',array('id'=>$_GPC['good_id']));
-        //$ordergood=pdo_getall('pintuan_order_goods',array('user_id'=>$_GPC['user_id'],'good_id'=>$_GPC['good_id'],'is_qg'=>1));
-        $sql="select a.id from " . tablename("pintuan_order_goods") . " a"  . " left join " . tablename("pintuan_order") . " b on b.id=a.order_id  where a.dishes_id={$_GPC['good_id']} and b.user_id={$_GPC['user_id']}";
+        $res=pdo_getall('mask_qgorder',array('user_id'=>$_GPC['user_id'],'good_id'=>$_GPC['good_id']));
+        $good=pdo_get('mask_qggoods',array('id'=>$_GPC['good_id']));
+        //$ordergood=pdo_getall('mask_order_goods',array('user_id'=>$_GPC['user_id'],'good_id'=>$_GPC['good_id'],'is_qg'=>1));
+        $sql="select a.id from " . tablename("mask_order_goods") . " a"  . " left join " . tablename("mask_order") . " b on b.id=a.order_id  where a.dishes_id={$_GPC['good_id']} and b.user_id={$_GPC['user_id']}";
         $ordergood=pdo_fetchall($sql);
         //echo count($ordergood);die;
         if($good['qg_num']==0){
@@ -6608,7 +6608,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         function  getCoade($order_id){
             function getaccess_token(){
                 global $_W, $_GPC;
-                $res=pdo_get('pintuan_system',array('uniacid' => $_W['uniacid']));
+                $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
                 $appid=$res['appid'];
                 $secret=$res['appsecret'];
                 // print_r($res);die;
@@ -6626,7 +6626,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $access_token = getaccess_token();
                 $data2=array(
                     "scene"=>$order_id,
-                    "page"=>"pintuan/pages/sjzx/qghx",
+                    "page"=>"mask/pages/sjzx/qghx",
                     "width"=>400
                 );
                 $data2 = json_encode($data2);
@@ -6653,15 +6653,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //核销订单
     public function doPageQgHx(){
         global $_W, $_GPC;
-        $order=pdo_get('pintuan_qgorder',array('id'=>$_GPC['order_id']));
-        $store=pdo_get('pintuan_store',array('id'=>$order['store_id']));
+        $order=pdo_get('mask_qgorder',array('id'=>$_GPC['order_id']));
+        $store=pdo_get('mask_store',array('id'=>$order['store_id']));
         if($order['store_id']==$_GPC['store_id'] || $store['admin_id']==$_GPC['user_id']){
             if($order['state']==3){
                 echo '已经核销过了';
             }elseif($order['dq_time']<time()){
                 echo '商品已失效';
             }else{
-                $res=pdo_update('pintuan_qgorder',array('state'=>3,'hx_time'=>date('Y-m-d H:i:s')),array('id'=>$_GPC['order_id']));
+                $res=pdo_update('mask_qgorder',array('state'=>3,'hx_time'=>date('Y-m-d H:i:s')),array('id'=>$_GPC['order_id']));
                 if($res){
                     echo '核销成功';
                 }else{
@@ -6678,7 +6678,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //删除
     public function doPageDelQgOrder(){
         global $_W, $_GPC;
-        $res=pdo_update('pintuan_qgorder',array('del'=>1),array('id'=>$_GPC['order_id']));
+        $res=pdo_update('mask_qgorder',array('del'=>1),array('id'=>$_GPC['order_id']));
         if($res){
             echo '1';
         }else{
@@ -6700,7 +6700,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select a.*,b.name as store_name,b.address,b.tel,b.logo as store_logo from " . tablename("pintuan_qgorder") . " a"  . " left join " . tablename("pintuan_store") . " b on b.id=a.store_id ".$where." order by a.id DESC";
+        $sql="select a.*,b.name as store_name,b.address,b.tel,b.logo as store_logo from " . tablename("mask_qgorder") . " a"  . " left join " . tablename("mask_store") . " b on b.id=a.store_id ".$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $res=pdo_fetchall($select_sql,$data);
         echo json_encode($res);
@@ -6730,7 +6730,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //拼团分类
     public function doPageGroupType(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_grouptype',array('uniacid'=>$_W['uniacid']),array(),'','num ASC');
+        $res=pdo_getall('mask_grouptype',array('uniacid'=>$_W['uniacid']),array(),'','num ASC');
         echo json_encode($res);
     }
 
@@ -6751,22 +6751,22 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=empty($_GPC['pagesize'])?10:$_GPC['pagesize'];
-        $sql="select a.*,b.name as store_name,b.address,b.tel,b.logo as store_logo from " . tablename("pintuan_groupgoods"). " a  left join " . tablename("pintuan_store") . " b on b.id=a.store_id" .$where." order by num asc";
+        $sql="select a.*,b.name as store_name,b.address,b.tel,b.logo as store_logo from " . tablename("mask_groupgoods"). " a  left join " . tablename("mask_store") . " b on b.id=a.store_id" .$where." order by num asc";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $res=pdo_fetchall($select_sql);
         echo json_encode($res);
-        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=UpdateGroup&m=pintuan&store_id=".$_GPC['store_id']);//模板
+        file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=UpdateGroup&m=mask&store_id=".$_GPC['store_id']);//模板
     }
 
 
 //商品详情
     public function  doPageGoodsInfo(){
         global $_W, $_GPC;
-        $gsql=" select a.*,b.logo as store_logo from".tablename('pintuan_groupgoods')." a left join ".tablename('pintuan_store')." b on a.store_id=b.id where a.id=:id";
+        $gsql=" select a.*,b.logo as store_logo from".tablename('mask_groupgoods')." a left join ".tablename('mask_store')." b on a.store_id=b.id where a.id=:id";
         $goods=pdo_fetch($gsql,array(':id'=>$_GPC['goods_id']));
-        //$goods=pdo_get('pintuan_groupgoods',array('id'=>$_GPC['goods_id']));
+        //$goods=pdo_get('mask_groupgoods',array('id'=>$_GPC['goods_id']));
         //拼团情况
-        $sql=" select a.id,a.kt_num,a.yg_num,a.user_id,b.name,b.img  from".tablename('pintuan_group')." a left join ".tablename('pintuan_user')." b on a.user_id=b.id  where a.goods_id=:goods_id and a.state=1 and a.uniacid=:uniacid";
+        $sql=" select a.id,a.kt_num,a.yg_num,a.user_id,b.name,b.img  from".tablename('mask_group')." a left join ".tablename('mask_user')." b on a.user_id=b.id  where a.goods_id=:goods_id and a.state=1 and a.uniacid=:uniacid";
         $group=pdo_fetchall($sql,array(':uniacid'=>$_W['uniacid'],':goods_id'=>$_GPC['goods_id']));
         $goodsInfo['goods']=$goods;
         $goodsInfo['group']=$group;
@@ -6779,7 +6779,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //下单
     public function doPageSaveGroupOrder(){
         global $_W, $_GPC;
-        $good=pdo_get('pintuan_groupgoods',array('id'=>$_GPC['goods_id']));
+        $good=pdo_get('mask_groupgoods',array('id'=>$_GPC['goods_id']));
         if($good['inventory']>=$_GPC['goods_num']){
             if($_GPC['type']==1){
                 $data['order_num']=date('YmdHis',time()).rand(1111,9999);//订单号
@@ -6803,7 +6803,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $data['uniacid']=$_W['uniacid'];
                 $data['pay_type']=$_GPC['pay_type'];
                 $data['state']=1;
-                $res=pdo_insert('pintuan_grouporder',$data);
+                $res=pdo_insert('mask_grouporder',$data);
                 $id=pdo_insertid();
                 if($res){
                     echo $id;
@@ -6825,10 +6825,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data2['state']=0;
                     $data2['user_id']=$_GPC['user_id'];
                     $data2['uniacid']=$_W['uniacid'];
-                    $rst=pdo_insert('pintuan_group',$data2);
+                    $rst=pdo_insert('mask_group',$data2);
                     $group_id=pdo_insertid();
                 }else{
-                    $group=pdo_get('pintuan_group',array('id'=>$_GPC['group_id']));
+                    $group=pdo_get('mask_group',array('id'=>$_GPC['group_id']));
                 }
                 if($_GPC['group_id']==''&&$rst or $_GPC['group_id']&&$group['state']==1){
                     $data['order_num']=date('YmdHis',time()).rand(1111,9999);//订单号
@@ -6852,7 +6852,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data['uniacid']=$_W['uniacid'];
                     $data['pay_type']=$_GPC['pay_type'];
                     $data['state']=1;
-                    $res=pdo_insert('pintuan_grouporder',$data);
+                    $res=pdo_insert('mask_grouporder',$data);
                     $id=pdo_insertid();
                     if($res){
                         echo $id;
@@ -6871,13 +6871,13 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //拼团支付
     public function doPageGroupPay(){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/wxpay.php';
-        // $grouporder=pdo_get('pintuan_grouporder',array('id'=>$_GPC['order_id']));
+        include IA_ROOT.'/addons/mask/wxpay.php';
+        // $grouporder=pdo_get('mask_grouporder',array('id'=>$_GPC['order_id']));
         // if($grouporder['group_id']>0){
-        // 	$group=pdo_group('pintuan_group',array('id'=>$grouporder['group_id']));
+        // 	$group=pdo_group('mask_group',array('id'=>$grouporder['group_id']));
         // }
-        $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-        $res2=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $res2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         if($res2['url_name']){
             $res2['url_name']=$res2['url_name'];
         }else{
@@ -6889,7 +6889,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $key=$res['wxkey'];
         $out_trade_no = $mch_id. time();
         $root=$_W['siteroot'];
-        pdo_update('pintuan_grouporder',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
+        pdo_update('mask_grouporder',array('code'=>$out_trade_no),array('id'=>$_GPC['order_id']));
         $total_fee =$_GPC['money'];
         if(empty($total_fee)) //押金
         {
@@ -6907,28 +6907,28 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //余额支付
     public function  doPageGroupYePay(){
         global $_W, $_GPC;
-        $grouporder=pdo_get('pintuan_grouporder',array('id'=>$_GPC['order_id']));
-        $rst=pdo_update('pintuan_user', array('wallet -=' => $grouporder['money']), array('id' => $grouporder['user_id']));
+        $grouporder=pdo_get('mask_grouporder',array('id'=>$_GPC['order_id']));
+        $rst=pdo_update('mask_user', array('wallet -=' => $grouporder['money']), array('id' => $grouporder['user_id']));
         if($rst){
             $data4['money'] = $grouporder['money'];
             $data4['user_id'] = $grouporder['user_id'];
             $data4['type'] = 2;
             $data4['note'] = '团购订单';
             $data4['time'] = date('Y-m-d H:i:s');
-            pdo_insert('pintuan_qbmx', $data4);
-            pdo_update('pintuan_grouporder',array('state'=>2,'pay_time'=>time()),array('id'=>$grouporder['id']));
+            pdo_insert('mask_qbmx', $data4);
+            pdo_update('mask_grouporder',array('state'=>2,'pay_time'=>time()),array('id'=>$grouporder['id']));
             //改变商品
-            $result=pdo_update('pintuan_groupgoods',array('ysc_num +='=>1,'inventory -='=>1),array('id'=>1));
+            $result=pdo_update('mask_groupgoods',array('ysc_num +='=>1,'inventory -='=>1),array('id'=>1));
             if($grouporder['group_id']>0){
-                $count=pdo_get('pintuan_grouporder', array('group_id'=>$grouporder['group_id'],'state '=>2), array('count(user_id) as count'));
-                $group=pdo_get('pintuan_group',array('id'=>$grouporder['group_id']));
+                $count=pdo_get('mask_grouporder', array('group_id'=>$grouporder['group_id'],'state '=>2), array('count(user_id) as count'));
+                $group=pdo_get('mask_group',array('id'=>$grouporder['group_id']));
                 if($group['kt_num']==$count['count']){
                     $state=2;
                 }else{
                     $state=1;
                 }
                 // //改变团状态
-                pdo_update('pintuan_group',array('state'=>$state,'yg_num +='=>1),array('id'=>$grouporder['group_id']));
+                pdo_update('mask_group',array('state'=>$state,'yg_num +='=>1),array('id'=>$grouporder['group_id']));
             }
             echo 1;
         }else{
@@ -6939,7 +6939,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //查看团员信息
     public function doPageGetGroupUserInfo(){
         global $_W, $_GPC;
-        $sql=" select a.id,b.name,b.img from".tablename('pintuan_grouporder')." a left join ".tablename('pintuan_user')."b on a.user_id=b.id where a.group_id=:group_id and a.state=2";
+        $sql=" select a.id,b.name,b.img from".tablename('mask_grouporder')." a left join ".tablename('mask_user')."b on a.user_id=b.id where a.group_id=:group_id and a.state=2";
         $group=pdo_fetchall($sql,array(':group_id'=>$_GPC['group_id']));
         echo json_encode($group);
     }
@@ -6950,7 +6950,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         function  getCoade($goods_id,$group_id){
             function getaccess_token(){
                 global $_W, $_GPC;
-                $res=pdo_get('pintuan_system',array('uniacid' => $_W['uniacid']));
+                $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
                 $appid=$res['appid'];
                 $secret=$res['appsecret'];
                 // print_r($res);die;
@@ -6968,7 +6968,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $access_token = getaccess_token();
                 $data2=array(
                     "scene"=>$goods_id.",".$group_id,
-                    "page"=>"pintuan/pages/collage/index",
+                    "page"=>"mask/pages/collage/index",
                     "width"=>400
                 );
                 $data2 = json_encode($data2);
@@ -6990,7 +6990,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $base64_image_content="data:image/jpeg;base64,".getCoade($_GPC['goods_id'],$_GPC['group_id']='');
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)){
             $type = $result[2];
-            $new_file = IA_ROOT ."/addons/pintuan/img/";
+            $new_file = IA_ROOT ."/addons/mask/img/";
             if(!file_exists($new_file))
             {
                 //检查是否有该文件夹，如果没有就创建，并给予最高权限
@@ -7001,15 +7001,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $new_file = $new_file.$wname;
             file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)));
         }
-        echo "/addons/pintuan/img/".$wname;
+        echo "/addons/mask/img/".$wname;
 
     }
 
 //团详情
     public function  doPageGroupInfo(){
         global $_W, $_GPC;
-        //$group=pdo_get('pintuan_group',array('id'=>$_GPC['group_id']));
-        $sql="select a.*,b.img,b.name from".tablename('pintuan_group')." a left join".tablename('pintuan_user')." b on a.user_id=b.id where a.id=:group_id";
+        //$group=pdo_get('mask_group',array('id'=>$_GPC['group_id']));
+        $sql="select a.*,b.img,b.name from".tablename('mask_group')." a left join".tablename('mask_user')." b on a.user_id=b.id where a.id=:group_id";
         $group=pdo_fetch($sql,array(':group_id'=>$_GPC['group_id']));
         echo json_encode($group);
     }
@@ -7026,18 +7026,18 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         }
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=empty($_GPC['pagesize'])?10:$_GPC['pagesize'];
-        $sql="select a.*,b.state as g_state,c.name as store_name from " .tablename("pintuan_grouporder"). " a left join ".tablename('pintuan_group') ." b on a.group_id=b.id  left join ".tablename('pintuan_store') ." c on a.store_id=c.id" .$where." order by a.id DESC";
+        $sql="select a.*,b.state as g_state,c.name as store_name from " .tablename("mask_grouporder"). " a left join ".tablename('mask_group') ." b on a.group_id=b.id  left join ".tablename('mask_store') ." c on a.store_id=c.id" .$where." order by a.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $res=pdo_fetchall($select_sql);
         echo json_encode($res);
-        pdo_update('pintuan_grouporder',array('state'=>5,'cz_time'=>time()),array('xf_time <='=>time(),'uniacid'=>$_W['uniacid'],'state'=>2));
+        pdo_update('mask_grouporder',array('state'=>5,'cz_time'=>time()),array('xf_time <='=>time(),'uniacid'=>$_W['uniacid'],'state'=>2));
 
     }
 
 //订单详情
     public function doPageGroupOrderInfo(){
         global $_W, $_GPC;
-        $sql="select a.*,b.state as g_state from " . tablename("pintuan_grouporder")." a left join ".tablename('pintuan_group') ." b on a.group_id=b.id where a.id=:order_id  ";
+        $sql="select a.*,b.state as g_state from " . tablename("mask_grouporder")." a left join ".tablename('mask_group') ." b on a.group_id=b.id where a.id=:order_id  ";
         $res=pdo_fetchall($sql,array(':order_id'=>$_GPC['order_id']));
         echo json_encode($res);
     }
@@ -7050,7 +7050,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         function  getCoade($order_id){
             function getaccess_token(){
                 global $_W, $_GPC;
-                $res=pdo_get('pintuan_system',array('uniacid' => $_W['uniacid']));
+                $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
                 $appid=$res['appid'];
                 $secret=$res['appsecret'];
                 // print_r($res);die;
@@ -7068,7 +7068,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 $access_token = getaccess_token();
                 $data2=array(
                     "scene"=>$order_id,
-                    "page"=>"pintuan/pages/collage/yz_code",
+                    "page"=>"mask/pages/collage/yz_code",
                     "width"=>400
                 );
                 $data2 = json_encode($data2);
@@ -7096,7 +7096,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         function  getCoade($order_id){
             function getaccess_token(){
                 global $_W, $_GPC;
-                $res=pdo_get('pintuan_system',array('uniacid' => $_W['uniacid']));
+                $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
                 $appid=$res['appid'];
                 $secret=$res['appsecret'];
                 // print_r($res);die;
@@ -7139,14 +7139,14 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //核销订单
     public function doPageGroupVerification(){
         global $_W, $_GPC;
-        $order=pdo_get('pintuan_grouporder',array('id'=>$_GPC['order_id']));
-        $store=pdo_getall('pintuan_grouphx',array('store_id'=>$order['store_id']),'hx_id');
+        $order=pdo_get('mask_grouporder',array('id'=>$_GPC['order_id']));
+        $store=pdo_getall('mask_grouphx',array('store_id'=>$order['store_id']),'hx_id');
         $uids = array_map('array_shift', $store);
         if($order['store_id']==$_GPC['user_id'] || in_array($_GPC['user_id'],$uids)){
             if($order['state']==3 or $order['state']==5){
                 echo '已经核销过了或订单已失效';
             }else{
-                $res=pdo_update('pintuan_grouporder',array('state'=>3,'cz_time'=>time()),array('id'=>$_GPC['order_id']));
+                $res=pdo_update('mask_grouporder',array('state'=>3,'cz_time'=>time()),array('id'=>$_GPC['order_id']));
                 if($res){
                     echo '核销成功';
                 }else{
@@ -7161,23 +7161,23 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //拼团失败退款
     public function doPageUpdateGroup(){
         global $_W, $_GPC;
-        $ids=pdo_getall('pintuan_group',array('dq_time <='=>time(),'state'=>1,'uniacid'=>$_W['uniacid'],'store_id'=>$_GPC['store_id']),'id');
+        $ids=pdo_getall('mask_group',array('dq_time <='=>time(),'state'=>1,'uniacid'=>$_W['uniacid'],'store_id'=>$_GPC['store_id']),'id');
         if($ids){
             $uids = array_map('array_shift', $ids);
-            $orders=pdo_getall('pintuan_grouporder',array('group_id'=>$uids,'state'=>2,'pay_type'=>1),'id');
+            $orders=pdo_getall('mask_grouporder',array('group_id'=>$uids,'state'=>2,'pay_type'=>1),'id');
             //var_dump($orders);die;
             foreach ($orders as $key => $value) {
-                include_once IA_ROOT . '/addons/pintuan/cert/WxPay.Api.php';
+                include_once IA_ROOT . '/addons/mask/cert/WxPay.Api.php';
                 load()->model('account');
                 load()->func('communication');
-                $refund_order =pdo_get('pintuan_grouporder',array('id'=>$value));
+                $refund_order =pdo_get('mask_grouporder',array('id'=>$value));
                 $WxPayApi = new WxPayApi();
                 $input = new WxPayRefund();
-                $path_cert = IA_ROOT . "/addons/pintuan/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
-                $path_key = IA_ROOT . "/addons/pintuan/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
+                $path_cert = IA_ROOT . "/addons/mask/cert/".'apiclient_cert_' .$_W['uniacid'] . '.pem';
+                $path_key = IA_ROOT . "/addons/mask/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem';
                 $account_info = $_W['account'];
-                $res=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-                $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+                $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+                $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
                 $appid=$system['appid'];
                 $key=$res['wxkey'];
                 $mchid=$res['mchid'];
@@ -7196,25 +7196,25 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                 ////////////////////////////////////
                 if ($result['result_code'] == 'SUCCESS' || $tkres) {//退款成功
                     //更改订单操作
-                    pdo_update('pintuan_grouporder',array('state'=>4),array('id'=>$value));
+                    pdo_update('mask_grouporder',array('state'=>4),array('id'=>$value));
                 }
 
             }
 
-            $yorders=pdo_getall('pintuan_grouporder',array('group_id'=>$uids,'state'=>2,'pay_type'=>2),'id');
+            $yorders=pdo_getall('mask_grouporder',array('group_id'=>$uids,'state'=>2,'pay_type'=>2),'id');
             foreach ($yorders as $key => $value2) {
-                $type=pdo_get('pintuan_grouporder',array('id'=>$value2));
-                pdo_update('pintuan_user', array('wallet +=' => $type['money']), array('id' => $type['user_id']));
+                $type=pdo_get('mask_grouporder',array('id'=>$value2));
+                pdo_update('mask_user', array('wallet +=' => $type['money']), array('id' => $type['user_id']));
                 $tk['money'] = $type['money'];
                 $tk['user_id'] = $type['user_id'];
                 $tk['type'] = 1;
                 $tk['note'] = '拼团失败';
                 $tk['time'] = date('Y-m-d H:i:s');
-                $tkres = pdo_insert('pintuan_qbmx', $tk);
-                pdo_update('pintuan_grouporder',array('state'=>4),array('id'=>$value2));
+                $tkres = pdo_insert('mask_qbmx', $tk);
+                pdo_update('mask_grouporder',array('state'=>4),array('id'=>$value2));
 
             }
-            $group=pdo_update('pintuan_group',array('state'=>3),array('id'=>$uids));
+            $group=pdo_update('mask_group',array('state'=>3),array('id'=>$uids));
         }
     }
 
@@ -7229,7 +7229,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $where=" where uniacid=:uniacid and status=1 and type in (".$_GPC['type'].")";
         $data[':uniacid']=$_W['uniacid'];
-        $sql="select * from ".tablename('pintuan_llz').$where;
+        $sql="select * from ".tablename('mask_llz').$where;
         $res=pdo_fetchall($sql,$data);
         echo json_encode($res);
     }
@@ -7237,14 +7237,14 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //判断今日预定
     public function doPageGetYdSet(){
         global $_W, $_GPC;
-        $set=pdo_get('pintuan_storeset',array('store_id'=>$_GPC['store_id']),'is_ydtime');
+        $set=pdo_get('mask_storeset',array('store_id'=>$_GPC['store_id']),'is_ydtime');
         echo json_encode($set);
     }
 
 //商户预定时间段
     public function doPageGetStoreTime(){
         global $_W, $_GPC;
-        $list = pdo_getall('pintuan_reservation',array('uniacid' => $_W['uniacid'],'store_id'=>$_GPC['store_id']), array() , '' , 'num ASC');
+        $list = pdo_getall('mask_reservation',array('uniacid' => $_W['uniacid'],'store_id'=>$_GPC['store_id']), array() , '' , 'num ASC');
         echo json_encode($list);
     }
 
@@ -7252,10 +7252,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageGetStoreService(){
         global $_W, $_GPC;
         $where=" WHERE uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} and pid=0";
-        $sql=" select * from" . tablename("pintuan_service") .$where." order by num asc";
+        $sql=" select * from" . tablename("mask_service") .$where." order by num asc";
         $list = pdo_fetchall($sql);
         foreach($list as $key => $value){
-            $data=pdo_getall('pintuan_service',array('pid'=>$value['id'],'uniacid'=>$_W['uniacid']),array(),'','order by num asc');
+            $data=pdo_getall('mask_service',array('pid'=>$value['id'],'uniacid'=>$_W['uniacid']),array(),'','order by num asc');
             if($data){
                 $list[$key]['ej']=$data;
             }else{
@@ -7281,7 +7281,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['yhk_num']=$_GPC['yhk_num'];
         $data['tel']=$_GPC['tel'];
         $data['yh_info']=$_GPC['yh_info'];
-        $res=pdo_insert('pintuan_withdrawal',$data);
+        $res=pdo_insert('mask_withdrawal',$data);
         if($res){
             echo '1';
         }else{
@@ -7299,7 +7299,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $end=strtotime($_GPC['end_time']);
             $where .=" and UNIX_TIMESTAMP(time) >='{$start}' and UNIX_TIMESTAMP(time)<='{$end}'";
         }
-        $sql="select * from ".tablename('pintuan_withdrawal')." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} ".$where." order by id DESC";
+        $sql="select * from ".tablename('mask_withdrawal')." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} ".$where." order by id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $res=pdo_fetchall($select_sql);
         echo json_encode($res);
@@ -7309,34 +7309,34 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageKtx(){
         global $_W, $_GPC;
         $storeid=$_GPC['store_id'];
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']),array('is_wx','is_yhk'));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),array('is_wx','is_yhk'));
         $data[':uniacid']=$_W['uniacid'];
         $data[':store_id']=$storeid;
         //获取商家手续费
-        $sql="select b.poundage,b.dn_poundage,b.dm_poundage,b.yd_poundage from".tablename('pintuan_store')."a  left join ".tablename('pintuan_storetype')." b on a.md_type=b.id where a.id={$storeid}";
+        $sql="select b.poundage,b.dn_poundage,b.dm_poundage,b.yd_poundage from".tablename('mask_store')."a  left join ".tablename('mask_storetype')." b on a.md_type=b.id where a.id={$storeid}";
         $list4=pdo_fetch($sql);
         $where=" where a.uniacid=:uniacid and a.type=1 and a.store_id=:store_id and a.pay_type in (1,2) and a.state in (4,5,10)" ;
         //总数统计
-        $sql2="select sum(money) as 'total_money',sum(ps_money) as ps_money from" . tablename("pintuan_order") ." as a".$where;
+        $sql2="select sum(money) as 'total_money',sum(ps_money) as ps_money from" . tablename("mask_order") ." as a".$where;
         $list2=pdo_fetch($sql2,$data);
         //店内订单金额统计
-        $dnwmcost=pdo_get('pintuan_order', array('store_id'=>$storeid,'dn_state '=>2,'pay_type'=>array(1,2),'type'=>2), array('sum(money) as total_money'));
+        $dnwmcost=pdo_get('mask_order', array('store_id'=>$storeid,'dn_state '=>2,'pay_type'=>array(1,2),'type'=>2), array('sum(money) as total_money'));
         //当面付订单金额统计
-        $dmcost=pdo_get('pintuan_order', array('store_id'=>$storeid,'dm_state '=>2,'pay_type'=>array(1,2),'type'=>4), array('sum(money) as total_money'));
+        $dmcost=pdo_get('mask_order', array('store_id'=>$storeid,'dm_state '=>2,'pay_type'=>array(1,2),'type'=>4), array('sum(money) as total_money'));
         //预约订单金额
-        $yycost=pdo_get('pintuan_order', array('store_id'=>$storeid,'yy_state '=>3,'pay_type'=>array(1,2),'type'=>3), array('sum(money) as total_money'));
+        $yycost=pdo_get('mask_order', array('store_id'=>$storeid,'yy_state '=>3,'pay_type'=>array(1,2),'type'=>3), array('sum(money) as total_money'));
         //已申请金额
-        $total=pdo_get('pintuan_withdrawal', array('store_id'=>$storeid,'state '=>1), array('sum(tx_cost) as tx_cost'));
+        $total=pdo_get('mask_withdrawal', array('store_id'=>$storeid,'state '=>1), array('sum(tx_cost) as tx_cost'));
         //已提现金额
-        $total2=pdo_get('pintuan_withdrawal', array('store_id'=>$storeid,'state '=>2), array('sum(tx_cost) as tx_cost'));
+        $total2=pdo_get('mask_withdrawal', array('store_id'=>$storeid,'state '=>2), array('sum(tx_cost) as tx_cost'));
         //运费服务费
-        $sys=pdo_get('pintuan_store',array('id'=>$storeid),'ps_poundage');
+        $sys=pdo_get('mask_store',array('id'=>$storeid),'ps_poundage');
 
         $ps_money=number_format($list2['ps_money']*$sys['ps_poundage']/100,1);
         //抢购金额
-        $qg_money=pdo_get('pintuan_qgorder', array('store_id'=>$storeid,'state'=>array(2,3)), array('sum(money) as total_money'));
+        $qg_money=pdo_get('mask_qgorder', array('store_id'=>$storeid,'state'=>array(2,3)), array('sum(money) as total_money'));
         //拼团金额
-        $pt_money=pdo_get('pintuan_grouporder', array('store_id'=>$storeid,'state'=>array(3,5)), array('sum(money) as total_money'));
+        $pt_money=pdo_get('mask_grouporder', array('store_id'=>$storeid,'state'=>array(3,5)), array('sum(money) as total_money'));
         $tuan=$qg_money['total_money']+$pt_money['total_money']-$list4['dn_poundage']*($qg_money['total_money']+$pt_money['total_money'])/100;
 
         //可提现金额
@@ -7349,9 +7349,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //取号成功模板消息
     public function doPageNumberMessage(){
         global $_W, $_GPC;
-        pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+        pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
         function getaccess_token($_W){
-            $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $appid=$res['appid'];
             $secret=$res['appsecret'];
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -7367,17 +7367,17 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         //设置与发送模板信息
         function set_msg($_W){
             $access_token = getaccess_token($_W);
-            $rst=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-            $res2=pdo_get('pintuan_number',array('id'=>$_GET['num_id']));
-            $store=pdo_get('pintuan_store',array('id'=>$res2['store_id']));
-            $user=pdo_get('pintuan_user',array('id'=>$res2['user_id']));
-            $newsql=" select count(id) as count from  ".tablename('pintuan_number')." where uniacid={$_W['uniacid']} and store_id={$res2['store_id']}  and num='{$res2['num']}' and state=1  and id<{$_GET['num_id']}";
+            $rst=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+            $res2=pdo_get('mask_number',array('id'=>$_GET['num_id']));
+            $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+            $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+            $newsql=" select count(id) as count from  ".tablename('mask_number')." where uniacid={$_W['uniacid']} and store_id={$res2['store_id']}  and num='{$res2['num']}' and state=1  and id<{$_GET['num_id']}";
             $res=pdo_fetch($newsql);
-            $form=pdo_get('pintuan_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7),array(),'','id asc');
+            $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7),array(),'','id asc');
             $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$rst["qh_tid"].'",
-           "page": "pintuan/pages/seller/getnum?storeid='.$store['id'].'",
+           "page": "mask/pages/seller/getnum?storeid='.$store['id'].'",
            "form_id":"'.$form['form_id'].'",
            "data": {
            	"keyword1": {
@@ -7421,7 +7421,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data = curl_exec($ch);
             curl_close($ch);
             // return $data;
-            pdo_delete('pintuan_formid',array('id'=>$form['id']));
+            pdo_delete('mask_formid',array('id'=>$form['id']));
         }
         echo set_msg($_W);
     }
@@ -7439,9 +7439,9 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['time']=time();
         $data['uniacid']=$_W['uniacid'];
         if($_GPC['id']==''){
-            $res=pdo_insert('pintuan_numbertype',$data);
+            $res=pdo_insert('mask_numbertype',$data);
         }else{
-            $res = pdo_update('pintuan_numbertype', $data, array('id' => $_GPC['id']));
+            $res = pdo_update('mask_numbertype', $data, array('id' => $_GPC['id']));
         }
         if($res){
             echo '1';
@@ -7455,7 +7455,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //排队分类列表
     public function doPageNumberTypeList(){
         global $_W, $_GPC;
-        $sql="select * from " . tablename("pintuan_numbertype") ." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} order by sort asc";
+        $sql="select * from " . tablename("mask_numbertype") ." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']} order by sort asc";
         $list = pdo_fetchall($sql);
         echo json_encode($list);
     }
@@ -7463,7 +7463,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //删除排队分类
     public function doPageDelNumberType(){
         global $_W, $_GPC;
-        $res=pdo_delete('pintuan_numbertype',array('id'=>$_GPC['id']));
+        $res=pdo_delete('mask_numbertype',array('id'=>$_GPC['id']));
         if($res){
             echo '1';
         }else{
@@ -7477,20 +7477,20 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data[':uniacid']=$_W['uniacid'];
         $data[':store_id']=$_GPC['store_id'];
         $where=" WHERE uniacid=:uniacid and store_id=:store_id and state!=4";
-        $sql=" select id,num,state,count(id) as count from" . tablename("pintuan_number") .$where." group by num ";
+        $sql=" select id,num,state,count(id) as count from" . tablename("mask_number") .$where." group by num ";
         $list = pdo_fetchall($sql,$data);
         foreach($list as $key => $value){
             $num=$value['num'];
-            $newsql=" select id,num,code from ".tablename('pintuan_number')." where uniacid=:uniacid and store_id=:store_id  and num='{$num}' and state=1  order by id asc";
+            $newsql=" select id,num,code from ".tablename('mask_number')." where uniacid=:uniacid and store_id=:store_id  and num='{$num}' and state=1  order by id asc";
             $res=pdo_fetch($newsql,$data);
             if($res){
-                $newsql2="select count(id) as count2 from ".tablename('pintuan_number')." where uniacid=:uniacid and store_id=:store_id and num='{$num}' and  id<={$res['id']}";
+                $newsql2="select count(id) as count2 from ".tablename('mask_number')." where uniacid=:uniacid and store_id=:store_id and num='{$num}' and  id<={$res['id']}";
                 $res2=pdo_fetch($newsql2,$data);
                 $list[$key]['dq']=$res['code'];
                 $list[$key]['pid']=$res['id'];
                 $list[$key]['rs']=$res2['count2'];
             }else{
-                $newsql2="select count(id) as count2 from ".tablename('pintuan_number')." where uniacid=:uniacid and store_id=:store_id and num='{$num}'";
+                $newsql2="select count(id) as count2 from ".tablename('mask_number')." where uniacid=:uniacid and store_id=:store_id and num='{$num}'";
                 $res2=pdo_fetch($newsql2,$data);
                 $list[$key]['dq']='暂无排队信息';
                 $list[$key]['pid']='null';
@@ -7510,12 +7510,12 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=empty($_GPC['pagesize'])?10:$_GPC['pagesize'];
         $where=" WHERE uniacid=:uniacid and store_id=:store_id and state!=4 and num=:num";
-        $sql=" select * from" . tablename("pintuan_number") .$where."  order by id asc ";
+        $sql=" select * from" . tablename("mask_number") .$where."  order by id asc ";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql,$data);
         foreach($list as $key => $value){
             if($value['state']==1){
-                $newsql=" select count(id) as count from  ".tablename('pintuan_number')." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']}  and num='{$value['num']}' and state=1  and id<{$value['id']}";
+                $newsql=" select count(id) as count from  ".tablename('mask_number')." where uniacid={$_W['uniacid']} and store_id={$_GPC['store_id']}  and num='{$value['num']}' and state=1  and id<{$value['id']}";
                 $res=pdo_fetch($newsql);
             }
             if($res){
@@ -7530,7 +7530,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //删除排队分号
     public function doPageDelNumberCode(){
         global $_W, $_GPC;
-        $res=pdo_delete('pintuan_number',array('id'=>$_GPC['id']));
+        $res=pdo_delete('mask_number',array('id'=>$_GPC['id']));
         if($res){
             echo '1';
         }else{
@@ -7541,8 +7541,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //叫号
     public function doPageQueryNumber(){
         global $_W, $_GPC;
-        $number=pdo_get('pintuan_number',array('id'=>$_GPC['id']));
-        $store=pdo_get('pintuan_call',array('store_id'=>$number['store_id']));
+        $number=pdo_get('mask_number',array('id'=>$_GPC['id']));
+        $store=pdo_get('mask_call',array('store_id'=>$number['store_id']));
         $num=2;
         for($i=0;$i<$num;$i++){
             $content.="请".$number['code']."的顾客用餐,";
@@ -7550,7 +7550,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
         $appid=$store['appid'];
         $appkey=$store['apikey'];
-        $output_path="../addons/pintuan/call/yc".$number['code'].$number['id'].".wav";
+        $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
             'auf' => 'audio/L16;rate=16000',
             'aue' => 'raw',
@@ -7595,7 +7595,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //排队入座
     public function doPagePdrz(){
         global $_W,$_GPC;
-        $rst=pdo_update('pintuan_number',array('state'=>2),array('id'=>$_GPC['id']));
+        $rst=pdo_update('mask_number',array('state'=>2),array('id'=>$_GPC['id']));
         if($rst){
             echo '1';
         }else{
@@ -7607,7 +7607,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //排队跳号
     public function doPagePdth(){
         global $_W,$_GPC;
-        $rst=pdo_update('pintuan_number',array('state'=>3),array('id'=>$_GPC['id']));
+        $rst=pdo_update('mask_number',array('state'=>3),array('id'=>$_GPC['id']));
         if($rst){
             echo '1';
         }else{
@@ -7619,7 +7619,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
     public function doPagePrintTest(){
         global $_W, $_GPC;
-        include IA_ROOT.'/addons/pintuan/print/dyj.php';
+        include IA_ROOT.'/addons/mask/print/dyj.php';
 
         //$url="https://hl.zhycms.com/addons/zh_jd/payment/peisong/notify2.php";
         $url="115.28.15.113:60002";
@@ -7650,11 +7650,11 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //获取订单价格
     public function doPageGetOrderPrice() {
         global $_W, $_GPC;
-        include IA_ROOT . '/addons/pintuan/uupt/upt.php';
+        include IA_ROOT . '/addons/mask/uupt/upt.php';
         //订单信息
-        $orderinfo = pdo_get('pintuan_order', array('id' => $_GPC['order_id']));
+        $orderinfo = pdo_get('mask_order', array('id' => $_GPC['order_id']));
         //获取商家信息
-        $sellerinfo = pdo_get('pintuan_store', array('id' => $orderinfo['store_id']));
+        $sellerinfo = pdo_get('mask_store', array('id' => $orderinfo['store_id']));
         $arr = explode(",", $sellerinfo['coordinates']);
         //获取uu配置
         //$uupt = pdo_get('wpdc_uuset', array('store_id' => $orderinfo['seller_id']));
@@ -7699,7 +7699,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageSelectStoreList(){
         global $_W, $_GPC;
         $time=time();
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         // $lat="30.525980";
         //  $lng="114.353440";
         if($_GPC['lat']){
@@ -7738,15 +7738,15 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $_GPC['by']="number asc";
         }
         if($system['distance']!=0){
-            $sql="select xx.* from (SELECT a.*, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli ,b.money as ps_money,c.ps_mode,c.ps_time,c.xyh_open,c.xyh_money FROM ".tablename("pintuan_store") . " a left join (select min(money) as money,store_id from ".tablename("pintuan_distribution")." group by store_id) b on a.id=b.store_id " . " left join " . tablename("pintuan_storeset") . " c on c.store_id=a.id left join (select min(reduction) as money,store_id from ".tablename("pintuan_reduction")." ) d on a.id=d.store_id ".  $where ." ORDER BY ".$_GPC['by'].") xx where xx.juli<=".$system['distance'];
+            $sql="select xx.* from (SELECT a.*, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli ,b.money as ps_money,c.ps_mode,c.ps_time,c.xyh_open,c.xyh_money FROM ".tablename("mask_store") . " a left join (select min(money) as money,store_id from ".tablename("mask_distribution")." group by store_id) b on a.id=b.store_id " . " left join " . tablename("mask_storeset") . " c on c.store_id=a.id left join (select min(reduction) as money,store_id from ".tablename("mask_reduction")." ) d on a.id=d.store_id ".  $where ." ORDER BY ".$_GPC['by'].") xx where xx.juli<=".$system['distance'];
         }else{
-            $sql="SELECT a.*, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli ,b.money as ps_money,c.ps_mode,c.ps_time,c.xyh_open,c.xyh_money FROM ".tablename("pintuan_store") . " a left join (select min(money) as money,store_id from ".tablename("pintuan_distribution")." group by store_id) b on a.id=b.store_id " . " left join " . tablename("pintuan_storeset") . " c on c.store_id=a.id left join (select min(reduction) as money,store_id from ".tablename("pintuan_reduction")." ) d on a.id=d.store_id ".  $where ." ORDER BY ".$_GPC['by'];
+            $sql="SELECT a.*, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($lat*PI()/180-SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)/2),2)+COS($lat*PI()/180)*COS(SUBSTRING_INDEX(coordinates, ',', 1)*PI()/180)*POW(SIN(($lng*PI()/180-SUBSTRING_INDEX(coordinates, ',', -1)*PI()/180)/2),2)))*1000) AS juli ,b.money as ps_money,c.ps_mode,c.ps_time,c.xyh_open,c.xyh_money FROM ".tablename("mask_store") . " a left join (select min(money) as money,store_id from ".tablename("mask_distribution")." group by store_id) b on a.id=b.store_id " . " left join " . tablename("mask_storeset") . " c on c.store_id=a.id left join (select min(reduction) as money,store_id from ".tablename("mask_reduction")." ) d on a.id=d.store_id ".  $where ." ORDER BY ".$_GPC['by'];
         }
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $list = pdo_fetchall($select_sql,$data);
         for($i=0;$i<count($list);$i++){
-            $mj=pdo_getall('pintuan_reduction',array('store_id'=>$list[$i]['id']));
-            $hot=pdo_getslice('pintuan_goods', array('type' =>1,'store_id'=>$list[$i]['id']), array(1,10) , $total , array() , '' , array('sales desc'));
+            $mj=pdo_getall('mask_reduction',array('store_id'=>$list[$i]['id']));
+            $hot=pdo_getslice('mask_goods', array('type' =>1,'store_id'=>$list[$i]['id']), array(1,10) , $total , array() , '' , array('sales desc'));
             $list[$i]['mj']=$mj;
             $list[$i]['hot']=$hot;
         }
@@ -7756,7 +7756,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 //签到
     public function doPageSign(){
         global $_W, $_GPC;
-        $sign=pdo_get('pintuan_signlist',array('user_id'=>$_GPC['user_id'],'time'=>$_GPC['time']));
+        $sign=pdo_get('mask_signlist',array('user_id'=>$_GPC['user_id'],'time'=>$_GPC['time']));
         if(!$sign){
             $time2=explode(',',$_GPC['time']);
             $time2=$time2[0]."-".$time2[1]."-".$time2[2];
@@ -7767,32 +7767,32 @@ class pintuanModuleWxapp extends WeModuleWxapp {
             $data['time']=$_GPC['time'];
             $data['integral']=$_GPC['integral'];
             $data['uniacid']=$_W['uniacid'];
-            $res=pdo_insert('pintuan_signlist',$data);
+            $res=pdo_insert('mask_signlist',$data);
             if($res){
                 if($_GPC['one']){
-                    pdo_update('pintuan_user',array('total_score +='=>$_GPC['one'],'day +='=>1),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
+                    pdo_update('mask_user',array('total_score +='=>$_GPC['one'],'day +='=>1),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
                     $data2['score']=$_GPC['one'];
                     $data2['user_id']=$_GPC['user_id'];
                     $data2['note']='首次签到';
                     $data2['type']=1;
                     $data2['cerated_time']=date('Y-m-d H:i:s');
                     $data2['uniacid']=$_W['uniacid'];//小程序id
-                    pdo_insert('pintuan_integral',$data2);//添加积分明细
+                    pdo_insert('mask_integral',$data2);//添加积分明细
                 }else{
-                    pdo_update('pintuan_user',array('total_score +='=>$_GPC['integral'],'day +='=>1),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
+                    pdo_update('mask_user',array('total_score +='=>$_GPC['integral'],'day +='=>1),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
                     $data2['score']=$_GPC['integral'];
                     $data2['user_id']=$_GPC['user_id'];
                     $data2['note']='每日签到';
                     $data2['type']=1;
                     $data2['cerated_time']=date('Y-m-d H:i:s');
                     $data2['uniacid']=$_W['uniacid'];//小程序id
-                    pdo_insert('pintuan_integral',$data2);//添加积分明细
+                    pdo_insert('mask_integral',$data2);//添加积分明细
                 }
-                $list=pdo_getall('pintuan_continuous',array('uniacid'=>$_W['uniacid']));//连续签到列表
-                $my=pdo_getall('pintuan_signlist',array('user_id'=>$_GPC['user_id']),array(),'','time2 DESC');
+                $list=pdo_getall('mask_continuous',array('uniacid'=>$_W['uniacid']));//连续签到列表
+                $my=pdo_getall('mask_signlist',array('user_id'=>$_GPC['user_id']),array(),'','time2 DESC');
                 // print_r($list);die;
                 $time=date('Y,n,j',time());//今天
-                $jt=pdo_get('pintuan_signlist',array('user_id'=>$_GPC['user_id'],'time'=>$time));//查看今天有没有签到
+                $jt=pdo_get('mask_signlist',array('user_id'=>$_GPC['user_id'],'time'=>$time));//查看今天有没有签到
                 if($jt){//签到了
                     $num=0;
                     for($i=0;$i<count($my);$i++){
@@ -7820,10 +7820,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                         $data3['type']=1;
                         $data3['cerated_time']=date('Y-m-d H:i:s');
                         $data3['uniacid']=$_W['uniacid'];//小程序id
-                        $qd=pdo_get('pintuan_integral',array('uniacid'=>$_W['uniacid'],'note'=>$data3['note'],'user_id'=>$_GPC['user_id']));
+                        $qd=pdo_get('mask_integral',array('uniacid'=>$_W['uniacid'],'note'=>$data3['note'],'user_id'=>$_GPC['user_id']));
                         if(!$qd){
-                            pdo_insert('pintuan_integral',$data3);//添加积分明细
-                            pdo_update('pintuan_user',array('total_score +='=>$list[$k]['integral']),array('id'=>$_GPC['user_id']));//连续签到增加积分
+                            pdo_insert('mask_integral',$data3);//添加积分明细
+                            pdo_update('mask_user',array('total_score +='=>$list[$k]['integral']),array('id'=>$_GPC['user_id']));//连续签到增加积分
                         }
                         break;
                     }
@@ -7848,42 +7848,42 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $data['time']=$_GPC['time'];
         $data['integral']=$_GPC['integral'];
         $data['uniacid']=$_W['uniacid'];
-        $res=pdo_insert('pintuan_signlist',$data);
-        $res2=pdo_get('pintuan_signset',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_insert('mask_signlist',$data);
+        $res2=pdo_get('mask_signset',array('uniacid'=>$_W['uniacid']));
         if($res){
-            pdo_update('pintuan_user',array('total_score -='=>$res2['bq_integral']),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
+            pdo_update('mask_user',array('total_score -='=>$res2['bq_integral']),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
             $data4['score']=$res2['bq_integral'];
             $data4['user_id']=$_GPC['user_id'];
             $data4['note']='补签';
             $data4['type']=2;
             $data4['cerated_time']=date('Y-m-d H:i:s');
             $data4['uniacid']=$_W['uniacid'];//小程序id
-            pdo_insert('pintuan_integral',$data4);//添加积分明细
+            pdo_insert('mask_integral',$data4);//添加积分明细
             if($_GPC['one']){
-                pdo_update('pintuan_user',array('total_score +='=>$_GPC['one'],'day +='=>1),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
+                pdo_update('mask_user',array('total_score +='=>$_GPC['one'],'day +='=>1),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
                 $data2['score']=$_GPC['one'];
                 $data2['user_id']=$_GPC['user_id'];
                 $data2['note']='首次签到';
                 $data2['type']=1;
                 $data2['cerated_time']=date('Y-m-d H:i:s');
                 $data2['uniacid']=$_W['uniacid'];//小程序id
-                pdo_insert('pintuan_integral',$data2);//添加积分明细
+                pdo_insert('mask_integral',$data2);//添加积分明细
             }else{
-                pdo_update('pintuan_user',array('total_score +='=>$_GPC['integral'],'day +='=>1),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
+                pdo_update('mask_user',array('total_score +='=>$_GPC['integral'],'day +='=>1),array('id'=>$_GPC['user_id']));//签到增加积分/签到天数
                 $data2['score']=$_GPC['integral'];
                 $data2['user_id']=$_GPC['user_id'];
                 $data2['note']='每日签到';
                 $data2['type']=1;
                 $data2['cerated_time']=date('Y-m-d H:i:s');
                 $data2['uniacid']=$_W['uniacid'];//小程序id
-                pdo_insert('pintuan_integral',$data2);//添加积分明细
+                pdo_insert('mask_integral',$data2);//添加积分明细
             }
 
 
-            $list=pdo_getall('pintuan_continuous',array('uniacid'=>$_W['uniacid']));//连续签到列表
-            $my=pdo_getall('pintuan_signlist',array('user_id'=>$_GPC['user_id']),array(),'','time2 DESC');
+            $list=pdo_getall('mask_continuous',array('uniacid'=>$_W['uniacid']));//连续签到列表
+            $my=pdo_getall('mask_signlist',array('user_id'=>$_GPC['user_id']),array(),'','time2 DESC');
             $time=date('Y,n,j',time());//今天
-            $jt=pdo_get('pintuan_signlist',array('user_id'=>$_GPC['user_id'],'time'=>$time));//查看今天有没有签到
+            $jt=pdo_get('mask_signlist',array('user_id'=>$_GPC['user_id'],'time'=>$time));//查看今天有没有签到
             if($jt){//签到了
                 $num=0;
                 for($i=0;$i<count($my);$i++){
@@ -7912,10 +7912,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
                     $data3['type']=1;
                     $data3['cerated_time']=date('Y-m-d H:i:s');
                     $data3['uniacid']=$_W['uniacid'];//小程序id
-                    $qd=pdo_get('pintuan_integral',array('uniacid'=>$_W['uniacid'],'note'=>$data3['note'],'user_id'=>$_GPC['user_id']));
+                    $qd=pdo_get('mask_integral',array('uniacid'=>$_W['uniacid'],'note'=>$data3['note'],'user_id'=>$_GPC['user_id']));
                     if(!$qd){
-                        pdo_insert('pintuan_integral',$data3);//添加积分明细
-                        pdo_update('pintuan_user',array('total_score +='=>$list[$k]['integral']),array('id'=>$_GPC['user_id']));//连续签到增加积分
+                        pdo_insert('mask_integral',$data3);//添加积分明细
+                        pdo_update('mask_user',array('total_score +='=>$list[$k]['integral']),array('id'=>$_GPC['user_id']));//连续签到增加积分
                     }
                     break;
                 }
@@ -7933,7 +7933,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
 
         $time="'%$time%'";
         // echo $time;die;
-        $sql="select *  from " . tablename("pintuan_integral") ." WHERE  cerated_time LIKE ".$time." and user_id=".$_GPC['user_id']." and note='补签'";
+        $sql="select *  from " . tablename("mask_integral") ." WHERE  cerated_time LIKE ".$time." and user_id=".$_GPC['user_id']." and note='补签'";
         //  echo $sql;die;
         $res=pdo_fetch($sql);
         if($res){
@@ -7945,7 +7945,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //查看我的签到
     public function doPageMySign(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_signlist',array('user_id'=>$_GPC['user_id']));
+        $res=pdo_getall('mask_signlist',array('user_id'=>$_GPC['user_id']));
         echo json_encode($res);
     }
     //签到排行
@@ -7954,7 +7954,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
         $where="where uniacid=:uniacid and day!=''";
-        $sql= "select * from".tablename('pintuan_user').$where." order by day DESC";
+        $sql= "select * from".tablename('mask_user').$where." order by day DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $res=pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid']));
         echo json_encode($res);
@@ -7964,7 +7964,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $pageindex = max(1, intval($_GPC['page']));
         $pagesize=$_GPC['pagesize'];
-        $sql="select a.*,b.name,b.img from " . tablename("pintuan_signlist") . " a"  . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id  WHERE a.uniacid=:uniacid and a.time=:time order by time3 asc";
+        $sql="select a.*,b.name,b.img from " . tablename("mask_signlist") . " a"  . " left join " . tablename("mask_user") . " b on b.id=a.user_id  WHERE a.uniacid=:uniacid and a.time=:time order by time3 asc";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $res=pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':time'=>date('Y,n,j')));
         echo json_encode($res);
@@ -7972,7 +7972,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //我的今日排行
     public function doPageMyJrRank(){
         global $_W, $_GPC;
-        $sql="select a.*,b.name,b.img from " . tablename("pintuan_signlist") . " a"  . " left join " . tablename("pintuan_user") . " b on b.id=a.user_id  WHERE a.uniacid=:uniacid and a.time=:time order by time3 asc";
+        $sql="select a.*,b.name,b.img from " . tablename("mask_signlist") . " a"  . " left join " . tablename("mask_user") . " b on b.id=a.user_id  WHERE a.uniacid=:uniacid and a.time=:time order by time3 asc";
         $res=pdo_fetchall($sql,array(':uniacid'=>$_W['uniacid'],':time'=>date('Y,n,j')));
         for($i=0;$i<count($res);$i++){
             if($_GPC['user_id']==$res[$i]['user_id']){
@@ -7985,7 +7985,7 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     //查看今天是否签到
     public function doPageMyJrSign(){
         global $_W, $_GPC;
-        $res=pdo_get('pintuan_signlist',array('user_id'=>$_GPC['user_id'],'time'=>date('Y,n,j')));
+        $res=pdo_get('mask_signlist',array('user_id'=>$_GPC['user_id'],'time'=>date('Y,n,j')));
         if($res){
             echo '1';
         }else{
@@ -7997,34 +7997,34 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $time=date('Y-m-d');
         $time="'%$time%'";
-        $sql="select sum(score) as total  from " . tablename("pintuan_integral") ." WHERE  cerated_time LIKE ".$time." and user_id=".$_GPC['user_id']." and (note='每日签到' || note='首次签到' || note LIKE '%连续签到%')";
+        $sql="select sum(score) as total  from " . tablename("mask_integral") ." WHERE  cerated_time LIKE ".$time." and user_id=".$_GPC['user_id']." and (note='每日签到' || note='首次签到' || note LIKE '%连续签到%')";
         $res=pdo_fetch($sql);
         echo $res['total'];
     }
     //查看连签奖励
     public function doPageContinuousList(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_continuous',array('uniacid'=>$_W['uniacid']),array(),'','day asc');
+        $res=pdo_getall('mask_continuous',array('uniacid'=>$_W['uniacid']),array(),'','day asc');
         echo json_encode($res);
     }
     //查看特殊日期奖励
     public function doPageSpecial(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_special',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_getall('mask_special',array('uniacid'=>$_W['uniacid']));
         echo json_encode($res);
     }
     //查看签到规则
     public function doPageSignset(){
         global $_W, $_GPC;
-        $res=pdo_getall('pintuan_signset',array('uniacid'=>$_W['uniacid']));
+        $res=pdo_getall('mask_signset',array('uniacid'=>$_W['uniacid']));
         echo json_encode($res);
     }
 //查看连续签到天数
     public function doPageContinuous(){
         global $_W, $_GPC;
-        $my=pdo_getall('pintuan_signlist',array('user_id'=>$_GPC['user_id']),array(),'','time2 desc');
+        $my=pdo_getall('mask_signlist',array('user_id'=>$_GPC['user_id']),array(),'','time2 desc');
         $time=date('Y,n,j',time());//今天
-        $jt=pdo_get('pintuan_signlist',array('user_id'=>$_GPC['user_id'],'time'=>$time));//查看今天有没有签到
+        $jt=pdo_get('mask_signlist',array('user_id'=>$_GPC['user_id'],'time'=>$time));//查看今天有没有签到
         if($jt){//签到了
             $num=0;
             for($i=0;$i<count($my);$i++){
@@ -8052,19 +8052,19 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $order_id=$_GPC['order_id'];
         $store_id=$_GPC['store_id'];
-        $sys=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']),'ps_name');
+        $sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),'ps_name');
         $ps_name=empty($sys['ps_name'])?'超级跑腿':$sys['ps_name'];
-        $rst=pdo_get('pintuan_storeset',array('store_id'=>$store_id),'ps_mode');
+        $rst=pdo_get('mask_storeset',array('store_id'=>$store_id),'ps_mode');
         if($rst['ps_mode']=='快服务配送'){
-            $rst=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=GetKfwInfo&m=pintuan&order_id=".$order_id);//配送详情
+            $rst=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=GetKfwInfo&m=mask&order_id=".$order_id);//配送详情
             return $rst;
         }
         if($rst['ps_mode']=='达达配送'){
-            $rst=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=GetDadaInfo&m=pintuan&order_id=".$order_id);//配送详情
+            $rst=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=GetDadaInfo&m=mask&order_id=".$order_id);//配送详情
             return $rst;
         }
         if($rst['ps_mode']==$ps_name){
-            $rst=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=GetPtInfo&m=pintuan&order_id=".$order_id);//配送详情
+            $rst=file_get_contents("".$_W['siteroot']."app/index.php?i=".$_W['uniacid']."&c=entry&a=wxapp&do=GetPtInfo&m=mask&order_id=".$order_id);//配送详情
             return $rst;
 
         }
@@ -8078,8 +8078,8 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageGetPtInfo(){
         global $_W, $_GPC;
         $order_id=$_GPC['order_id'];
-        include IA_ROOT.'/addons/pintuan/peisong/cjpt.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
+        include IA_ROOT.'/addons/mask/peisong/cjpt.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
         $bind=pdo_get('cjpt_bind',array('cy_uniacid'=>$_W['uniacid']));
         $newstr = substr($news,0,strlen($news)-1);
         //下订单
@@ -8098,10 +8098,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
     public function doPageGetDadaInfo(){
         global $_W, $_GPC;
         $order_id=$_GPC['order_id'];
-        include IA_ROOT.'/addons/pintuan/peisong/peisong.php';
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
-        $set=pdo_get('pintuan_psset',array('store_id'=>$order['store_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        include IA_ROOT.'/addons/mask/peisong/peisong.php';
+        $order=pdo_get('mask_order',array('id'=>$order_id));
+        $set=pdo_get('mask_psset',array('store_id'=>$order['store_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 //*********************配置项*************************
         $config = array();
         $config['app_key'] = $system['dada_key'];
@@ -8125,10 +8125,10 @@ class pintuanModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         include IA_ROOT.'/addons/zh_jd/peisong/KfwOpenapi.php';
         $order_id=$_GPC['order_id'];
-        $order=pdo_get('pintuan_order',array('id'=>$order_id));
+        $order=pdo_get('mask_order',array('id'=>$order_id));
 
-        $set=pdo_get('pintuan_kfwset',array('store_id'=>$order['store_id']));
-        $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+        $set=pdo_get('mask_kfwset',array('store_id'=>$order['store_id']));
+        $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
         $app_secret=$system['kfw_appsecret'];
         $data = array(
             'app_id'=>  $system['kfw_appid'],

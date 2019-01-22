@@ -6,7 +6,7 @@ $uid=$_COOKIE["uid"];
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
-$type=pdo_getall('pintuan_type',array('store_id'=>$storeid),array(),'','order_by asc');
+$type=pdo_getall('mask_type',array('store_id'=>$storeid),array(),'','order_by asc');
 $where=" WHERE a.uniacid=:uniacid and a.store_id=:store_id";
 $data[':uniacid']=$_W['uniacid'];
 $data[':store_id']=$storeid;
@@ -34,14 +34,14 @@ if($_GPC['is_show2']){
 
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=15;
-$sql="select a.* ,b.type_name from " . tablename("pintuan_goods") . " a"  . " left join " . tablename("pintuan_type") . " b on b.id=a.type_id".$where." order by num asc";
+$sql="select a.* ,b.type_name from " . tablename("mask_goods") . " a"  . " left join " . tablename("mask_type") . " b on b.id=a.type_id".$where." order by num asc";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list = pdo_fetchall($select_sql,$data);     
-$total=pdo_fetchcolumn("select count(*) from " . tablename("pintuan_goods") . " a"  . " left join " . tablename("pintuan_type") . " b on b.id=a.type_id".$where,$data);
+$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_goods") . " a"  . " left join " . tablename("mask_type") . " b on b.id=a.type_id".$where,$data);
 $pager = pagination($total, $pageindex, $pagesize);
 if($_GPC['id']){
   $data2['is_show']=$_GPC['is_show'];
-  $res=pdo_update('pintuan_goods',$data2,array('id'=>$_GPC['id']));
+  $res=pdo_update('mask_goods',$data2,array('id'=>$_GPC['id']));
   if($res){
     message('设置成功',$this->createWebUrl2('dldishes2',array('page'=>$_GPC['page'],'keywords'=>$_GPC['keywords'],'dishes_type'=>$_GPC['dishes_type'],'type_id'=>$_GPC['type_id'],'is_show2'=>$_GPC['is_show2'])),'success');
   }else{
@@ -49,7 +49,7 @@ if($_GPC['id']){
   }
 }
 if($_GPC['op']=='delete'){
-  $result = pdo_delete('pintuan_goods', array('id'=>$_GPC['delid']));
+  $result = pdo_delete('mask_goods', array('id'=>$_GPC['delid']));
   if($result){
     message('删除成功',$this->createWebUrl2('dldishes2',array()),'success');
   }else{
@@ -61,7 +61,7 @@ if(checksubmit('submit2')){
   $url=$_W['attachurl'];
   $filename = $_FILES['file_stu']['name'];
   $tmp_name = $_FILES['file_stu']['tmp_name'];
-  $filePath = IA_ROOT . '/addons/pintuan/excel/';
+  $filePath = IA_ROOT . '/addons/mask/excel/';
   include 'phpexcelreader/reader.php';
   $data = new Spreadsheet_Excel_Reader();
   $data->setOutputEncoding('utf-8');
@@ -119,7 +119,7 @@ if(checksubmit('submit2')){
             $insert['is_show'] = $row[16];
             $insert['store_id'] = $storeid;
             $insert['uniacid'] = $_W['uniacid'];
-            $res= pdo_insert('pintuan_goods',$insert);
+            $res= pdo_insert('mask_goods',$insert);
             $count = $count + $res;
           }
         }

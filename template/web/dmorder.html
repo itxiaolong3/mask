@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
     .yg5_key>div{float: left;line-height: 34px;}
     .store_td1{height: 45px;}
@@ -69,7 +69,7 @@
         <form action="" method="get" class="col-md-4" style="padding-left: 0">
         <input type="hidden" name="c" value="site" />
             <input type="hidden" name="a" value="entry" />
-            <input type="hidden" name="m" value="pintuan" />
+            <input type="hidden" name="m" value="mask" />
             <input type="hidden" name="do" value="dmorder" />
             <div class="input-group" style="width: 300px">
                 <input type="text" name="keywords" class="form-control" placeholder="请输入门店名称/订单编号" value="{$_GPC['keywords']}">
@@ -88,7 +88,7 @@
         <form action="" method="get" class="col-md-4" style="padding-left: 20px;">
         <input type="hidden" name="c" value="site" />
                    <input type="hidden" name="a" value="entry" />
-                   <input type="hidden" name="m" value="pintuan" />
+                   <input type="hidden" name="m" value="mask" />
                    <input type="hidden" name="do" value="dmorder" />
             <div class="input-group" style="width: 100px">
                 {php echo tpl_form_field_daterange('time',$_GPC['time'],true);}
@@ -108,7 +108,7 @@
     {if !$list}
         <div class="panel panel-default">
             <div class="orderwu">
-                <img src="../addons/pintuan/template/images/noorder.png">
+                <img src="../addons/mask/template/images/noorder.png">
                 <p class="wufont1">暂无指定订单</p>
                 <p class="orfont10">暂时没有筛选条件的订单，稍后再来看看吧！</p>
             </div>
@@ -180,7 +180,7 @@
 </div>
 
 
-<audio id="myaudio" src="../addons/pintuan/template/images/yy.mp3" controls="controls" loop="false" hidden="true" >
+<audio id="myaudio" src="../addons/mask/template/images/yy.mp3" controls="controls" loop="false" hidden="true" >
 <script type="text/javascript">
     $(function(){
         // $("#frame-1").addClass("in");

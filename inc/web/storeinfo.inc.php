@@ -13,8 +13,8 @@ $storeid=$_COOKIE["storeid"];
 // $cur_store = $this->getStoreById($storeid);	
 // }
 $cur_store = $this->getStoreById($storeid);
-$info=pdo_get('pintuan_store',array('id'=>$storeid));
-$info2=pdo_get('pintuan_storeset',array('store_id'=>$storeid));
+$info=pdo_get('mask_store',array('id'=>$storeid));
+$info2=pdo_get('mask_storeset',array('store_id'=>$storeid));
 
 		//print_r($img);die;
 		if($info['environment']){
@@ -83,8 +83,8 @@ if(checksubmit('submit')){
 			$data2['top_style']=$_GPC['top_style'];
 			$data2['info_style']=$_GPC['info_style'];
 			$data2['is_dcyhq']=$_GPC['is_dcyhq'];
-			$res = pdo_update('pintuan_store', $data, array('id' => $storeid));
-			 $res2 =pdo_update('pintuan_storeset', $data2, array('store_id' => $storeid));
+			$res = pdo_update('mask_store', $data, array('id' => $storeid));
+			 $res2 =pdo_update('mask_storeset', $data2, array('store_id' => $storeid));
 			if($res || $res2){
 				message('编辑成功',$this->createWebUrl('storeinfo',array()),'success');
 			}else{
@@ -96,7 +96,7 @@ if(checksubmit('submit')){
 function  getCoade($storeid){
 		function getaccess_token(){
 			global $_W, $_GPC;
-         $res=pdo_get('pintuan_system',array('uniacid' => $_W['uniacid']));
+         $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
          $appid=$res['appid'];
          $secret=$res['appsecret'];
          
@@ -139,7 +139,7 @@ function  getCoade($storeid){
 		function  getCoade2($storeid){
 			function getaccess_token2(){
 				global $_W, $_GPC;
-				$res=pdo_get('pintuan_system',array('uniacid' => $_W['uniacid']));
+				$res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
 				$appid=$res['appid'];
 				$secret=$res['appsecret'];
 
@@ -157,7 +157,7 @@ function  getCoade($storeid){
 				$access_token = getaccess_token2();
 				$data2=array(
 					"scene"=>$storeid,
-				"page"=>"pintuan/pages/seller/fukuan",
+				"page"=>"mask/pages/seller/fukuan",
 					"width"=>100
 					);
 				$data2 = json_encode($data2);

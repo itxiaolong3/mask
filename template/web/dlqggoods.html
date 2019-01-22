@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
     .ygmartop{margin-top: 30px;font-size: 12px;}
     .ygmartop2{margin-bottom: 10px;}
@@ -37,7 +37,7 @@
             <div class="col-md-12 ygboxl">
                <input type="hidden" name="c" value="site" />
                <input type="hidden" name="a" value="entry" />
-               <input type="hidden" name="m" value="pintuan" />
+               <input type="hidden" name="m" value="mask" />
                <input type="hidden" name="do" value="dlqggoods" />
                 <div class="col-md-2" style="padding: 0px;">
                     <div class="yg_name">商品名称</div>
@@ -204,7 +204,7 @@
                 console.log(id)
                 $.ajax({
                     type:"post",
-                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=Delqggoods&m=pintuan",
+                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=Delqggoods&m=mask",
                     dataType:"text",
                     data:{id:id},
                     success:function(data){
@@ -228,7 +228,7 @@
                 console.log(id)
                 $.ajax({
                     type:"post",
-                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=qggoodsSj&m=pintuan",
+                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=qggoodsSj&m=mask",
                     dataType:"text",
                     data:{id:id},
                     success:function(data){
@@ -252,7 +252,7 @@
                 console.log(id)
                 $.ajax({
                     type:"post",
-                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=qggoodsXj&m=pintuan",
+                    url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=qggoodsXj&m=mask",
                     dataType:"text",
                     data:{id:id},
                     success:function(data){

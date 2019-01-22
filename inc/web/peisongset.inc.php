@@ -3,11 +3,11 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu2();
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
-$sys=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']),array('ps_name','is_sj','is_dada','is_kfw','is_pt','id'));
+$sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),array('ps_name','is_sj','is_dada','is_kfw','is_pt','id'));
 $ps_name=empty($sys['ps_name'])?'超级跑腿':$sys['ps_name'];
-$info=pdo_get('pintuan_storeset',array('store_id'=>$storeid));
-$dadainfo=pdo_get('pintuan_psset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
-$kfwinfo=pdo_get('pintuan_kfwset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
+$info=pdo_get('mask_storeset',array('store_id'=>$storeid));
+$dadainfo=pdo_get('mask_psset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
+$kfwinfo=pdo_get('mask_kfwset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
 if(checksubmit('submit')){
 	$data['ps_time']=$_GPC['ps_time'];
 	$data['ps_jl']=$_GPC['ps_jl'];
@@ -20,28 +20,28 @@ if(checksubmit('submit')){
 	if($_GPC['is_ps']==2 and $_GPC['is_zt']==2){
 		message('外卖配送和到店自提必须开启一个','','error');
 	}
-	$res = pdo_update('pintuan_storeset', $data, array('store_id' => $storeid));
+	$res = pdo_update('mask_storeset', $data, array('store_id' => $storeid));
 	if($_GPC['ps_mode']=='达达配送'){
 		$data2['source_id']=$_GPC['source_id'];
 		$data2['shop_no']=$_GPC['shop_no'];
 		$data2['store_id']=$storeid;
 		$data2['uniacid']=$_W['uniacid'];
-		$dada=pdo_get('pintuan_psset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
+		$dada=pdo_get('mask_psset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
 		if($dada){
-			$res2 = pdo_update('pintuan_psset', $data2, array('store_id' => $storeid));
+			$res2 = pdo_update('mask_psset', $data2, array('store_id' => $storeid));
 		}else{
-			$res2 =pdo_insert('pintuan_psset', $data2);
+			$res2 =pdo_insert('mask_psset', $data2);
 		}
 	}
 	if($_GPC['ps_mode']=='快服务配送'){
 		$data2['store_id']=$storeid;
 		$data2['user_id']=$_GPC['user_id'];	
 		$data2['uniacid']=$_W['uniacid'];
-		$dada=pdo_get('pintuan_kfwset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
+		$dada=pdo_get('mask_kfwset',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
 		if($dada){
-			$res2 = pdo_update('pintuan_kfwset', $data2, array('store_id' => $storeid));
+			$res2 = pdo_update('mask_kfwset', $data2, array('store_id' => $storeid));
 		}else{
-			$res2 =pdo_insert('pintuan_kfwset', $data2);
+			$res2 =pdo_insert('mask_kfwset', $data2);
 		}
 	}
 	if($res or $res2){

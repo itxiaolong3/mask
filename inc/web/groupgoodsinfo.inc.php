@@ -4,7 +4,7 @@ $GLOBALS['frames'] = $this->getMainMenu();
 
 $cur_store = $this->getStoreById($storeid); 
 
-$info=pdo_get('pintuan_groupgoods',array('id'=>$_GPC['id']));
+$info=pdo_get('mask_groupgoods',array('id'=>$_GPC['id']));
 if($info['img']){
 	if(strlen($info['img'])>51){
 		$img= explode(',',$info['img']);
@@ -15,7 +15,7 @@ if($info['img']){
 	}
 }
 
-$type=pdo_getall('pintuan_grouptype',array('uniacid'=>$_W['uniacid']),array(),'','num asc');
+$type=pdo_getall('mask_grouptype',array('uniacid'=>$_W['uniacid']),array(),'','num asc');
 
 if(!$type){
 	message('请先添加分类',$this->createWebUrl('adddishestype',array()),'error');
@@ -51,14 +51,14 @@ if(checksubmit('submit')){
 
 	$data['uniacid']=$_W['uniacid'];
 	if($_GPC['id']==''){
-		$res=pdo_insert('pintuan_groupgoods',$data);
+		$res=pdo_insert('mask_groupgoods',$data);
 		if($res){
 			message('添加成功',$this->createWebUrl('allgroupgoods',array()),'success');
 		}else{
 			message('添加失败','','error');
 		}
 	}else{
-		$res = pdo_update('pintuan_groupgoods', $data, array('id' => $_GPC['id']));
+		$res = pdo_update('mask_groupgoods', $data, array('id' => $_GPC['id']));
 		if($res){
 			message('编辑成功',$this->createWebUrl('allgroupgoods',array()),'success');
 		}else{

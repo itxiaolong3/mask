@@ -3,9 +3,9 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu2();
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
-$list=pdo_getall('pintuan_dyj',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
+$list=pdo_getall('mask_dyj',array('store_id'=>$storeid,'uniacid'=>$_W['uniacid']));
 if($_GPC['id']){
-	$result = pdo_delete('pintuan_dyj', array('id'=>$_GPC['id']));
+	$result = pdo_delete('mask_dyj', array('id'=>$_GPC['id']));
 		if($result){
 			message('删除成功',$this->createWebUrl('print',array()),'success');
 		}else{

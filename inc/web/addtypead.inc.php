@@ -1,7 +1,7 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$info=pdo_get('pintuan_typead',array('id'=>$_GPC['id']));
+$info=pdo_get('mask_typead',array('id'=>$_GPC['id']));
 if(checksubmit('submit')){
     if($info['logo']!=$_GPC['logo']){
     $data['logo']=$_W['attachurl'].$_GPC['logo'];
@@ -22,14 +22,14 @@ if(checksubmit('submit')){
         $data['uniacid']=$_W['uniacid'];
         $data['created_time']=date('Y-m-d H:i:s');
      if($_GPC['id']==''){  
-        $res=pdo_insert('pintuan_typead',$data);
+        $res=pdo_insert('mask_typead',$data);
         if($res){
              message('添加成功！', $this->createWebUrl('typead'), 'success');
         }else{
              message('添加失败！','','error');
         }
     }else{
-        $res=pdo_update('pintuan_typead',$data,array('id'=>$_GPC['id']));
+        $res=pdo_update('mask_typead',$data,array('id'=>$_GPC['id']));
         if($res){
              message('编辑成功！', $this->createWebUrl('typead'), 'success');
         }else{

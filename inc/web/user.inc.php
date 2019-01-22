@@ -9,17 +9,17 @@ if($_GPC['keywords']){
 	$where='%%';
 }
 
-	/*	$sql="select *  from " . tablename("pintuan_user") ." WHERE  name LIKE :name  and uniacid=:uniacid";
+	/*	$sql="select *  from " . tablename("mask_user") ." WHERE  name LIKE :name  and uniacid=:uniacid";
 	$list=pdo_fetchall($sql,array(':name'=>$where,'uniacid'=>$_W['uniacid']));*/
 	$pageindex = max(1, intval($_GPC['page']));
 	$pagesize=10;
-	$sql="select *  from " . tablename("pintuan_user") ." WHERE  username LIKE :name || phone LIKE :name and uniacid=:uniacid and username!='' order by  u_id desc";
+	$sql="select *  from " . tablename("mask_user") ." WHERE  username LIKE :name || phone LIKE :name and uniacid=:uniacid and username!='' order by  u_id desc";
 	$select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 	$list = pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':name'=>$where));	   
-	$total=pdo_fetchcolumn("select count(*) from " . tablename("pintuan_user") ." WHERE  username LIKE :name || phone LIKE :name and uniacid=:uniacid  and username!=''",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
+	$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") ." WHERE  username LIKE :name || phone LIKE :name and uniacid=:uniacid  and username!=''",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
 	$pager = pagination($total, $pageindex, $pagesize);
 	if($_GPC['id']){
-		$res4=pdo_delete("pintuan_user",array('u_id'=>$_GPC['id']));
+		$res4=pdo_delete("mask_user",array('u_id'=>$_GPC['id']));
 		if($res4){
 		 message('删除成功！', $this->createWebUrl('user'), 'success');
 		}else{
@@ -27,7 +27,7 @@ if($_GPC['keywords']){
 		}
 	}
 if(checksubmit('submit2')){
-      $res=pdo_update('pintuan_user',array('wallet +='=>$_GPC['reply']),array('id'=>$_GPC['id2']));
+      $res=pdo_update('mask_user',array('wallet +='=>$_GPC['reply']),array('id'=>$_GPC['id2']));
       if($res){
        $data['money']=$_GPC['reply'];
        $data['user_id']=$_GPC['id2'];
@@ -39,7 +39,7 @@ if(checksubmit('submit2')){
           $data['note']='后台充值'; 
       }
        $data['time']=date('Y-m-d H:i:s');
-       $res2=pdo_insert('pintuan_qbmx',$data); 
+       $res2=pdo_insert('mask_qbmx',$data);
        if($res2){
        message('充值成功！', $this->createWebUrl('user'), 'success');
       }else{
@@ -56,7 +56,7 @@ if(checksubmit('submit3')){
           $data['note']='后台充值'; 
       }
       if($_GPC['reply']!=0){
-          $res=pdo_update('pintuan_user',array('total_score +='=>$_GPC['reply']),array('id'=>$_GPC['id3']));   
+          $res=pdo_update('mask_user',array('total_score +='=>$_GPC['reply']),array('id'=>$_GPC['id3']));
       }
      
       if($res){
@@ -64,7 +64,7 @@ if(checksubmit('submit3')){
        $data['user_id']=$_GPC['id3'];
        $data['cerated_time']=date('Y-m-d H:i:s');
        $data['uniacid']=$_W['uniacid'];//小程序id
-       $res2=pdo_insert('pintuan_integral',$data); 
+       $res2=pdo_insert('mask_integral',$data);
        if($res2){
        message('充值成功！', $this->createWebUrl('user'), 'success');
       }else{
@@ -73,7 +73,7 @@ if(checksubmit('submit3')){
     }
 }
 if(checksubmit('submit4')){
-      $res=pdo_update('pintuan_user',array('user_address '=>''),array('uniacid'=>$_W['uniacid']));     
+      $res=pdo_update('mask_user',array('user_address '=>''),array('uniacid'=>$_W['uniacid']));
        if($res){
        message('清空成功', $this->createWebUrl('user'), 'success');
       }else{

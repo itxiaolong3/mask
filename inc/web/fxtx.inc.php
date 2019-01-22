@@ -15,13 +15,13 @@ if(checksubmit('submit')){
     $type='all';
 }
 if($type=='all'){    
-  $sql="SELECT * FROM ".tablename('pintuan_commission_withdrawal') ."".$where." ORDER BY time DESC";
-  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_commission_withdrawal') ."".$where." ORDER BY time DESC",$data);
+  $sql="SELECT * FROM ".tablename('mask_commission_withdrawal') ."".$where." ORDER BY time DESC";
+  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_commission_withdrawal') ."".$where." ORDER BY time DESC",$data);
 }else{
     $where.= " and state=$state";
-    $sql="SELECT * FROM ".tablename('pintuan_commission_withdrawal')."". $where." ORDER BY time DESC";
+    $sql="SELECT * FROM ".tablename('mask_commission_withdrawal')."". $where." ORDER BY time DESC";
     $data[':uniacid']=$_W['uniacid'];
-    $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_commission_withdrawal') ."".$where." ORDER BY time DESC",$data);
+    $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_commission_withdrawal') ."".$where." ORDER BY time DESC",$data);
 }
 $list=pdo_fetchall( $sql,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
@@ -29,10 +29,10 @@ $list=pdo_fetchall($select_sql,$data);
 $pager = pagination($total, $pageindex, $pagesize);
 if($operation=='adopt'){//审核通过
     $id=$_GPC['id'];
-    $list=pdo_get('pintuan_commission_withdrawal',array('id'=>$_GPC['id']));
-    $user=pdo_get('pintuan_user',array('id'=>$list['user_id']));
+    $list=pdo_get('mask_commission_withdrawal',array('id'=>$_GPC['id']));
+    $user=pdo_get('mask_user',array('id'=>$list['user_id']));
    
-  $res=pdo_update('pintuan_commission_withdrawal',array('state'=>2,'sh_time'=>time()),array('id'=>$id));
+  $res=pdo_update('mask_commission_withdrawal',array('state'=>2,'sh_time'=>time()),array('id'=>$id));
     if($res){
         message('审核成功',$this->createWebUrl('fxtx',array()),'success');
     }else{
@@ -41,8 +41,8 @@ if($operation=='adopt'){//审核通过
 }
 if($operation=='adopt2'){
     $id=$_GPC['id'];
-    $list=pdo_get('pintuan_commission_withdrawal',array('id'=>$_GPC['id']));
-    $user=pdo_get('pintuan_user',array('id'=>$list['user_id']));
+    $list=pdo_get('mask_commission_withdrawal',array('id'=>$_GPC['id']));
+    $user=pdo_get('mask_user',array('id'=>$list['user_id']));
 
 ////////////////打款//////////////////////
 function arraytoxml($data){
@@ -78,8 +78,8 @@ function arraytoxml($data){
         curl_close($ch);
         return $data;
     }  
-  $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
-    $psystem=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
+  $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+    $psystem=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
     $data=array(
         'mch_appid'=>$system['appid'],//商户账号appid
         'mchid'=>$psystem['mchid'],//商户号
@@ -107,7 +107,7 @@ function arraytoxml($data){
     $res=curl($xml,$url);
     $return=xmltoarray($res);
     if($return['result_code']=='SUCCESS'){
-      pdo_update('pintuan_commission_withdrawal',array('state'=>2,'sh_time'=>time()),array('id'=>$id));
+      pdo_update('mask_commission_withdrawal',array('state'=>2,'sh_time'=>time()),array('id'=>$id));
       message('审核成功',$this->createWebUrl('fxtx',array()),'success');
     }else{
         if($return['err_code_des']){
@@ -125,10 +125,10 @@ function arraytoxml($data){
  
 if($operation=='reject'){
      $id=$_GPC['id'];
-     $list=pdo_get('pintuan_commission_withdrawal',array('id'=>$id));
-    $res=pdo_update('pintuan_commission_withdrawal',array('state'=>3,'sh_time'=>time()),array('id'=>$id));
+     $list=pdo_get('mask_commission_withdrawal',array('id'=>$id));
+    $res=pdo_update('mask_commission_withdrawal',array('state'=>3,'sh_time'=>time()),array('id'=>$id));
      if($res){
-        pdo_update('pintuan_user',array('commission +='=>$list['tx_cost']),array('id'=>$list['user_id']));
+        pdo_update('mask_user',array('commission +='=>$list['tx_cost']),array('id'=>$list['user_id']));
         message('拒绝成功',$this->createWebUrl('fxtx',array()),'success');
     }else{
         message('拒绝失败','','error');
@@ -136,7 +136,7 @@ if($operation=='reject'){
 }
 if($operation=='delete'){
      $id=$_GPC['id'];
-     $res=pdo_delete('pintuan_commission_withdrawal',array('id'=>$id));
+     $res=pdo_delete('mask_commission_withdrawal',array('id'=>$id));
      if($res){
         message('删除成功',$this->createWebUrl('fxtx',array()),'success');
     }else{

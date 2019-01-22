@@ -86,7 +86,7 @@ function checklogin() {
 		$url = url('user/login');
 		header('location:' . $url);
 	} else {
-		$account = pdo_fetch("SELECT * FROM " . tablename("pintuan_account") . " WHERE status=2 AND uid=:uid ORDER BY id DESC LIMIT 1", array(':uid' => $_W['uid']));
+		$account = pdo_fetch("SELECT * FROM " . tablename("mask_account") . " WHERE status=2 AND uid=:uid ORDER BY id DESC LIMIT 1", array(':uid' => $_W['uid']));
 		if (empty($account)) {
 			$url = url('user/login');
 			header('location:' . $url);

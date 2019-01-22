@@ -4,7 +4,7 @@ global $_GPC, $_W;
 // $title = $this->actions_titles[$action];
 $GLOBALS['frames'] = $this->getMainMenu();
 $operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
- $item=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
+ $item=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
     if(checksubmit('submit')){
             $data['xd_tid']=trim($_GPC['xd_tid']);
             $data['jd_tid']=trim($_GPC['jd_tid']);
@@ -21,14 +21,14 @@ $operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
              $data['qh_tid']=trim($_GPC['qh_tid']);
             $data['uniacid']=trim($_W['uniacid']);
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_message',$data);
+                $res=pdo_insert('mask_message',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('template',array()),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_message', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_message', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl('template',array()),'success');
                 }else{

@@ -3,11 +3,11 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu2();
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
-$list = pdo_getall('pintuan_bighome',array('uniacid' => $_W['uniacid']));
+$list = pdo_getall('mask_bighome',array('uniacid' => $_W['uniacid']));
 if($_GPC['op']=='del'){
-	$rst=pdo_getall('pintuan_goodmy',array('StallsName'=>$_GPC['id']));
+	$rst=pdo_getall('mask_goodmy',array('StallsName'=>$_GPC['id']));
 		if(!$rst){
-		$result = pdo_delete('pintuan_bighome', array('bid'=>$_GPC['id']));
+		$result = pdo_delete('mask_bighome', array('bid'=>$_GPC['id']));
 		if($result){
 			message('删除成功',$this->createWebUrl('dishestype',array()),'success');
 		}else{

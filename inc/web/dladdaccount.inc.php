@@ -12,7 +12,7 @@ $cur_store = $this->getStoreById($storeid);
     //echo $id;die;
     $user_id = intval($_GPC['user_id']);
     if (!empty($id)) {
-        $account = pdo_fetch("SELECT * FROM " . tablename('pintuan_account') . " WHERE weid = :weid AND id=:id ORDER BY id DESC", array(':weid' => $_W['uniacid'], ':id' => $id));
+        $account = pdo_fetch("SELECT * FROM " . tablename('mask_account') . " WHERE weid = :weid AND id=:id ORDER BY id DESC", array(':weid' => $_W['uniacid'], ':id' => $id));
     }
     if (!empty($account)) {
         $users = user_single($account['uid']);
@@ -76,7 +76,7 @@ $cur_store = $this->getStoreById($storeid);
                     'type' => 'zh_jdgjb',
                    'permission' => 'zh_jdgjb_menu_store'
                 ));
-                pdo_insert('pintuan_account', array(
+                pdo_insert('mask_account', array(
                     'uid' => $uid,
                     'weid' => $_W['uniacid'],
                     'storeid' => $storeid,
@@ -100,7 +100,7 @@ $cur_store = $this->getStoreById($storeid);
             }
         }else {
             user_update($user);
-            pdo_update('pintuan_account', array(
+            pdo_update('mask_account', array(
                 'weid' => $_W['uniacid'],
                 'storeid' => $storeid,
                 'from_user' => trim($_GPC['from_user']),

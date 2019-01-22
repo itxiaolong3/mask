@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
     .ygrow{margin-top: 20px;}
     .yg5_key>div{float: left;line-height: 34px;}
@@ -111,7 +111,7 @@
         <form action="" method="get" style="padding: 0" class="col-md-4">
             <input type="hidden" name="c" value="site" />
             <input type="hidden" name="a" value="entry" />
-            <input type="hidden" name="m" value="pintuan" />
+            <input type="hidden" name="m" value="mask" />
             <input type="hidden" name="do" value="qgorderall" />
             <div class="input-group" style="width: 300px;">
                 <input type="text" name="keywords" value="{$_GPC['keywords']}" class="form-control" placeholder="请输入姓名/订单编号/门店名称">
@@ -129,7 +129,7 @@
     {if !$list}
         <div class="panel panel-default">
             <div class="orderwu">
-                <img src="../addons/pintuan/template/images/noorder.png">
+                <img src="../addons/mask/template/images/noorder.png">
                 <p class="wufont1">暂无指定订单</p>
                 <p class="orfont10">暂时没有筛选条件的订单，稍后再来看看吧！</p>
             </div>
@@ -158,7 +158,7 @@
                         </div>
                         <div class="">
                             <div class="right ordertelimg1">
-                                <img src="../addons/pintuan/template/images/ordertel.png" class="ordertelimg">
+                                <img src="../addons/mask/template/images/ordertel.png" class="ordertelimg">
                                 <span>{$item['user_tel']} </span>
                             </div>
                         </div>

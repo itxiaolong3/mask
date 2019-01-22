@@ -64,14 +64,14 @@ if (empty($getid)){
     if(!$_GPC['storeid']){
         message('不知哪个栏目的商品，无法操作','','error');
     }
-    $res=pdo_insert('pintuan_goodmy',$data);
+    $res=pdo_insert('mask_goodmy',$data);
     if (!empty($res)) {
         message('添加成功',$this->createWebUrl('dishes2',array()),'success');
     } else {
         message("添加失败", referer(), 'error');
     }
 }else{
-    $res=pdo_update('pintuan_goodmy',$data,array('gID'=>$getid));
+    $res=pdo_update('mask_goodmy',$data,array('gID'=>$getid));
     if (!empty($res)) {
         if($_GPC['allgood']){
             message('编辑成功！', $this->createWebUrl('allgood'), 'success');

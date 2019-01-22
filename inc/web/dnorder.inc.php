@@ -46,11 +46,11 @@ if($type2=='month'){
   $where.="  and a.time LIKE '%{$time}%' ";
 }
 
-$sql="SELECT a.*,d.name,b.name as table_name,b.status as t_status,c.name as tablename,d.name,e.dn_poundage as md_poundage,e.poundage FROM ".tablename('pintuan_order'). " a"  . " left join " . tablename("pintuan_table") . " b on a.table_id=b.id  left join " . tablename("pintuan_table_type") ." c on b.type_id=c.id left join " . tablename("pintuan_store") ." d on a.store_id=d.id left join " . tablename("pintuan_storetype") ." e on d.md_type=e.id left join " . tablename("pintuan_storeset") ." f on a.store_id=f.store_id ".$where." ORDER BY a.time DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_order'). " a"  . " left join " . tablename("pintuan_table") . " b on a.table_id=b.id left join " . tablename("pintuan_table_type") ." c on b.type_id=c.id left join " . tablename("pintuan_store") ." d on a.store_id=d.id  left join " . tablename("pintuan_storetype") ." e on d.md_type=e.id left join " . tablename("pintuan_storeset") ." f on a.store_id=f.store_id ".$where." ORDER BY a.time DESC",$data);
+$sql="SELECT a.*,d.name,b.name as table_name,b.status as t_status,c.name as tablename,d.name,e.dn_poundage as md_poundage,e.poundage FROM ".tablename('mask_order'). " a"  . " left join " . tablename("mask_table") . " b on a.table_id=b.id  left join " . tablename("mask_table_type") ." c on b.type_id=c.id left join " . tablename("mask_store") ." d on a.store_id=d.id left join " . tablename("mask_storetype") ." e on d.md_type=e.id left join " . tablename("mask_storeset") ." f on a.store_id=f.store_id ".$where." ORDER BY a.time DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_order'). " a"  . " left join " . tablename("mask_table") . " b on a.table_id=b.id left join " . tablename("mask_table_type") ." c on b.type_id=c.id left join " . tablename("mask_store") ." d on a.store_id=d.id  left join " . tablename("mask_storetype") ." e on d.md_type=e.id left join " . tablename("mask_storeset") ." f on a.store_id=f.store_id ".$where." ORDER BY a.time DESC",$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list=pdo_fetchall($select_sql,$data);
-$res2=pdo_getall('pintuan_order_goods');
+$res2=pdo_getall('mask_order_goods');
   $data3=array();
   for($i=0;$i<count($list);$i++){
     $data4=array();
@@ -80,18 +80,18 @@ $pager = pagination($total, $pageindex, $pagesize);
 
 
 
-// $wx = "select sum(money) as total from " . tablename("pintuan_order")." WHERE time LIKE ".$time."  and dn_state=2 and is_yue=2 and type=2 and pay_time !=''";
+// $wx = "select sum(money) as total from " . tablename("mask_order")." WHERE time LIKE ".$time."  and dn_state=2 and is_yue=2 and type=2 and pay_time !=''";
 // $wx = pdo_fetch($wx);//今天的微信店内销售额
-// $yue = "select sum(money) as total from " . tablename("pintuan_order")." WHERE time LIKE ".$time."  and dn_state=2 and is_yue=1 and type=2 and pay_time !=''";
+// $yue = "select sum(money) as total from " . tablename("mask_order")." WHERE time LIKE ".$time."  and dn_state=2 and is_yue=1 and type=2 and pay_time !=''";
 // $yue = pdo_fetch($yue);//今天的余额店内销售额
-// $jf = "select sum(money) as total from " . tablename("pintuan_order")." WHERE time LIKE ".$time."  and dn_state=2 and is_yue=3 and type=2 and pay_time !=''";
+// $jf = "select sum(money) as total from " . tablename("mask_order")." WHERE time LIKE ".$time."  and dn_state=2 and is_yue=3 and type=2 and pay_time !=''";
 // $jf = pdo_fetch($jf);//今天的积分店内销售额
 
-// $ztwx = "select sum(money) as total from " . tablename("pintuan_order")." WHERE time LIKE ".$time2."  and dn_state=2 and is_yue=2 and type=2 and pay_time !=''";
+// $ztwx = "select sum(money) as total from " . tablename("mask_order")." WHERE time LIKE ".$time2."  and dn_state=2 and is_yue=2 and type=2 and pay_time !=''";
 // $ztwx = pdo_fetch($ztwx);//昨天的微信店内销售额
-// $ztyue = "select sum(money) as total from " . tablename("pintuan_order")." WHERE time LIKE ".$time2."  and dn_state=2 and is_yue=1 and type=2 and pay_time !=''";
+// $ztyue = "select sum(money) as total from " . tablename("mask_order")." WHERE time LIKE ".$time2."  and dn_state=2 and is_yue=1 and type=2 and pay_time !=''";
 // $ztyue = pdo_fetch($ztyue);//昨天的余额店内销售额
-// $ztjf = "select sum(money) as total from " . tablename("pintuan_order")." WHERE time LIKE ".$time2."  and dn_state=2 and is_yue=3 and type=2 and pay_time !=''";
+// $ztjf = "select sum(money) as total from " . tablename("mask_order")." WHERE time LIKE ".$time2."  and dn_state=2 and is_yue=3 and type=2 and pay_time !=''";
 // $ztjf = pdo_fetch($ztjf);//昨天的积分店内销售额
 
 
@@ -99,25 +99,25 @@ $pager = pagination($total, $pageindex, $pagesize);
 
 
 
-// $dn2 = "select * from " . tablename("pintuan_order")." WHERE time LIKE ".$time."   and type=2 and dn_state=2 and uniacid=".$_W['uniacid'];
+// $dn2 = "select * from " . tablename("mask_order")." WHERE time LIKE ".$time."   and type=2 and dn_state=2 and uniacid=".$_W['uniacid'];
 // $dn2 = count(pdo_fetchall($dn2));//今天店内订单量
-// $wxdn2 = "select * from " . tablename("pintuan_order")." WHERE time LIKE ".$time."   and type=2 and dn_state=2 and is_yue=2 and uniacid=".$_W['uniacid'];
+// $wxdn2 = "select * from " . tablename("mask_order")." WHERE time LIKE ".$time."   and type=2 and dn_state=2 and is_yue=2 and uniacid=".$_W['uniacid'];
 // $wxdn2 = count(pdo_fetchall($wxdn2));//今天店内微信订单量
-// $yuedn2 = "select * from " . tablename("pintuan_order")." WHERE time LIKE ".$time."   and type=2 and dn_state=2 and is_yue=1 and uniacid=".$_W['uniacid'];
+// $yuedn2 = "select * from " . tablename("mask_order")." WHERE time LIKE ".$time."   and type=2 and dn_state=2 and is_yue=1 and uniacid=".$_W['uniacid'];
 // $yuedn2 = count(pdo_fetchall($yuedn2));//今天店内余额订单量
-// $jfdn2 = "select * from " . tablename("pintuan_order")." WHERE time LIKE ".$time."   and type=2 and dn_state=2 and is_yue=3 and uniacid=".$_W['uniacid'];
+// $jfdn2 = "select * from " . tablename("mask_order")." WHERE time LIKE ".$time."   and type=2 and dn_state=2 and is_yue=3 and uniacid=".$_W['uniacid'];
 // $jfdn2 = count(pdo_fetchall($jfdn2));//今天店内积分订单量
 
 
 
 
-// $ztdn2 = "select * from " . tablename("pintuan_order")." WHERE time LIKE ".$time2."   and type=2 and dn_state=2 and uniacid=".$_W['uniacid'];
+// $ztdn2 = "select * from " . tablename("mask_order")." WHERE time LIKE ".$time2."   and type=2 and dn_state=2 and uniacid=".$_W['uniacid'];
 // $ztdn2 = count(pdo_fetchall($ztdn2));//昨天店内订单量
-// $ztwxdn2 = "select * from " . tablename("pintuan_order")." WHERE time LIKE ".$time2."   and type=2 and dn_state=2 and is_yue=2 and uniacid=".$_W['uniacid'];
+// $ztwxdn2 = "select * from " . tablename("mask_order")." WHERE time LIKE ".$time2."   and type=2 and dn_state=2 and is_yue=2 and uniacid=".$_W['uniacid'];
 // $ztwxdn2 = count(pdo_fetchall($ztwxdn2));//昨天店内微信订单量
-// $ztyuedn2 = "select * from " . tablename("pintuan_order")." WHERE time LIKE ".$time2."   and type=2 and dn_state=2 and is_yue=1 and uniacid=".$_W['uniacid'];
+// $ztyuedn2 = "select * from " . tablename("mask_order")." WHERE time LIKE ".$time2."   and type=2 and dn_state=2 and is_yue=1 and uniacid=".$_W['uniacid'];
 // $ztyuedn2 = count(pdo_fetchall($ztyuedn2));//昨天店内余额订单量
-// $ztjfdn2 = "select * from " . tablename("pintuan_order")." WHERE time LIKE ".$time2."   and type=2 and dn_state=2 and is_yue=3 and uniacid=".$_W['uniacid'];
+// $ztjfdn2 = "select * from " . tablename("mask_order")." WHERE time LIKE ".$time2."   and type=2 and dn_state=2 and is_yue=3 and uniacid=".$_W['uniacid'];
 // $ztjfdn2 = count(pdo_fetchall($ztjfdn2));//昨天店内积分订单量
 
 //打印
@@ -128,7 +128,7 @@ if($_GPC['op']=='dy'){
 }
 
 if($_GPC['op']=='sc'){
-  $result = pdo_delete('pintuan_order',array('dn_state'=>3));
+  $result = pdo_delete('mask_order',array('dn_state'=>3));
     if($result){
         message('删除成功',$this->createWebUrl('dnorder',array()),'success');
     }else{
@@ -140,7 +140,7 @@ if($_GPC['op']=='sc'){
 
 if($_GPC['op']=='receivables'){
     $id=$_GPC['id'];
-    $result = pdo_update('pintuan_order',array('dn_state'=>2,'pay_time'=>date("Y-m-d H:i:s")), array('id'=>$id));
+    $result = pdo_update('mask_order',array('dn_state'=>2,'pay_time'=>date("Y-m-d H:i:s")), array('id'=>$id));
     if($result){
         message('确认成功',$this->createWebUrl('dnorder',array()),'success');
     }else{
@@ -151,8 +151,8 @@ if($_GPC['op']=='receivables'){
     $id=$_GPC['id'];
     $table_id=$_GPC['table_id'];
     // $data2['dn_state']=3;
-    $result = pdo_update('pintuan_order',array('dn_state'=>3), array('id'=>$id));
-    pdo_update('pintuan_table',array('status'=>0), array('id'=>$table_id));
+    $result = pdo_update('mask_order',array('dn_state'=>3), array('id'=>$id));
+    pdo_update('mask_table',array('status'=>0), array('id'=>$table_id));
     if($result){
         message('关闭成功',$this->createWebUrl('dnorder',array()),'success');
     }else{
@@ -162,7 +162,7 @@ if($_GPC['op']=='receivables'){
 }elseif($_GPC['op']=='open'){
     $table_id=$_GPC['id'];
     $data2['status']=0;
-    $result = pdo_update('pintuan_table',$data2, array('id'=>$table_id));
+    $result = pdo_update('mask_table',$data2, array('id'=>$table_id));
     if($result){
         message('重新开台成功',$this->createWebUrl('dnorder',array()),'success');
     }else{
@@ -171,7 +171,7 @@ if($_GPC['op']=='receivables'){
 }
 
 if($_GPC['op']=='delete'){
-    $res=pdo_delete('pintuan_order',array('id'=>$_GPC['id']));
+    $res=pdo_delete('mask_order',array('id'=>$_GPC['id']));
  if($res){
  message('删除成功！', $this->createWebUrl('dnorder'), 'success');
 }else{
@@ -184,7 +184,7 @@ if(checksubmit('export_submit', true)) {
   $time="'%$time%'";
    $start=$_GPC['time']['start'];
   $end=$_GPC['time']['end'];
-  $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("pintuan_order")." WHERE uniacid={$_W['uniacid']} and type=2 and time >='{$start}' and time<='{$end}'");
+  $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE uniacid={$_W['uniacid']} and type=2 and time >='{$start}' and time<='{$end}'");
   $pagesize = ceil($count/5000);
         //array_unshift( $names,  '活动名称'); 
 
@@ -208,7 +208,7 @@ if(checksubmit('export_submit', true)) {
   }
   $html .= "\n";
   for ($j = 1; $j <= $pagesize; $j++) {
-    $sql = "select a.*,b.name as md_name,c.name as table_name from " . tablename("pintuan_order")."  a"  . " inner join " . tablename("pintuan_store")." b on a.store_id=b.id inner join " . tablename("pintuan_table")." c on a.table_id=c.id WHERE  a.uniacid={$_W['uniacid']} and a.type=2 and a.time >='{$start}' and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
+    $sql = "select a.*,b.name as md_name,c.name as table_name from " . tablename("mask_order")."  a"  . " inner join " . tablename("mask_store")." b on a.store_id=b.id inner join " . tablename("mask_table")." c on a.table_id=c.id WHERE  a.uniacid={$_W['uniacid']} and a.type=2 and a.time >='{$start}' and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
     $list = pdo_fetchall($sql);            
   }
   if (!empty($list)) {
@@ -234,7 +234,7 @@ if(checksubmit('export_submit', true)) {
         }elseif($row['pay_type']==5){
           $row['pay_type']='餐后付款';
         }
-        $good=pdo_getall('pintuan_order_goods',array('order_id'=>$row['id']));
+        $good=pdo_getall('mask_order_goods',array('order_id'=>$row['id']));
         for($i=0;$i<count($good);$i++){
           $date6='';
           if($good[$i]['spec']){

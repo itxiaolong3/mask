@@ -10,8 +10,8 @@ function template($filename, $flag = TEMPLATE_DISPLAY)
 {
     global $_W;
 
-    $source = IA_ROOT . "/addons/pintuan/admin/themes/default/{$filename}.html";
-    $compile = IA_ROOT . "/data/tpl/web/pintuan/default/{$filename}.tpl.php";
+    $source = IA_ROOT . "/addons/mask/admin/themes/default/{$filename}.html";
+    $compile = IA_ROOT . "/data/tpl/web/mask/default/{$filename}.tpl.php";
 
     if (!is_file($source)) {
         exit("Error: template source '{$filename}' is not exist!");

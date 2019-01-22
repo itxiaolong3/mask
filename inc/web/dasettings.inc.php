@@ -1,11 +1,11 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$info=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+$info=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
     if(checksubmit('submit')){
             $data['dada_key']=trim($_GPC['dada_key']);
             $data['dada_secret']=trim($_GPC['dada_secret']);
-            $res = pdo_update('pintuan_system', $data, array('id' => $_GPC['id']));
+            $res = pdo_update('mask_system', $data, array('id' => $_GPC['id']));
             if($res){
                 message('编辑成功',$this->createWebUrl('dasettings',array()),'success');
             }else{

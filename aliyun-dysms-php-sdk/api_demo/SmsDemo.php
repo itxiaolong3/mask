@@ -33,7 +33,7 @@ class SmsDemo
      */
     public static function getAcsClient() {
         global $_GPC, $_W;
-        $values=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
+        $values=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
         //产品名称:云通信流量服务API产品,开发者无需替换
         $product = "Dysmsapi";
 
@@ -73,7 +73,7 @@ class SmsDemo
     public static function sendSms() {
         global $_GPC, $_W;
         $phoneNum = $_REQUEST['tel'];
-        $values=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
+        $values=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
         // 初始化SendSmsRequest实例用于设置发送短信的参数
         $request = new SendSmsRequest();
 

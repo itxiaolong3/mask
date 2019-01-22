@@ -5,7 +5,7 @@ $uid=$_COOKIE["uid"];
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
-$item=pdo_get('pintuan_sms',array('store_id'=>$storeid));
+$item=pdo_get('mask_sms',array('store_id'=>$storeid));
     if(checksubmit('submit')){
             $data['appkey']=trim($_GPC['appkey']);
             $data['wm_tid']=trim($_GPC['wm_tid']);
@@ -17,14 +17,14 @@ $item=pdo_get('pintuan_sms',array('store_id'=>$storeid));
             $data['is_dn']=$_GPC['is_dn'];
              $data['is_yy']=$_GPC['is_yy'];
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_sms',$data);
+                $res=pdo_insert('mask_sms',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl2('dlinsms',array()),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_sms', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_sms', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl2('dlinsms',array()),'success');
                 }else{

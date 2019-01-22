@@ -7,34 +7,34 @@ $cur_store = $this->getStoreById($storeid);
 $type=isset($_GPC['type'])?$_GPC['type']:'today';
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
-$system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']),array('is_wx','is_yhk'));
+$system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),array('is_wx','is_yhk'));
 $data[':uniacid']=$_W['uniacid'];
 $data[':store_id']=$storeid;
   //获取商家手续费
-    $sql="select b.poundage,b.dn_poundage,b.dm_poundage,b.yd_poundage from".tablename('pintuan_store')."a  left join ".tablename('pintuan_storetype')." b on a.md_type=b.id where a.id={$storeid}";
+    $sql="select b.poundage,b.dn_poundage,b.dm_poundage,b.yd_poundage from".tablename('mask_store')."a  left join ".tablename('mask_storetype')." b on a.md_type=b.id where a.id={$storeid}";
     $list4=pdo_fetch($sql); 
 $where=" where a.uniacid=:uniacid and a.type=1 and a.store_id=:store_id and a.pay_type in (1,2) and a.state in (4,5,10)" ;
 //总数统计
-$sql2="select sum(money) as 'total_money',sum(ps_money) as ps_money from" . tablename("pintuan_order") ." as a".$where;
+$sql2="select sum(money) as 'total_money',sum(ps_money) as ps_money from" . tablename("mask_order") ." as a".$where;
 $list2=pdo_fetch($sql2,$data);
 //店内订单金额统计
-$dnwmcost=pdo_get('pintuan_order', array('store_id'=>$storeid,'dn_state '=>2,'pay_type'=>array(1,2),'type'=>2), array('sum(money) as total_money'));
+$dnwmcost=pdo_get('mask_order', array('store_id'=>$storeid,'dn_state '=>2,'pay_type'=>array(1,2),'type'=>2), array('sum(money) as total_money'));
 //当面付订单金额统计
-$dmcost=pdo_get('pintuan_order', array('store_id'=>$storeid,'dm_state '=>2,'pay_type'=>array(1,2),'type'=>4), array('sum(money) as total_money'));
+$dmcost=pdo_get('mask_order', array('store_id'=>$storeid,'dm_state '=>2,'pay_type'=>array(1,2),'type'=>4), array('sum(money) as total_money'));
 //预约订单金额
-$yycost=pdo_get('pintuan_order', array('store_id'=>$storeid,'yy_state '=>3,'pay_type'=>array(1,2),'type'=>3), array('sum(money) as total_money'));
+$yycost=pdo_get('mask_order', array('store_id'=>$storeid,'yy_state '=>3,'pay_type'=>array(1,2),'type'=>3), array('sum(money) as total_money'));
 //已申请金额
-$total=pdo_get('pintuan_withdrawal', array('store_id'=>$storeid,'state '=>1), array('sum(tx_cost) as tx_cost'));
+$total=pdo_get('mask_withdrawal', array('store_id'=>$storeid,'state '=>1), array('sum(tx_cost) as tx_cost'));
 //已提现金额
-$total2=pdo_get('pintuan_withdrawal', array('store_id'=>$storeid,'state '=>2), array('sum(tx_cost) as tx_cost'));
+$total2=pdo_get('mask_withdrawal', array('store_id'=>$storeid,'state '=>2), array('sum(tx_cost) as tx_cost'));
 //运费服务费
-$sys=pdo_get('pintuan_store',array('id'=>$storeid),'ps_poundage');
+$sys=pdo_get('mask_store',array('id'=>$storeid),'ps_poundage');
 
 $ps_money=number_format($list2['ps_money']*$sys['ps_poundage']/100,1);
 //抢购金额
-$qg_money=pdo_get('pintuan_qgorder', array('store_id'=>$storeid,'state'=>array(2,3)), array('sum(money) as total_money'));
+$qg_money=pdo_get('mask_qgorder', array('store_id'=>$storeid,'state'=>array(2,3)), array('sum(money) as total_money'));
 //拼团金额
-$pt_money=pdo_get('pintuan_grouporder', array('store_id'=>$storeid,'state'=>array(3,5)), array('sum(money) as total_money'));
+$pt_money=pdo_get('mask_grouporder', array('store_id'=>$storeid,'state'=>array(3,5)), array('sum(money) as total_money'));
 $tuan=$qg_money['total_money']+$pt_money['total_money']-$list4['dn_poundage']*($qg_money['total_money']+$pt_money['total_money'])/100;
 
 //可提现金额
@@ -50,9 +50,9 @@ if($total['tx_cost']){
 
 
 //未入账
-$sql3="select sum(money) as 'total_money' from" . tablename("pintuan_order") ." where  type=1 and store_id={$storeid} and pay_type in (1,2) and state in (2,3,8)";
+$sql3="select sum(money) as 'total_money' from" . tablename("mask_order") ." where  type=1 and store_id={$storeid} and pay_type in (1,2) and state in (2,3,8)";
 $list3=pdo_fetch($sql3,$data);
-$drzyycost=pdo_get('pintuan_order', array('store_id'=>$storeid,'yy_state '=>2,'pay_type'=>1,'type'=>3), array('sum(money) as total_money'));
+$drzyycost=pdo_get('mask_order', array('store_id'=>$storeid,'yy_state '=>2,'pay_type'=>1,'type'=>3), array('sum(money) as total_money'));
 $wrz_money=$list3['total_money']+$drzyycost['total_money']-(($list3['total_money']*$list4['poundage']+$drzyycost['total_money']*$list4['yd_poundage'])/100);
 $where2=" where a.store_id={$storeid} ";
 if($_GPC['time']){
@@ -62,8 +62,8 @@ if($_GPC['time']){
 }
 
 //提现记录
-$sql="SELECT a.*,b.name,b.user_id FROM ".tablename('pintuan_withdrawal') .  " a"  . " left join " . tablename("pintuan_store") . " b on a.store_id=b.id".$where2." ORDER BY a.time DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_withdrawal') .  " a"  . " left join " . tablename("pintuan_store") . " b on a.store_id=b.id ".$where2);
+$sql="SELECT a.*,b.name,b.user_id FROM ".tablename('mask_withdrawal') .  " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id".$where2." ORDER BY a.time DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_withdrawal') .  " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id ".$where2);
 $list=pdo_fetchall($sql);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list=pdo_fetchall($select_sql,$data);
@@ -82,7 +82,7 @@ if(checksubmit('submit2')){
   $data2['yhk_num']=$_GPC['yhk_num'];
   $data2['tel']=$_GPC['tel'];
   $data2['yh_info']=$_GPC['yh_info'];
-  $res=pdo_insert('pintuan_withdrawal',$data2);
+  $res=pdo_insert('mask_withdrawal',$data2);
   if($res){
    message('添加成功！', $this->createWebUrl('finance'), 'success');
  }else{
@@ -94,9 +94,9 @@ if(checksubmit('submit2')){
 if($operation=='adopt'){//审核通过
 
     $id=$_GPC['id'];
-    $list=pdo_get('pintuan_withdrawal',array('id'=>$_GPC['id']));
-    $user=pdo_get('pintuan_user',array('id'=>$list['user_id']));
-    $res=pdo_update('pintuan_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
+    $list=pdo_get('mask_withdrawal',array('id'=>$_GPC['id']));
+    $user=pdo_get('mask_user',array('id'=>$list['user_id']));
+    $res=pdo_update('mask_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
     if($res){
         message('审核成功',$this->createWebUrl('finance',array()),'success');
     }else{
@@ -108,9 +108,9 @@ if($operation=='adopt'){//审核通过
 
 if($operation=='adopt2'){
     $id=$_GPC['id'];
-    $list=pdo_get('pintuan_withdrawal',array('id'=>$_GPC['id']));
-    $store=pdo_get('pintuan_store',array('id'=>$list['store_id']));
-    $user=pdo_get('pintuan_user',array('id'=>$store['user_id']));
+    $list=pdo_get('mask_withdrawal',array('id'=>$_GPC['id']));
+    $store=pdo_get('mask_store',array('id'=>$list['store_id']));
+    $user=pdo_get('mask_user',array('id'=>$store['user_id']));
 
 ////////////////打款//////////////////////
 function arraytoxml($data){
@@ -140,14 +140,14 @@ function arraytoxml($data){
         curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);           // 增加 HTTP Header（头）里的字段 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);        // 终止从服务端进行验证
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch,CURLOPT_SSLCERT,IA_ROOT . "/addons/pintuan/cert/".'apiclient_cert_' . $_W['uniacid'] . '.pem'); //这个是证书的位置绝对路径
-        curl_setopt($ch,CURLOPT_SSLKEY,IA_ROOT . "/addons/pintuan/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem'); //这个也是证书的位置绝对路径
+        curl_setopt($ch,CURLOPT_SSLCERT,IA_ROOT . "/addons/mask/cert/".'apiclient_cert_' . $_W['uniacid'] . '.pem'); //这个是证书的位置绝对路径
+        curl_setopt($ch,CURLOPT_SSLKEY,IA_ROOT . "/addons/mask/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem'); //这个也是证书的位置绝对路径
         $data = curl_exec($ch);                                 //运行curl
         curl_close($ch);
         return $data;
     }  
-    $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
-    $psystem=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
+    $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+    $psystem=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
     $data=array(
         'mch_appid'=>$system['appid'],//商户账号appid
         'mchid'=>$psystem['mchid'],//商户号
@@ -177,7 +177,7 @@ function arraytoxml($data){
     $res=curl($xml,$url);
     $return=xmltoarray($res);
     if($return['result_code']=='SUCCESS'){
-      pdo_update('pintuan_withdrawal',array('state'=>2,'sh_time'=>time()),array('id'=>$id));
+      pdo_update('mask_withdrawal',array('state'=>2,'sh_time'=>time()),array('id'=>$id));
       message('审核成功',$this->createWebUrl('finance',array()),'success');
     }else{
         if($return['err_code_des']){
@@ -197,7 +197,7 @@ function arraytoxml($data){
 
 if($operation=='reject'){
      $id=$_GPC['id'];
-    $res=pdo_update('pintuan_withdrawal',array('state'=>3,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
+    $res=pdo_update('mask_withdrawal',array('state'=>3,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
      if($res){
         message('拒绝成功',$this->createWebUrl('finance',array()),'success');
     }else{

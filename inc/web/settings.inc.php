@@ -1,8 +1,8 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$stores=pdo_getall('pintuan_store',array('uniacid'=>$_W['uniacid'],'state'=>2));
-$item=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+$stores=pdo_getall('mask_store',array('uniacid'=>$_W['uniacid'],'state'=>2));
+$item=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 if($item['gs_img']){
 
 
@@ -64,14 +64,14 @@ if(strpos($item['gs_img'],',')){
           
             $data['uniacid']=$_W['uniacid'];
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_system',$data);
+                $res=pdo_insert('mask_system',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('settings',array()),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_system', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_system', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl('settings',array()),'success');
                 }else{

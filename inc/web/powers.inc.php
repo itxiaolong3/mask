@@ -1,15 +1,15 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$stores=pdo_getall('pintuan_store',array('uniacid'=>$_GPC['uniacid']));
- $item=pdo_get('pintuan_system',array('uniacid'=>$_GPC['uniacid']));
+$stores=pdo_getall('mask_store',array('uniacid'=>$_GPC['uniacid']));
+ $item=pdo_get('mask_system',array('uniacid'=>$_GPC['uniacid']));
     if(checksubmit('submit')){
             $data['msgn']=$_GPC['msgn'];//平台模式功能1多2单
             $data['model']=$_GPC['msgn'];
 
             $data['fxgn']=$_GPC['fxgn'];//分销功能
             if($_GPC['fxgn']==2){
-               pdo_update('pintuan_fxset',array('is_open'=>2),array('uniacid'=>$_W['uniacid']));
+               pdo_update('mask_fxset',array('is_open'=>2),array('uniacid'=>$_W['uniacid']));
             }
 
             $data['jfgn']=$_GPC['jfgn'];//积分功能
@@ -24,14 +24,14 @@ $stores=pdo_getall('pintuan_store',array('uniacid'=>$_GPC['uniacid']));
             $data['ptgn']=$_GPC['ptgn'];
             $data['qggn']=$_GPC['qggn'];
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_system',$data);
+                $res=pdo_insert('mask_system',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('powers',array('uniacid'=>$_GPC['uniacid'])),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_system', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_system', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl('powers',array('uniacid'=>$_GPC['uniacid'])),'success');
                 }else{

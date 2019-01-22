@@ -6,12 +6,12 @@ $uid=$_COOKIE["uid"];
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
-$type=pdo_getall('pintuan_table_type',array('uniacid'=>$_W['uniacid'],'store_id'=>$storeid));
+$type=pdo_getall('mask_table_type',array('uniacid'=>$_W['uniacid'],'store_id'=>$storeid));
 $where="WHERE a.uniacid=:uniacid and a.store_id=:store_id";
 $data[':uniacid']=$_W['uniacid'];
 $data[':store_id']=$storeid;
 if($_GPC['op']=='del'){
-	$result = pdo_delete('pintuan_table', array('id'=>$_GPC['id']));
+	$result = pdo_delete('mask_table', array('id'=>$_GPC['id']));
 		if($result){
 			message('删除成功',$this->createWebUrl2('dltable2',array()),'success');
 		}else{
@@ -23,7 +23,7 @@ if($_GPC['status']){
 		$_GPC['status']=0;
 	}
 	$data2['status']=$_GPC['status'];
-	$res=pdo_update('pintuan_table',$data2,array('id'=>$_GPC['id']));
+	$res=pdo_update('mask_table',$data2,array('id'=>$_GPC['id']));
 	if($res){
 		message('编辑成功',$this->createWebUrl2('dltable2',array()),'success');
 	}else{
@@ -44,14 +44,14 @@ if(checksubmit('submit')){
     }
 } 
 if($_GPC['op']=='qt'){
-	$res=pdo_update('pintuan_table',array('status'=>0));
+	$res=pdo_update('mask_table',array('status'=>0));
 	if($res){
 		message('清台成功',$this->createWebUrl2('dltable2',array()),'success');
 	}else{
 		message('清台失败','','error');
 	}
 } 
-$sql="select a.*,b.name as type_name from " . tablename("pintuan_table") . " a"  . " left join " . tablename("pintuan_table_type") . " b on b.id=a.type_id " .$where;
+$sql="select a.*,b.name as type_name from " . tablename("mask_table") . " a"  . " left join " . tablename("mask_table_type") . " b on b.id=a.type_id " .$where;
 $list=pdo_fetchall($sql,$data);	
 
 

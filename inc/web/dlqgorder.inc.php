@@ -36,8 +36,8 @@ if($type=='ok'){
 
 
 
-$sql="SELECT a.*,b.name as md_name,c.poundage as md_poundage,d.poundage,d.ps_mode FROM ".tablename('pintuan_qgorder'). " a"  . " left join " . tablename("pintuan_store") . " b on a.store_id=b.id " . " left join " . tablename("pintuan_storetype") . " c on b.md_type=c.id ". " left join " . tablename("pintuan_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_qgorder'). " a"  . " left join " . tablename("pintuan_store") . " b on a.store_id=b.id  " . " left join " . tablename("pintuan_storetype") . " c on b.md_type=c.id ". " left join " . tablename("pintuan_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC",$data);
+$sql="SELECT a.*,b.name as md_name,c.poundage as md_poundage,d.poundage,d.ps_mode FROM ".tablename('mask_qgorder'). " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id " . " left join " . tablename("mask_storetype") . " c on b.md_type=c.id ". " left join " . tablename("mask_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_qgorder'). " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id  " . " left join " . tablename("mask_storetype") . " c on b.md_type=c.id ". " left join " . tablename("mask_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC",$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $pager = pagination($total, $pageindex, $pagesize);
 $list=pdo_fetchall($select_sql,$data);

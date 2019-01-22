@@ -2,10 +2,10 @@
 defined('IN_IA') or exit('Access Denied');
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$certfile = IA_ROOT . "/addons/pintuan/cert/" . 'apiclient_cert_' . $_W['uniacid'] . '.pem';
-$keyfile = IA_ROOT . "/addons/pintuan/cert/" . 'apiclient_key_' . $_W['uniacid'] . '.pem';
-$item=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
-$item2=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+$certfile = IA_ROOT . "/addons/mask/cert/" . 'apiclient_cert_' . $_W['uniacid'] . '.pem';
+$keyfile = IA_ROOT . "/addons/mask/cert/" . 'apiclient_key_' . $_W['uniacid'] . '.pem';
+$item=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+$item2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
 if(checksubmit('submit')){
     if($_GPC['apiclient_cert']){
         file_put_contents($certfile, trim($_GPC['apiclient_cert']));
@@ -20,16 +20,16 @@ if(checksubmit('submit')){
    $data['uniacid']=trim($_W['uniacid']);
    $data['ip']=$_GPC['ip'];
    $data2['is_yuepay']=$_GPC['is_yuepay'];
-   $res2=pdo_update('pintuan_system', $data2, array('uniacid' => $_W['uniacid']));
+   $res2=pdo_update('mask_system', $data2, array('uniacid' => $_W['uniacid']));
    if($_GPC['id']==''){                
-    $res=pdo_insert('pintuan_pay',$data);
+    $res=pdo_insert('mask_pay',$data);
     if($res || $res2){
         message('添加成功',$this->createWebUrl('pay',array()),'success');
     }else{
         message('添加失败','','error');
     }
 }else{
-    $res = pdo_update('pintuan_pay', $data, array('id' => $_GPC['id']));
+    $res = pdo_update('mask_pay', $data, array('id' => $_GPC['id']));
     if($res || $res2){
         message('编辑成功',$this->createWebUrl('pay',array()),'success');
     }else{

@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
   .ygrow{margin-top: 20px;}
   .yg5_key>div{float: left;line-height: 34px;}
@@ -84,7 +84,7 @@
         <form action="" method="get" style="padding: 0" class="col-md-4">
             <input type="hidden" name="c" value="site" />
             <input type="hidden" name="a" value="entry" />
-            <input type="hidden" name="m" value="pintuan" />
+            <input type="hidden" name="m" value="mask" />
             <input type="hidden" name="do" value="tableorder" />
             <input type="hidden" name="table_id" value="{$table_id}" />
             <div class="input-group" style="width: 300px;">
@@ -104,7 +104,7 @@
         <form action="" method="get" class="col-md-4">
            <input type="hidden" name="c" value="site" />
            <input type="hidden" name="a" value="entry" />
-           <input type="hidden" name="m" value="pintuan" />
+           <input type="hidden" name="m" value="mask" />
            <input type="hidden" name="do" value="tableorder" />
            <input type="hidden" name="table_id" value="{$table_id}" />
             <div class="input-group" style="width: 100px">
@@ -163,7 +163,7 @@
   {/loop}
      {if empty($list)}
           <div class="yg5_tr2" style="text-align:center">
-            <img src="../addons/pintuan/template/images/none_data.png" alt="" style="margin-top: 200px">
+            <img src="../addons/mask/template/images/none_data.png" alt="" style="margin-top: 200px">
             <p style="margin:30px auto">暂无订单信息</p>
          
       </div> 

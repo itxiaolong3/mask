@@ -1,9 +1,9 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$list=pdo_getall('pintuan_typead',array('uniacid'=>$_W['uniacid']),array(),'','orderby ASC');
+$list=pdo_getall('mask_typead',array('uniacid'=>$_W['uniacid']),array(),'','orderby ASC');
 if($_GPC['op']=='delete'){
-	$res=pdo_delete('pintuan_typead',array('id'=>$_GPC['id']));
+	$res=pdo_delete('mask_typead',array('id'=>$_GPC['id']));
 	if($res){
 		 message('删除成功！', $this->createWebUrl('typead'), 'success');
 		}else{
@@ -12,7 +12,7 @@ if($_GPC['op']=='delete'){
 }
 if($_GPC['status']){
 	$data['status']=$_GPC['status'];
-	$res=pdo_update('pintuan_typead',$data,array('id'=>$_GPC['id']));
+	$res=pdo_update('mask_typead',$data,array('id'=>$_GPC['id']));
 	if($res){
 		 message('编辑成功！', $this->createWebUrl('typead'), 'success');
 		}else{

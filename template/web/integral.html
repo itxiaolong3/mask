@@ -274,7 +274,7 @@
                                           console.log(id);
                                           $.ajax({
                                               type:"post",
-                                              url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=DelQd&m=pintuan",
+                                              url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=DelQd&m=mask",
                                               dataType:"text",
                                               data:{id:id},
                                               success:function(data){
@@ -412,7 +412,7 @@
           }
           $.ajax({
               type:"post",
-              url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=AddQd&m=pintuan",
+              url:"{$_W['siteroot']}/app/index.php?i={$_W['uniacid']}&c=entry&do=AddQd&m=mask",
               dataType:"text",
               data:{
                 list:list,

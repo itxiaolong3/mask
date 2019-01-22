@@ -23,16 +23,16 @@ if($_GPC['is_shelves2']){
 }
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
-$sql="select a.* ,b.name as type_name from " . tablename("pintuan_qggoods") . " a"  . " left join " . tablename("pintuan_qgtype") . " b on b.id=a.type_id ".$where."  order by num asc";
+$sql="select a.* ,b.name as type_name from " . tablename("mask_qggoods") . " a"  . " left join " . tablename("mask_qgtype") . " b on b.id=a.type_id ".$where."  order by num asc";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list = pdo_fetchall($select_sql,$data);	   
-$total=pdo_fetchcolumn("select count(*) from " . tablename("pintuan_qggoods") . " a"  . " left join " . tablename("pintuan_qgtype") . " b on b.id=a.type_id ".$where,$data);
+$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_qggoods") . " a"  . " left join " . tablename("mask_qgtype") . " b on b.id=a.type_id ".$where,$data);
 $pager = pagination($total, $pageindex, $pagesize);
 
 
-$type=pdo_getall('pintuan_qgtype',array('uniacid'=>$_W['uniacid']));
+$type=pdo_getall('mask_qgtype',array('uniacid'=>$_W['uniacid']));
 if($_GPC['op']=='del'){
-    $res=pdo_delete('pintuan_qggoods',array('id'=>$_GPC['id']));
+    $res=pdo_delete('mask_qggoods',array('id'=>$_GPC['id']));
     if($res){
         message('删除成功',$this->createWebUrl2('dlqggoods',array()),'success');
     }else{
@@ -40,7 +40,7 @@ if($_GPC['op']=='del'){
     }
 }
 if($_GPC['state']){
-    $res=pdo_update('pintuan_qggoods',array('state'=>$_GPC['state']),array('id'=>$_GPC['id']));
+    $res=pdo_update('mask_qggoods',array('state'=>$_GPC['state']),array('id'=>$_GPC['id']));
     if($res){
         message('编辑成功',$this->createWebUrl2('dlqggoods',array()),'success');
     }else{

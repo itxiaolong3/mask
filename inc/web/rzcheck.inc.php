@@ -19,30 +19,30 @@ if($_GPC['keywords']){
 if($type !='all'){
      $where.= " and state=".$state;
 }
-$sql="SELECT * FROM ".tablename('pintuan_store'). $where." ORDER BY id DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_store') .$where,$data);
+$sql="SELECT * FROM ".tablename('mask_store'). $where." ORDER BY id DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_store') .$where,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list=pdo_fetchall($select_sql,$data);
 $pager = pagination($total, $pageindex, $pagesize);
 if($operation=='adopt'){//审核通过 
     $id=$_GPC['id'];
-    $store=pdo_get('pintuan_store',array('id'=>$id));
+    $store=pdo_get('mask_store',array('id'=>$id));
     if(!$store['md_type']){
     message('门店类型不能为空,为门店编辑分类后再来审核!','','error'); 
 }
 $dqtime=date('Y-m-d H:i:s',strtotime("+{$store['rz_time']}day"));
-$res=pdo_update('pintuan_store',array('state'=>2,'rzdq_time'=>$dqtime),array('id'=>$id));  
+$res=pdo_update('mask_store',array('state'=>2,'rzdq_time'=>$dqtime),array('id'=>$id));
     if($res){
-    $set=pdo_get('pintuan_storeset',array('store_id'=>$id));
+    $set=pdo_get('mask_storeset',array('store_id'=>$id));
     if(!$set){   
       $data3['store_id']=$id;
-      pdo_insert('pintuan_storeset',$data3);
+      pdo_insert('mask_storeset',$data3);
     }
    
-    pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+    pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
        ///////////////模板消息拒绝///////////////////
  function getaccess_token($_W){
-         $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+         $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
          $appid=$res['appid'];
          $secret=$res['appsecret'];
          $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -58,9 +58,9 @@ $res=pdo_update('pintuan_store',array('state'=>2,'rzdq_time'=>$dqtime),array('id
       //设置与发送模板信息
        function set_msg($_W){
          $access_token = getaccess_token($_W);
-         $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-         $res2=pdo_get('pintuan_store',array('id'=>$_GET['id']));
-         $user=pdo_get('pintuan_user',array('id'=>$res2['sq_id']));
+         $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+         $res2=pdo_get('mask_store',array('id'=>$_GET['id']));
+         $user=pdo_get('mask_user',array('id'=>$res2['sq_id']));
          if($res2['state']==2){
             $state="审核通过";
             $note="审核通过,请尽快完善信息";
@@ -68,11 +68,11 @@ $res=pdo_update('pintuan_store',array('state'=>2,'rzdq_time'=>$dqtime),array('id
             $state="审核拒绝";
             $note="审核拒绝,请核对信息后再次提交";
          }  
-         $form=pdo_get('pintuan_formid',array('user_id'=>$res2['sq_id'],'time >='=>time()-60*60*24*7));
+         $form=pdo_get('mask_formid',array('user_id'=>$res2['sq_id'],'time >='=>time()-60*60*24*7));
          $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["rzcg_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -106,7 +106,7 @@ $res=pdo_update('pintuan_store',array('state'=>2,'rzdq_time'=>$dqtime),array('id
          $data = curl_exec($ch);
          curl_close($ch);
         // return $data;
-        pdo_delete('pintuan_formid',array('id'=>$form['id']));
+        pdo_delete('mask_formid',array('id'=>$form['id']));
        }
        echo set_msg($_W);
         message('审核成功',$this->createWebUrl('rzcheck',array()),'success');
@@ -116,12 +116,12 @@ $res=pdo_update('pintuan_store',array('state'=>2,'rzdq_time'=>$dqtime),array('id
 }
 if($operation=='reject'){
      $id=$_GPC['id'];
-    $res=pdo_update('pintuan_store',array('state'=>3),array('id'=>$id));
+    $res=pdo_update('mask_store',array('state'=>3),array('id'=>$id));
      if($res){  
-          pdo_delete('pintuan_formid',array('time <='=>time()-60*60*24*7));
+          pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
        ///////////////模板消息拒绝///////////////////
  function getaccess_token($_W){
-         $res=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+         $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
          $appid=$res['appid'];
          $secret=$res['appsecret'];
          $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
@@ -137,9 +137,9 @@ if($operation=='reject'){
       //设置与发送模板信息
        function set_msg($_W){
          $access_token = getaccess_token($_W);
-         $res=pdo_get('pintuan_message',array('uniacid'=>$_W['uniacid']));
-         $res2=pdo_get('pintuan_store',array('id'=>$_GET['id']));
-         $user=pdo_get('pintuan_user',array('id'=>$res2['sq_id']));
+         $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+         $res2=pdo_get('mask_store',array('id'=>$_GET['id']));
+         $user=pdo_get('mask_user',array('id'=>$res2['sq_id']));
          if($res2['state']==2){
             $state="审核通过";
             $note="审核通过,请尽快完善信息";
@@ -147,11 +147,11 @@ if($operation=='reject'){
             $state="审核拒绝";
             $note="审核拒绝,请核对信息后再次提交";
          }  
-         $form=pdo_get('pintuan_formid',array('user_id'=>$res2['sq_id'],'time >='=>time()-60*60*24*7));
+         $form=pdo_get('mask_formid',array('user_id'=>$res2['sq_id'],'time >='=>time()-60*60*24*7));
          $formwork ='{
            "touser": "'.$user["openid"].'",
            "template_id": "'.$res["rzcg_tid"].'",
-           "page": "pintuan/pages/Liar/loginindex",
+           "page": "mask/pages/Liar/loginindex",
            "form_id":"'.$form['form_id'].'",
            "data": {
              "keyword1": {
@@ -185,7 +185,7 @@ if($operation=='reject'){
          $data = curl_exec($ch);
          curl_close($ch);
         // return $data;
-        pdo_delete('pintuan_formid',array('id'=>$form['id']));
+        pdo_delete('mask_formid',array('id'=>$form['id']));
        }
        echo set_msg($_W);
         message('拒绝成功',$this->createWebUrl('rzcheck',array()),'success');
@@ -195,7 +195,7 @@ if($operation=='reject'){
 }
 if($operation=='delete'){
      $id=$_GPC['id'];
-     $res=pdo_delete('pintuan_store',array('id'=>$id));
+     $res=pdo_delete('mask_store',array('id'=>$id));
      if($res){
         message('删除成功',$this->createWebUrl('rzcheck',array()),'success');
     }else{

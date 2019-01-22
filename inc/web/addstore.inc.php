@@ -1,10 +1,10 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$area=pdo_getall('pintuan_areatype',array('uniacid'=>$_W['uniacid']),array(),'','Cid asc');
-$warehome=pdo_getall('pintuan_warehome',array('uniacid'=>$_W['uniacid']),array(),'','fid asc');
-$store=pdo_getall('pintuan_lanmu',array('uniacid'=>$_W['uniacid']));
-$info=pdo_get('pintuan_lanmu',array('QsID'=>$_GPC['id']));
+$area=pdo_getall('mask_areatype',array('uniacid'=>$_W['uniacid']),array(),'','Cid asc');
+$warehome=pdo_getall('mask_warehome',array('uniacid'=>$_W['uniacid']),array(),'','fid asc');
+$store=pdo_getall('mask_lanmu',array('uniacid'=>$_W['uniacid']));
+$info=pdo_get('mask_lanmu',array('QsID'=>$_GPC['id']));
 if(checksubmit('submit')){
 
 	$data['tid']=$_GPC['tid'];
@@ -46,7 +46,7 @@ if(checksubmit('submit')){
         message('请选择栏目封面图片','','error');
     }
 	if($_GPC['id']==''){
-		$res=pdo_insert('pintuan_lanmu',$data);
+		$res=pdo_insert('mask_lanmu',$data);
 		$storeid=pdo_insertid();
 		if($res){
 			message('添加成功！', $this->createWebUrl('store'), 'success');
@@ -54,7 +54,7 @@ if(checksubmit('submit')){
 			message('添加失败！','','error');
 		}
 	}else{
-		$res=pdo_update('pintuan_lanmu',$data,array('QsID'=>$_GPC['id']));
+		$res=pdo_update('mask_lanmu',$data,array('QsID'=>$_GPC['id']));
 		if($res){
 			message('编辑成功！', $this->createWebUrl('store'), 'success');
 		}else{

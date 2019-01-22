@@ -11,9 +11,9 @@ if($_GPC['time']){
 }
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
-$sql="select *  from " . tablename("pintuan_qbmx") ." ".$where." order by id DESC";
+$sql="select *  from " . tablename("mask_qbmx") ." ".$where." order by id DESC";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list = pdo_fetchall($select_sql);	   
-$total=pdo_fetchcolumn("select count(*) from " . tablename("pintuan_qbmx") ." ".$where);
+$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_qbmx") ." ".$where);
 $pager = pagination($total, $pageindex, $pagesize);
 include $this->template('web/userqb');

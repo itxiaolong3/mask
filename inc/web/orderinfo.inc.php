@@ -1,8 +1,8 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$item=pdo_get('pintuan_order',array('id'=>$_GPC['id']));
-$goods=pdo_getall('pintuan_order_goods',array('order_id'=>$_GPC['id']));
+$item=pdo_get('mask_order',array('id'=>$_GPC['id']));
+$goods=pdo_getall('mask_order_goods',array('order_id'=>$_GPC['id']));
 if(checksubmit('submit')){
 	$data['state']=$_GPC['state'];
 	$data['money']=$_GPC['money'];
@@ -10,7 +10,7 @@ if(checksubmit('submit')){
 	if($_GPC['dn_state']=="2"){
 		$data['pay_time']=time();
 	}
-	$res=pdo_update('pintuan_order',$data,array('id'=>$_GPC['id']));
+	$res=pdo_update('mask_order',$data,array('id'=>$_GPC['id']));
 	if($res){
              message('编辑成功！', $this->createWebUrl('order'), 'success');
         }else{

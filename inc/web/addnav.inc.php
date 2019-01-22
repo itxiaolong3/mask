@@ -1,7 +1,7 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$info=pdo_get('pintuan_nav',array('id'=>$_GPC['id']));
+$info=pdo_get('mask_nav',array('id'=>$_GPC['id']));
 if(checksubmit('submit')){
    if(!$_GPC['title']){
     message('标题不能为空','','error');
@@ -42,14 +42,14 @@ $data['num']=$_GPC['num'];
 $data['uniacid']=$_W['uniacid'];
 $data['state']=$_GPC['state'];
 if($_GPC['id']==''){  
-    $res=pdo_insert('pintuan_nav',$data);
+    $res=pdo_insert('mask_nav',$data);
     if($res){
        message('添加成功！', $this->createWebUrl('nav'), 'success');
    }else{
        message('添加失败！','','error');
    }
 }else{
-    $res=pdo_update('pintuan_nav',$data,array('id'=>$_GPC['id']));
+    $res=pdo_update('mask_nav',$data,array('id'=>$_GPC['id']));
     if($res){
        message('编辑成功！', $this->createWebUrl('nav'), 'success');
    }else{

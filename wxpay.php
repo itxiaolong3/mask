@@ -47,7 +47,7 @@
 //            'spbill_create_ip' => $_SERVER['REMOTE_ADDR'], //终端IP
             'spbill_create_ip' => $_SERVER['REMOTE_ADDR'], //终端IP
             //'notify_url' => 'http://www.weixin.qq.com/wxpay/pay.php', //通知地址  确保外网能正常访问
-            'notify_url' => $this->root.'addons/pintuan/payment/wechat/notify.php', //通知地址  确保外网能正常访问
+            'notify_url' => $this->root.'addons/mask/payment/wechat/notify.php', //通知地址  确保外网能正常访问
            
             'openid' => $this->openid, //用户id
             'trade_type' => 'JSAPI'//交易类型

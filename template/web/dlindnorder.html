@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<link rel="stylesheet" type="text/css" href="../addons/pintuan/template/public/ygcsslist.css">
+<link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
   .ygrow{margin-top: 20px;}
   .yg5_key>div{float: left;line-height: 34px;}
@@ -85,7 +85,7 @@
     <form action="" method="get" class="col-md-4" style="padding-left: 0">
       <input type="hidden" name="c" value="site" />
       <input type="hidden" name="a" value="entry" />
-      <input type="hidden" name="m" value="pintuan" />
+      <input type="hidden" name="m" value="mask" />
       <input type="hidden" name="do" value="dlindnorder" />
       <div class="input-group" style="width: 300px">
         <input type="text" name="keywords" class="form-control" placeholder="请输入订单编号">
@@ -104,7 +104,7 @@
     <form action="" method="get" class="col-md-4">
       <input type="hidden" name="c" value="site" />
       <input type="hidden" name="a" value="entry" />
-      <input type="hidden" name="m" value="pintuan" />
+      <input type="hidden" name="m" value="mask" />
       <input type="hidden" name="do" value="dlindnorder" />
       <div class="input-group" style="width: 100px">
         {php echo tpl_form_field_daterange('time',$_GPC['time'],true);}
@@ -154,7 +154,7 @@
       {if !$data3}
       <div class="panel panel-default">
         <div class="orderwu">
-          <img src="../addons/pintuan/template/images/noorder.png">
+          <img src="../addons/mask/template/images/noorder.png">
           <p class="wufont1">暂无指定订单</p>
           <p class="orfont10">暂时没有筛选条件的订单，稍后再来看看吧！</p>
         </div>
@@ -167,11 +167,11 @@
           <div class="row" style="position: relative;">
             {if $item['order']['dn_state']==1 || $item['order']['dn_state']==3}
             <div class="ortypeimg">
-              <img src="../addons/pintuan/template/images/daizhifu.png">
+              <img src="../addons/mask/template/images/daizhifu.png">
             </div>
             {else}
             <div class="ortypeimg2">
-              <img src="../addons/pintuan/template/images/yizhifu.png">
+              <img src="../addons/mask/template/images/yizhifu.png">
             </div>
             {/if}
             <div class="col-md-12 orderback">

@@ -1,8 +1,8 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$list = pdo_get('pintuan_coupons',array('id'=>$_GPC['id']));
-$type = pdo_getall('pintuan_storetype',array('uniacid'=>$_W['uniacid']));
+$list = pdo_get('mask_coupons',array('id'=>$_GPC['id']));
+$type = pdo_getall('mask_storetype',array('uniacid'=>$_W['uniacid']));
 if(checksubmit('submit')){
 		$data['name']=$_GPC['name'];
 		$data['full']=$_GPC['full'];
@@ -16,7 +16,7 @@ if(checksubmit('submit')){
 		$data['instruction']=$_GPC['instruction'];
 	if($_GPC['id']==''){
 		$data['stock']=$_GPC['number'];
-		$res=pdo_insert('pintuan_coupons',$data);
+		$res=pdo_insert('mask_coupons',$data);
 		if($res){
 			message('添加成功',$this->createWebUrl('coupons',array()),'success');
 		}else{
@@ -24,7 +24,7 @@ if(checksubmit('submit')){
 		}
 	}else{
 		$data['stock']=$_GPC['stock'];
-		$res = pdo_update('pintuan_coupons', $data, array('id' => $_GPC['id']));
+		$res = pdo_update('mask_coupons', $data, array('id' => $_GPC['id']));
 		if($res){
 			message('编辑成功',$this->createWebUrl('coupons',array()),'success');
 		}else{

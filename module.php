@@ -1,7 +1,7 @@
 <?php
 defined('IN_IA') or exit('Access Denied');
 
-class pintuanModule extends WeModule
+class maskModule extends WeModule
 {
     
 

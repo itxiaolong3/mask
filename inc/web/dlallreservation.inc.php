@@ -21,7 +21,7 @@ if (checksubmit('submit')) {
 	for ($i = 0; $i < $timecount; $i++) {
 		$time = date('H:i', $t);
 		$num=$_GPC['num']+$i;
-		$ishave = pdo_fetch("SELECT * FROM " . tablename('pintuan_reservation') . " WHERE uniacid = :uniacid AND store_id = :storeid  AND time=:time", array(':uniacid' => $_W['uniacid'], ':storeid' => $storeid, ':time' => $time));
+		$ishave = pdo_fetch("SELECT * FROM " . tablename('mask_reservation') . " WHERE uniacid = :uniacid AND store_id = :storeid  AND time=:time", array(':uniacid' => $_W['uniacid'], ':storeid' => $storeid, ':time' => $time));
 		$data = array(
 			'uniacid' => $_W['uniacid'],
 			'store_id' => $storeid,
@@ -30,7 +30,7 @@ if (checksubmit('submit')) {
 			'num'=>$num
 			);
 		if (empty($ishave)) {
-			pdo_insert('pintuan_reservation', $data);
+			pdo_insert('mask_reservation', $data);
 		}
 		$t = strtotime($time) + $timepoint * 60;
 	}

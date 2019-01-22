@@ -17,8 +17,8 @@ if(isset($_GPC['keywords'])){
 if($type!='all'){   
  $where.= " and a.state=$state"; 
 }
-  $sql="SELECT a.*,b.name,b.user_id,c.name as sk_name FROM ".tablename('pintuan_withdrawal') .  " a"  . " left join " . tablename("pintuan_store") . " b on a.store_id=b.id left join " . tablename("pintuan_user") . " c on c.id=b.user_id ". $where." ORDER BY a.time DESC";
-  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_withdrawal') .  " a"  . " left join " . tablename("pintuan_store") . " b on a.store_id=b.id".$where." ORDER BY a.time DESC",$data);
+  $sql="SELECT a.*,b.name,b.user_id,c.name as sk_name FROM ".tablename('mask_withdrawal') .  " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id left join " . tablename("mask_user") . " c on c.id=b.user_id ". $where." ORDER BY a.time DESC";
+  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_withdrawal') .  " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id".$where." ORDER BY a.time DESC",$data);
 
 $list=pdo_fetchall($sql,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
@@ -28,7 +28,7 @@ $pager = pagination($total, $pageindex, $pagesize);
 
 if($operation=='adopt'){//审核通过
     $id=$_GPC['id'];
-    $res=pdo_update('pintuan_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));  
+    $res=pdo_update('mask_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
     if($res){
         message('审核成功',$this->createWebUrl('txlist',array()),'success');
     }else{
@@ -41,9 +41,9 @@ if($operation=='adopt'){//审核通过
 // if($operation=='adopt'){//审核通过
 
 //     $id=$_GPC['id'];
-//     $list=pdo_get('pintuan_withdrawal',array('id'=>$_GPC['id']));
-//     $user=pdo_get('pintuan_user',array('id'=>$list['user_id']));
-//     $res=pdo_update('pintuan_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));  
+//     $list=pdo_get('mask_withdrawal',array('id'=>$_GPC['id']));
+//     $user=pdo_get('mask_user',array('id'=>$list['user_id']));
+//     $res=pdo_update('mask_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
 //     if($res){
 //         message('审核成功',$this->createWebUrl('finance',array()),'success');
 //     }else{
@@ -55,9 +55,9 @@ if($operation=='adopt'){//审核通过
 
 if($operation=='adopt2'){
     $id=$_GPC['id'];
-    $list=pdo_get('pintuan_withdrawal',array('id'=>$_GPC['id']));
-    $store=pdo_get('pintuan_store',array('id'=>$list['store_id']));
-    $user=pdo_get('pintuan_user',array('id'=>$store['user_id']));
+    $list=pdo_get('mask_withdrawal',array('id'=>$_GPC['id']));
+    $store=pdo_get('mask_store',array('id'=>$list['store_id']));
+    $user=pdo_get('mask_user',array('id'=>$store['user_id']));
 
 ////////////////打款//////////////////////
 function arraytoxml($data){
@@ -87,14 +87,14 @@ function arraytoxml($data){
         curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);           // 增加 HTTP Header（头）里的字段 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);        // 终止从服务端进行验证
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch,CURLOPT_SSLCERT,IA_ROOT . "/addons/pintuan/cert/".'apiclient_cert_' . $_W['uniacid'] . '.pem'); //这个是证书的位置绝对路径
-        curl_setopt($ch,CURLOPT_SSLKEY,IA_ROOT . "/addons/pintuan/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem'); //这个也是证书的位置绝对路径
+        curl_setopt($ch,CURLOPT_SSLCERT,IA_ROOT . "/addons/mask/cert/".'apiclient_cert_' . $_W['uniacid'] . '.pem'); //这个是证书的位置绝对路径
+        curl_setopt($ch,CURLOPT_SSLKEY,IA_ROOT . "/addons/mask/cert/".'apiclient_key_' . $_W['uniacid'] . '.pem'); //这个也是证书的位置绝对路径
         $data = curl_exec($ch);                                 //运行curl
         curl_close($ch);
         return $data;
     }  
-    $system=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
-    $psystem=pdo_get('pintuan_pay',array('uniacid'=>$_W['uniacid']));
+    $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+    $psystem=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
     $data=array(
         'mch_appid'=>$system['appid'],//商户账号appid
         'mchid'=>$psystem['mchid'],//商户号
@@ -124,7 +124,7 @@ function arraytoxml($data){
     $res=curl($xml,$url);
     $return=xmltoarray($res);
     if($return['result_code']=='SUCCESS'){
-      pdo_update('pintuan_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
+      pdo_update('mask_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
       message('审核成功',$this->createWebUrl('finance',array()),'success');
     }else{
         if($return['err_code_des']){
@@ -144,7 +144,7 @@ function arraytoxml($data){
 
 if($operation=='reject'){
      $id=$_GPC['id'];
-    $res=pdo_update('pintuan_withdrawal',array('state'=>3,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
+    $res=pdo_update('mask_withdrawal',array('state'=>3,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
      if($res){
         message('拒绝成功',$this->createWebUrl('txlist',array()),'success');
     }else{
@@ -153,7 +153,7 @@ if($operation=='reject'){
 }
 if($operation=='delete'){
      $id=$_GPC['id'];
-     $res=pdo_delete('pintuan_withdrawal',array('id'=>$id));
+     $res=pdo_delete('mask_withdrawal',array('id'=>$id));
      if($res){
         message('删除成功',$this->createWebUrl('txlist',array()),'success');
     }else{

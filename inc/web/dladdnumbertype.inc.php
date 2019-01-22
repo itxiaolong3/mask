@@ -6,7 +6,7 @@ $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
 
-$list = pdo_get('pintuan_numbertype',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
+$list = pdo_get('mask_numbertype',array('uniacid' => $_W['uniacid'],'id'=>$_GPC['id']));
 if(checksubmit('submit')){
 	$data['typename']=$_GPC['typename'];
 	$data['store_id']=$storeid;
@@ -14,14 +14,14 @@ if(checksubmit('submit')){
 	$data['time']=time();
 	$data['uniacid']=$_W['uniacid'];
 	if($_GPC['id']==''){	
-		$res=pdo_insert('pintuan_numbertype',$data);
+		$res=pdo_insert('mask_numbertype',$data);
 		if($res){
 			message('添加成功',$this->createWebUrl2('dlnumbertype',array()),'success');
 		}else{
 			message('添加失败','','error');
 		}
 	}else{		
-		$res = pdo_update('pintuan_numbertype', $data, array('id' => $_GPC['id']));
+		$res = pdo_update('mask_numbertype', $data, array('id' => $_GPC['id']));
 		if($res){
 			message('编辑成功',$this->createWebUrl2('dlnumbertype',array()),'success');
 		}else{

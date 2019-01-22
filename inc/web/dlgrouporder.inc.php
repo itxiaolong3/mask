@@ -41,15 +41,15 @@ if($type=='invalid'){
 } 
 
 }
-$sql="SELECT a.*,b.name as nick_name FROM ".tablename('pintuan_grouporder'). " a"  . " left join " . tablename("pintuan_user") . " b on a.user_id=b.id " .$where." ORDER BY a.id DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_grouporder'). " a"  . " left join " . tablename("pintuan_user") . " b on a.user_id=b.id  " .$where,$data);
+$sql="SELECT a.*,b.name as nick_name FROM ".tablename('mask_grouporder'). " a"  . " left join " . tablename("mask_user") . " b on a.user_id=b.id " .$where." ORDER BY a.id DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_grouporder'). " a"  . " left join " . tablename("mask_user") . " b on a.user_id=b.id  " .$where,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 
 $list=pdo_fetchall($select_sql,$data);
 
 
 if($_GPC['op']=='delete'){
-  $res=pdo_delete('pintuan_grouporder',array('id'=>$_GPC['id']));
+  $res=pdo_delete('mask_grouporder',array('id'=>$_GPC['id']));
   if($res){
    message('删除成功！', $this->createWebUrl2('dlgrouporder'), 'success');
  }else{

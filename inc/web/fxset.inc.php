@@ -1,7 +1,7 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$item=pdo_get('pintuan_fxset',array('uniacid'=>$_W['uniacid']));
+$item=pdo_get('mask_fxset',array('uniacid'=>$_W['uniacid']));
     if(checksubmit('submit')){
             $data['tx_rate']=$_GPC['tx_rate'];
            $data['fx_name']=$_GPC['fx_name'];
@@ -22,14 +22,14 @@ $item=pdo_get('pintuan_fxset',array('uniacid'=>$_W['uniacid']));
             $data['fx_details']=html_entity_decode($_GPC['fx_details']);
             $data['instructions']=html_entity_decode($_GPC['instructions']);
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_fxset',$data);
+                $res=pdo_insert('mask_fxset',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('fxset',array()),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_fxset', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_fxset', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl('fxset',array()),'success');
                 }else{

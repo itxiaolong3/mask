@@ -2,20 +2,20 @@
 defined('IN_IA') or exit('Access Denied');
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$info=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+$info=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
     if(checksubmit('submit')){
             $data['kfw_appid']=$_GPC['kfw_appid'];
             $data['kfw_appsecret']=$_GPC['kfw_appsecret'];
             $data['uniacid']=$_W['uniacid'];
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_system',$data);
+                $res=pdo_insert('mask_system',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('kfw',array()),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_system', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_system', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl('kfw',array()),'success');
                 }else{

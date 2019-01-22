@@ -5,7 +5,7 @@ $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
 
 if($_GPC['op']=='del'){
-	$result = pdo_delete('pintuan_numbertype', array('id'=>$_GPC['id']));
+	$result = pdo_delete('mask_numbertype', array('id'=>$_GPC['id']));
 		if($result){
 			message('删除成功',$this->createWebUrl('numbertype',array()),'success');
 		}else{
@@ -13,7 +13,7 @@ if($_GPC['op']=='del'){
 		}
 }
 
-$sql="select * from " . tablename("pintuan_numbertype")." where uniacid={$_W['uniacid']} and store_id={$storeid} order by sort asc";
+$sql="select * from " . tablename("mask_numbertype")." where uniacid={$_W['uniacid']} and store_id={$storeid} order by sort asc";
 $list=pdo_fetchall($sql);	
 
 

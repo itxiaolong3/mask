@@ -3,7 +3,7 @@ global $_GPC, $_W;
 // $action = 'ad';
 // $title = $this->actions_titles[$action];
 $GLOBALS['frames'] = $this->getMainMenu();
-$item=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
+$item=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
     if(checksubmit('submit')){
             $data['appid']=trim($_GPC['appid']);
             $data['appsecret']=trim($_GPC['appsecret']);
@@ -19,14 +19,14 @@ $item=pdo_get('pintuan_system',array('uniacid'=>$_W['uniacid']));
                 message('小程序appsecret不能为空!','','error'); 
             }
             if($_GPC['id']==''){                
-                $res=pdo_insert('pintuan_system',$data);
+                $res=pdo_insert('mask_system',$data);
                 if($res){
                     message('添加成功',$this->createWebUrl('peiz',array()),'success');
                 }else{
                     message('添加失败','','error');
                 }
             }else{
-                $res = pdo_update('pintuan_system', $data, array('id' => $_GPC['id']));
+                $res = pdo_update('mask_system', $data, array('id' => $_GPC['id']));
                 if($res){
                     message('编辑成功',$this->createWebUrl('peiz',array()),'success');
                 }else{

@@ -8,20 +8,20 @@ $GLOBALS['frames'] = $this->getNaveMenu($storeid, $action,$uid);
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=15;
 $where=" WHERE uniacid={$_W['uniacid']} and store_id={$storeid} and pid=0";
-$sql=" select * from" . tablename("pintuan_service") .$where." order by num asc";
+$sql=" select * from" . tablename("mask_service") .$where." order by num asc";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list = pdo_fetchall($select_sql);	   
 foreach($list as $key => $value){
-	$data=pdo_getall('pintuan_service',array('pid'=>$value['id'],'uniacid'=>$_W['uniacid']),array(),'','order by num asc');
+	$data=pdo_getall('mask_service',array('pid'=>$value['id'],'uniacid'=>$_W['uniacid']),array(),'','order by num asc');
 	$list[$key]['ej']=$data;
 	
 }
-$total=pdo_fetchcolumn("select count(*) from " . tablename("pintuan_service").$where);
+$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_service").$where);
 $pager = pagination($total, $pageindex, $pagesize);
 if($_GPC['op']=='delete'){
-	$rst=pdo_get('pintuan_service',array('pid'=>$_GPC['id'],'uniacid'=>$_W['uniacid']));
+	$rst=pdo_get('mask_service',array('pid'=>$_GPC['id'],'uniacid'=>$_W['uniacid']));
 	if(!$rst){
-	$result = pdo_delete('pintuan_service', array('id'=>$_GPC['id']));
+	$result = pdo_delete('mask_service', array('id'=>$_GPC['id']));
 	if($result){
 		message('删除成功',$this->createWebUrl2('dlservice',array()),'success');
 	}else{

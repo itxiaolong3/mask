@@ -34,8 +34,8 @@ if($type2=='month'){
   $time=date("Y-m");
   $where.="  and a.time LIKE '%{$time}%' ";
 }
-$sql="SELECT a.*,d.name,b.name as table_name,b.status as t_status,c.name as tablename,d.name,e.dm_poundage as md_poundage,e.poundage FROM ".tablename('pintuan_order'). " a"  . " left join " . tablename("pintuan_table") . " b on a.table_id=b.id  left join " . tablename("pintuan_table_type") ." c on b.type_id=c.id left join " . tablename("pintuan_store") ." d on a.store_id=d.id left join " . tablename("pintuan_storetype") ." e on d.md_type=e.id left join " . tablename("pintuan_storeset") ." f on a.store_id=f.store_id ".$where." ORDER BY a.time DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('pintuan_order'). " a"  . " left join " . tablename("pintuan_table") . " b on a.table_id=b.id left join " . tablename("pintuan_table_type") ." c on b.type_id=c.id left join " . tablename("pintuan_store") ." d on a.store_id=d.id  left join " . tablename("pintuan_storetype") ." e on d.md_type=e.id left join " . tablename("pintuan_storeset") ." f on a.store_id=f.store_id ".$where." ORDER BY a.time DESC",$data);
+$sql="SELECT a.*,d.name,b.name as table_name,b.status as t_status,c.name as tablename,d.name,e.dm_poundage as md_poundage,e.poundage FROM ".tablename('mask_order'). " a"  . " left join " . tablename("mask_table") . " b on a.table_id=b.id  left join " . tablename("mask_table_type") ." c on b.type_id=c.id left join " . tablename("mask_store") ." d on a.store_id=d.id left join " . tablename("mask_storetype") ." e on d.md_type=e.id left join " . tablename("mask_storeset") ." f on a.store_id=f.store_id ".$where." ORDER BY a.time DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_order'). " a"  . " left join " . tablename("mask_table") . " b on a.table_id=b.id left join " . tablename("mask_table_type") ." c on b.type_id=c.id left join " . tablename("mask_store") ." d on a.store_id=d.id  left join " . tablename("mask_storetype") ." e on d.md_type=e.id left join " . tablename("mask_storeset") ." f on a.store_id=f.store_id ".$where." ORDER BY a.time DESC",$data);
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
@@ -55,7 +55,7 @@ if(checksubmit('export_submit', true)) {
   $time="'%$time%'";
    $start=$_GPC['time']['start'];
   $end=$_GPC['time']['end'];
-  $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("pintuan_order")." WHERE type=4 and store_id={$storeid} and dm_state=2 and  time >='{$start}' and time<='{$end}'");
+  $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE type=4 and store_id={$storeid} and dm_state=2 and  time >='{$start}' and time<='{$end}'");
   $pagesize = ceil($count/5000);
         //array_unshift( $names,  '活动名称'); 
 
@@ -75,7 +75,7 @@ if(checksubmit('export_submit', true)) {
   }
   $html .= "\n";
   for ($j = 1; $j <= $pagesize; $j++) {
-    $sql = "select a.*,b.name as md_name from " . tablename("pintuan_order")."  a"  . " inner join " . tablename("pintuan_store")." b on a.store_id=b.id  WHERE a.type=4 and a.time >='{$start}' and a.dm_state=2 and a.store_id={$storeid} and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
+    $sql = "select a.*,b.name as md_name from " . tablename("mask_order")."  a"  . " inner join " . tablename("mask_store")." b on a.store_id=b.id  WHERE a.type=4 and a.time >='{$start}' and a.dm_state=2 and a.store_id={$storeid} and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
     $list = pdo_fetchall($sql);            
   }
   if (!empty($list)) {
@@ -93,7 +93,7 @@ if(checksubmit('export_submit', true)) {
         }elseif($row['pay_type']==3){
           $row['pay_type']='积分支付';
         }
-        $good=pdo_getall('pintuan_order_goods',array('order_id'=>$row['id']));
+        $good=pdo_getall('mask_order_goods',array('order_id'=>$row['id']));
         for($i=0;$i<count($good);$i++){
           $date6='';
           if($good[$i]['spec']){

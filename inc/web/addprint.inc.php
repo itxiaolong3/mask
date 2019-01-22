@@ -3,8 +3,8 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu2();
 $storeid=$_COOKIE["storeid"];
 $cur_store = $this->getStoreById($storeid);
-$tag=pdo_getall('pintuan_dytag',array('uniacid'=>$_W['uniacid'],'store_id'=>$storeid),array(),'','sort asc');
-$item = pdo_get('pintuan_dyj',array('id'=>$_GPC['id']));
+$tag=pdo_getall('mask_dytag',array('uniacid'=>$_W['uniacid'],'store_id'=>$storeid),array(),'','sort asc');
+$item = pdo_get('mask_dyj',array('id'=>$_GPC['id']));
 if(checksubmit('submit')){
 	$data['name']=$_GPC['name'];
 	$data['tag_id']=$_GPC['tag_id'];
@@ -26,14 +26,14 @@ if(checksubmit('submit')){
 	$data['fe_dycode']=$_GPC['fe_dycode'];
 	$data['xx_sn']=$_GPC['xx_sn'];
 	if($_GPC['id']==''){
-		$res=pdo_insert('pintuan_dyj',$data);
+		$res=pdo_insert('mask_dyj',$data);
 		if($res){
 			message('添加成功',$this->createWebUrl('print',array()),'success');
 		}else{
 			message('添加失败','','error');
 		}
 	}else{
-		$res = pdo_update('pintuan_dyj', $data, array('id' => $_GPC['id']));
+		$res = pdo_update('mask_dyj', $data, array('id' => $_GPC['id']));
 		if($res){
 			message('编辑成功',$this->createWebUrl('print',array()),'success');
 		}else{
