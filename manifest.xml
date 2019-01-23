@@ -325,7 +325,29 @@ CREATE TABLE IF NOT EXISTS `ims_mask_fxuser` (
 `time` datetime NOT NULL,
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+CREATE TABLE `ims_mask_goodmy` (
+  `gID` int(11) NOT NULL AUTO_INCREMENT,
+  `Title` varchar(50) NOT NULL COMMENT '商品名称或者标题',
+  `Itemcover` varchar(200) NOT NULL COMMENT '图片链接',
+  `Price` decimal(10,2) NOT NULL COMMENT '商品价格',
+  `OriPrice` decimal(10,2) NOT NULL COMMENT '原价，默认跟价格一样',
+  `DealCount` int(11) NOT NULL COMMENT '已拼数',
+  `DisplayStatuID` int(2) NOT NULL DEFAULT '0' COMMENT '0代表新 1代表补 默认0',
+  `Videos` text NOT NULL COMMENT '视频',
+  `Discount` int(11) NOT NULL DEFAULT '0' COMMENT '折扣，默认为空',
+  `Statu` int(2) NOT NULL DEFAULT '2' COMMENT '商品状态，1已上架 2待上架',
+  `TotalQty` int(11) NOT NULL COMMENT '总销量',
+  `zid` int(11) NOT NULL COMMENT '专栏id',
+  `StallsName` int(11) NOT NULL DEFAULT '1' COMMENT '所在大厦 1 工厂货源',
+  `Colors` varchar(100) NOT NULL COMMENT '颜色，以/为分割',
+  `Tag` varchar(20) DEFAULT NULL COMMENT '商品标签id,以逗号隔开',
+  `Images` text COMMENT '商品图片集',
+  `tid` int(2) DEFAULT NULL COMMENT '分类id',
+  `uniacid` int(11) DEFAULT NULL,
+  `isdelete` int(2) DEFAULT '0' COMMENT '1表示删除',
+  `Sizes` varchar(100) DEFAULT '均码' COMMENT '尺寸',
+  PRIMARY KEY (`gID`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='商品表';
 CREATE TABLE IF NOT EXISTS `ims_mask_goods` (
 `id` int(11) NOT NULL AUTO_INCREMENT,
 `name` varchar(20) NOT NULL,
@@ -650,73 +672,81 @@ CREATE TABLE IF NOT EXISTS `ims_mask_numbertype` (
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `ims_mask_order`;
 CREATE TABLE IF NOT EXISTS `ims_mask_order` (
 `id` int(11) NOT NULL AUTO_INCREMENT,
-`user_id` int(11) NOT NULL,
-`order_num` varchar(20) NOT NULL,
-`state` int(11) NOT NULL,
-`time` varchar(20) NOT NULL,
-`pay_time` varchar(20) NOT NULL,
-`jd_time` varchar(20) NOT NULL,
-`cancel_time` varchar(20) NOT NULL,
-`complete_time` varchar(20) NOT NULL,
-`money` decimal(10,2) NOT NULL,
-`box_money` decimal(10,2) NOT NULL,
-`ps_money` decimal(10,2) NOT NULL,
-`mj_money` decimal(10,2) NOT NULL,
-`xyh_money` decimal(10,2) NOT NULL,
-`tel` varchar(20) NOT NULL,
-`name` varchar(20) NOT NULL,
-`address` varchar(200) NOT NULL,
-`type` int(11) NOT NULL,
-`store_id` int(11) NOT NULL,
-`note` varchar(50) NOT NULL,
-`jj_note` varchar(50) NOT NULL,
-`area` varchar(20) NOT NULL,
-`lat` varchar(20) NOT NULL,
-`lng` varchar(20) NOT NULL,
-`del` int(11) NOT NULL,
-`pay_type` int(11) NOT NULL,
-`form_id` varchar(50) NOT NULL,
-`form_id2` varchar(50) NOT NULL,
-`code` varchar(100) NOT NULL,
-`order_type` int(11) NOT NULL,
-`delivery_time` varchar(20) NOT NULL,
-`sex` int(11) NOT NULL,
-`discount` decimal(10,2) NOT NULL,
-`tableware` int(11) NOT NULL,
-`dd_info` text NOT NULL,
-`uniacid` int(11) NOT NULL,
-`yhq_money` decimal(10,2) NOT NULL,
-`coupon_id` int(11) NOT NULL,
-`yhq_money2` decimal(10,2) NOT NULL,
-`coupon_id2` int(11) NOT NULL,
-`table_id` int(11) NOT NULL,
-`dn_state` int(11) NOT NULL,
-`dm_state` int(4) NOT NULL,
-`yy_state` int(11) NOT NULL,
-`deposit` decimal(10,2) NOT NULL,
-`ship_id` varchar(30) NOT NULL,
-`zk_money` decimal(10,2) NOT NULL,
-`is_dd` int(11) NOT NULL,
-`pt_info` text NOT NULL,
-`kfw_info` text NOT NULL,
-PRIMARY KEY (`id`)
+  `user_id` int(11) NOT NULL,
+  `order_num` varchar(20) NOT NULL,
+  `state` int(11) NOT NULL DEFAULT '1' COMMENT '1-待支付 2-已支付 3-已货 4-已完成 5-取消/关闭 6-已退款',
+  `time` varchar(20) NOT NULL,
+  `pay_time` varchar(20) NOT NULL,
+  `jd_time` varchar(20) NOT NULL,
+  `cancel_time` varchar(20) NOT NULL,
+  `complete_time` varchar(20) NOT NULL,
+  `money` varchar(10) NOT NULL,
+  `box_money` decimal(10,2) NOT NULL,
+  `ps_money` decimal(10,2) NOT NULL,
+  `mj_money` decimal(10,2) NOT NULL,
+  `xyh_money` decimal(10,2) NOT NULL,
+  `tel` varchar(20) NOT NULL,
+  `name` varchar(20) NOT NULL,
+  `address` varchar(200) NOT NULL,
+  `type` int(11) NOT NULL,
+  `store_id` int(11) NOT NULL,
+  `note` varchar(50) NOT NULL,
+  `jj_note` varchar(50) NOT NULL,
+  `area` varchar(20) NOT NULL,
+  `lat` varchar(20) NOT NULL,
+  `lng` varchar(20) NOT NULL,
+  `del` int(11) NOT NULL,
+  `pay_type` int(11) NOT NULL,
+  `form_id` varchar(50) NOT NULL,
+  `form_id2` varchar(50) NOT NULL,
+  `code` varchar(100) NOT NULL COMMENT '支付流水号',
+  `order_type` int(11) NOT NULL,
+  `delivery_time` varchar(20) NOT NULL,
+  `sex` int(11) NOT NULL,
+  `discount` decimal(10,2) NOT NULL,
+  `tableware` int(11) NOT NULL,
+  `dd_info` text NOT NULL,
+  `uniacid` int(11) NOT NULL,
+  `yhq_money` decimal(10,2) NOT NULL,
+  `coupon_id` int(11) NOT NULL,
+  `yhq_money2` decimal(10,2) NOT NULL,
+  `coupon_id2` int(11) NOT NULL,
+  `table_id` int(11) NOT NULL,
+  `dn_state` int(11) NOT NULL,
+  `dm_state` int(4) NOT NULL,
+  `yy_state` int(11) NOT NULL,
+  `deposit` decimal(10,2) NOT NULL,
+  `ship_id` varchar(30) NOT NULL,
+  `zk_money` decimal(10,2) NOT NULL,
+  `is_dd` int(11) NOT NULL,
+  `pt_info` text NOT NULL,
+  `kfw_info` text NOT NULL,
+  `Summary` varchar(100) DEFAULT NULL,
+  `postfee` varchar(50) DEFAULT '' COMMENT '运费',
+  `postfeename` varchar(100) DEFAULT NULL COMMENT '快递公司名字',
+  `postfeenum` varchar(100) DEFAULT NULL COMMENT '快递单号',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+DROP TABLE IF EXISTS `ims_mask_order_goods`;
 CREATE TABLE IF NOT EXISTS `ims_mask_order_goods` (
 `id` int(11) NOT NULL AUTO_INCREMENT,
-`img` varchar(200) NOT NULL,
-`number` int(11) NOT NULL,
-`order_id` int(11) NOT NULL,
-`name` varchar(20) NOT NULL,
-`money` decimal(10,2) NOT NULL,
-`dishes_id` int(11) NOT NULL,
-`spec` varchar(50) NOT NULL,
-`uniacid` int(11) NOT NULL,
-`is_jc` int(11) NOT NULL,
-`is_qg` int(4) NOT NULL,
-PRIMARY KEY (`id`)
+  `img` varchar(200) NOT NULL,
+  `number` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `name` varchar(20) NOT NULL,
+  `money` decimal(10,2) NOT NULL,
+  `dishes_id` int(11) NOT NULL COMMENT '商品id',
+  `spec` text NOT NULL COMMENT '商品规格信息',
+  `uniacid` int(11) NOT NULL,
+  `is_jc` int(11) NOT NULL,
+  `is_qg` int(4) NOT NULL,
+  `Code` varchar(100) DEFAULT NULL COMMENT '商品单号',
+  `Summary` int(2) DEFAULT '1' COMMENT '1-待支付  2-待发货 3-待收货 4-已完成 5-已关闭/已取消',
+  `fid` int(2) DEFAULT NULL COMMENT '发货地id',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `ims_mask_pay` (
@@ -1376,6 +1406,7 @@ DROP TABLE IF EXISTS `ims_mask_formid`;
 DROP TABLE IF EXISTS `ims_mask_fxset`;
 DROP TABLE IF EXISTS `ims_mask_fxuser`;
 DROP TABLE IF EXISTS `ims_mask_goods`;
+DROP TABLE IF EXISTS `ims_mask_goodmy`;
 DROP TABLE IF EXISTS `ims_mask_group`;
 DROP TABLE IF EXISTS `ims_mask_groupgoods`;
 DROP TABLE IF EXISTS `ims_mask_grouphx`;
@@ -1395,8 +1426,6 @@ DROP TABLE IF EXISTS `ims_mask_message2`;
 DROP TABLE IF EXISTS `ims_mask_nav`;
 DROP TABLE IF EXISTS `ims_mask_number`;
 DROP TABLE IF EXISTS `ims_mask_numbertype`;
-DROP TABLE IF EXISTS `ims_mask_order`;
-DROP TABLE IF EXISTS `ims_mask_order_goods`;
 DROP TABLE IF EXISTS `ims_mask_pay`;
 DROP TABLE IF EXISTS `ims_mask_psset`;
 DROP TABLE IF EXISTS `ims_mask_qbmx`;
