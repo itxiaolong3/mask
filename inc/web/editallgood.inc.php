@@ -5,10 +5,8 @@ $info=pdo_get('mask_goodmy',array('gID'=>$_GPC['id']));
 if(!empty($info)){
     $info['Images']=explode(',',$info['Images']);
 }
-//大厦
-$bighome=pdo_getall('mask_bighome',array('uniacid'=>$_W['uniacid']));
-//分类
-$sql=" select * from".tablename('mask_typetwomy')." where  uniacid={$_W['uniacid']} and ID>0";
-$type=pdo_fetchall($sql);
-
+$type=pdo_getall('mask_goodtype',array('uniacid'=>$_W['uniacid'],'id >'=>'1'));
+if(!$type){
+    message('请先添加分类',$this->createWebUrl('addgoodtype',array()),'error');
+}
 include $this->template('web/editallgood');

@@ -136,7 +136,8 @@
 <link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcss.css">
 <div class="nav_box col-md-1">
     <ul class="left_nav">
-        <li class="active"><a href="javascript:void(0);">编辑商品</a></li>
+        <li><a href="{php echo $this->createWebUrl('allgood')}">商品列表</a></li>
+        <li class="active"><a href="javascript:void(0);">添加/编辑商品</a></li>
     </ul>
 </div>
 
@@ -156,27 +157,13 @@
                     <div class="col-md-8 col-md-push-2 btn btn-sm btn-danger">删除成功！</div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label" style="margin-right: 15px;">所属大厦</label>
-                    <select class="col-sm-8" id="printing_label" name="StallsName">
-                        {loop $bighome $key $item}
-                        {if $item['bid']==$info['StallsName']}
-                        <option value="{$item['bid']}" selected="selected">{$item['hname']}</option>
-                        {else}
-                        <option value="{$item['bid']}" >{$item['hname']}</option>
-                        {/if}
-
-                        {/loop}
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label" style="margin-right: 15px;">所在分类</label>
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label" style="margin-right: 15px;">所属分类</label>
                     <select class="col-sm-8" id="onefenlei" name="tid">
                         {loop $type $key $item2}
-                        {if $item2['ID']==$info['tid']}
-                        <option value="{$item2['ID']}" selected="selected">{$item2['Name']}</option>
+                        {if $item2['id']==$info['tid']}
+                        <option value="{$item2['id']}" selected="selected">{$item2['typename']}</option>
                         {else}
-                        <option value="{$item2['ID']}" >{$item2['Name']}</option>
+                        <option value="{$item2['id']}" >{$item2['typename']}</option>
                         {/if}
                         {/loop}
                     </select>
@@ -200,23 +187,22 @@
                         <input type="text" id="goodpice" name="Price" class="form-control" value="{$info['Price']}" />
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label class="col-md-2 control-label">已拼数</label>
+                    <label class="col-md-2 control-label">获得积分</label>
                     <div class="col-sm-9">
-                        <input type="number" id="pingnum" name="DealCount" class="form-control" value="{$info['DealCount']}" onKeyUp="value=value.replace(/[^\d]/g,'')"/>
+                        <input type="number" id="integral" name="integral" class="form-control" value="{$info['integral']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">邮费</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="freight" name="freight" class="form-control" value="{$info['freight']}" />
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">商品销量</label>
                     <div class="col-sm-9">
                         <input type="number" id="flxiao" name="TotalQty" class="form-control" value="{$info['TotalQty']}" onKeyUp="value=value.replace(/[^\d]/g,'')"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">展示视频</label>
-                    <div class="col-sm-9">
-                        {php echo tpl_form_field_video('Videos',$info['Videos'])}
                     </div>
                 </div>
                 <div class="form-group">
@@ -233,27 +219,15 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商品图片集</label>
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商品轮播图</label>
                     <div class="col-sm-9">
                         {php echo tpl_form_field_multi_image('Images', $info['Images']);}
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">颜色</label>
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商品描述</label>
                     <div class="col-sm-9">
-                        <input type="text" name="Colors" id="colors" placeholder="多钟颜色以/分隔" class="form-control" value="{$info['Color']}" />
-                    </div>
-                </div>
-              <div class="form-group">
-                    <label class="col-md-2 control-label">尺寸</label>
-                    <div class="col-sm-9">
-                        <input type="text" name="Sizes" id="sizes" placeholder="多个尺寸以/分隔" class="form-control" value="{$info['Sizes']}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">商品标签</label>
-                    <div class="col-sm-9">
-                        <input type="text" name="Tag" id="Tag" placeholder="多钟标签以/分隔" class="form-control" value="{$info['Tag']}" />
+                        {php echo tpl_ueditor('content',$info['content']);}
                     </div>
                 </div>
 

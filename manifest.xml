@@ -1382,7 +1382,14 @@ CREATE TABLE IF NOT EXISTS `ims_mask_withdrawal` (
 `yh_info` varchar(100) NOT NULL,
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+CREATE TABLE `ims_mask_cart` (
+  `cid` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL COMMENT '用户id',
+  `gid` int(20) NOT NULL COMMENT '商品id',
+  `num` int(20) NOT NULL COMMENT '数量',
+  `uniacid` int(11) NOT NULL,
+  PRIMARY KEY (`cid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='购物车表';
 ]]></install>
 	<uninstall><![CDATA[DROP TABLE IF EXISTS `ims_mask_account`;
 DROP TABLE IF EXISTS `ims_mask_ad`;
@@ -1461,6 +1468,7 @@ DROP TABLE IF EXISTS `ims_mask_user`;
 DROP TABLE IF EXISTS `ims_mask_useradd`;
 DROP TABLE IF EXISTS `ims_mask_usercoupons`;
 DROP TABLE IF EXISTS `ims_mask_withdrawal`;
+DROP TABLE IF EXISTS `ims_mask_cart`;
 ]]></uninstall>
 	<upgrade><![CDATA[]]></upgrade>
 

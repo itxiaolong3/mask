@@ -1,7 +1,7 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-$type=pdo_getall('mask_lanmu',array('uniacid'=>$_W['uniacid']));
+$type=pdo_getall('mask_goodtype',array('uniacid'=>$_W['uniacid'],'id >'=>'1'));
 $where=" WHERE a.uniacid=:uniacid";
 $data[':uniacid']=$_W['uniacid'];
 
@@ -12,10 +12,10 @@ if($_GPC['keywords']){
     $data[':name']="%$op%";
 
 }
-//栏目
-if($_GPC['type_id']){
-    $where .=" and a.zid=:type_id";
-    $data[':type_id']=$_GPC['type_id'];
+//分类
+if($_GPC['tid']){
+    $where .=" and a.tid=:type_id";
+    $data[':type_id']=$_GPC['tid'];
 }
 //上下架
 if($_GPC['is_show2']){
@@ -25,22 +25,20 @@ if($_GPC['is_show2']){
 
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=15;
-$sql="select a.* ,b.hname,c.Name as typename,c.ID,d.QsID,d.Name from " . tablename("mask_goodmy") . " a"
-    . " left join " . tablename("mask_bighome")
-    . " b on b.bid=a.StallsName". " left join " . tablename("mask_typetwomy")
-    . " c on c.ID=a.tid ". " left join " . tablename("mask_lanmu")
-    . " d on a.zid=d.QsID ".$where." and a.isdelete=0 order by a.Statu asc";
+$sql="select a.* ,t.typename,t.id  from " . tablename("mask_goodmy") . " a"
+    . " left join " . tablename("mask_goodtype")
+    . " t on a.tid=t.id ".$where." and a.isdelete=0 order by a.Statu asc";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 
 $list = pdo_fetchall($select_sql,$data);
-$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_goodmy") . " a"  . " left join " . tablename("mask_bighome") . " b on b.bid=a.StallsName".$where,$data);
+$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_goodmy") . " a"  . " left join " . tablename("mask_goodtype") . " t on t.id=a.tid".$where,$data);
 $pager = pagination($total, $pageindex, $pagesize);
 if($_GPC['id']){
     $data2['Statu']=$_GPC['is_show'];
 
     $res=pdo_update('mask_goodmy',$data2,array('gID'=>$_GPC['id']));
     if($res){
-        message('设置成功',$this->createWebUrl('allgood',array('page'=>$_GPC['page'],'keywords'=>$_GPC['keywords'],'type_id'=>$_GPC['type_id'],'is_show2'=>$_GPC['is_show2'])),'success');
+        message('设置成功',$this->createWebUrl('allgood',array('page'=>$_GPC['page'],'keywords'=>$_GPC['keywords'],'tid'=>$_GPC['tid'],'is_show2'=>$_GPC['is_show2'])),'success');
     }else{
         message('设置失败','','error');
     }

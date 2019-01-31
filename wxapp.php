@@ -31,7 +31,9 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_GPC, $_W;
         echo $_W['attachurl'];
     }
-    //获取openid
+    //我的接口
+    ////////////面膜接口开始/////////////////////////////////////////////
+    //获取openid并保存用户信息
     public function doPageOpenid(){
         global $_W, $_GPC;
         $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
@@ -41,36 +43,681 @@ class maskModuleWxapp extends WeModuleWxapp {
         // echo $appid;die;
         $url="https://api.weixin.qq.com/sns/jscode2session?appid=".$appid."&secret=".$secret."&js_code=".$code."&grant_type=authorization_code";
         function httpRequest($url,$data = null){
-            $curl = curl_init();
-            curl_setopt($curl, CURLOPT_URL, $url);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-            if (!empty($data)){
-                curl_setopt($curl, CURLOPT_POST, 1);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-            }
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            //执行
-            $output = curl_exec($curl);
-            curl_close($curl);
-            return $output;
+//            $curl = curl_init();
+//            curl_setopt($curl, CURLOPT_URL, $url);
+//            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+//            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+//            if (!empty($data)){
+//                curl_setopt($curl, CURLOPT_POST, 1);
+//                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+//            }
+//            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+//            //执行
+//            $output = curl_exec($curl);
+//            curl_close($curl);
+//            return $output;
+            $html = file_get_contents($url);
+            $getcode = json_decode($html);
+            return $getcode->openid;
         }
-        $res=httpRequest($url);
-        print_r($res);
+        $getopenid=httpRequest($url);
+        if ($getopenid){
+            $sdata['nickname']=$_GPC['nickname'];
+            $sdata['headerimg']=$_GPC['headerimg'];
+            $sdata['uniacid']=$_W['uniacid'];
+            $sdata['openid']=$getopenid;
+            $sdata['dq_time']=date('Y-m-d H:i:s',time());
+            $getuserinfo=pdo_get('mask_user',array('openid'=>$getopenid));
+            if ($getuserinfo){
+                echo $this->resultToJson(1,'登录成功',$getuserinfo);
+            }else{
+                $insres=pdo_insert('mask_user',$sdata);
+                if ($insres){
+                    $getuser=pdo_get('mask_user',array('openid'=>$getopenid));
+                    echo $this->resultToJson(1,'登录成功',$getuser);
+                }else{
+                    echo $this->resultToJson(0,'保存用户信息失败','');
+                }
+
+            }
+        }else{
+            echo $this->resultToJson(0,'无法登录','');
+        }
+
+        //print_r($res);
     }
-    /////////////////////////////////////////////////////////
-    //我的接口
-  //获取专栏下的商品数据
+
+    //返回结果的封装
+    function resultToJson($code,$msg,$data){
+        $re['code']=$code;
+        $re['msg']=$msg;
+        $re['data']=$data;
+        return json_encode($re);
+    }
+    //获取分类
+    public function doPagegettype(){
+        global $_GPC, $_W;
+        $types=pdo_getall('mask_goodtype',array('uniacid'=>$_W['uniacid']));
+        if ($types){
+            echo $this->resultToJson(1,'返回分类',$types);
+        }else{
+            echo $this->resultToJson(0,'返回分类失败','');
+        }
+    }
+    //获取分类下的商品数据
     public function  doPageGetgoodapi(){
         global $_GPC, $_W;
-        $getlid=$_GPC['zid'];//专栏id
-        if(!empty($getlid)){
-            $resdata['result']=pdo_getall('mask_goodmy',array('zid'=>$getlid));
+        $getlid=$_GPC['id'];//专栏id
+        if($getlid>1){
+            $resdata=pdo_getall('mask_goodmy',array('tid'=>$getlid));
         }else{
-            $resdata['result']=pdo_getall('mask_goodmy',array());
+            $resdata=pdo_getall('mask_goodmy',array());
         }
-        echo json_encode($resdata);
+        if ($resdata){
+            echo $this->resultToJson(1,'返回商品',$resdata);
+        }else{
+            echo $this->resultToJson(0,'返回商品失败','');
+        }
     }
+    //搜索接口
+    public function doPageFindgood(){
+        global $_GPC,$_W;
+        if($_GPC['keywords']){
+            $op=$_GPC['keywords'];
+            $where="%$op%";
+        }else{
+            $where='%%';
+        }
+        $pageindex = max(1, intval($_GPC['page']));
+        $pagesize=10;
+        $sql="select *  from " . tablename("mask_goodmy") ." WHERE  Title LIKE :name and uniacid=:uniacid and Title!='' order by  gID desc";
+        $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
+        $list = pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':name'=>$where));
+        $total=pdo_fetchcolumn("select count(*) from " . tablename("mask_goodmy") ." WHERE  Title LIKE :name and uniacid=:uniacid  and Title!=''",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
+        $redata['total']=$total;
+        $redata['list']=$list;
+        if ($list){
+            echo $this->resultToJson(1,'有数据',$redata);
+        }else{
+            $redata['total']='';
+            $redata['list']='';
+            echo $this->resultToJson(0,'无匹配数据',$redata);
+        }
+    }
+    //获取商品详细
+    public function doPageDetailgood(){
+        global $_GPC, $_W;
+        $gid=$_GPC['gid'];//商品id
+        $uid=$_GPC['uid'];//用户id
+        $iscollection='';
+        if($uid){
+            $islike=pdo_get('mask_footprint',array('gid'=>$gid,'uid'=>$uid,'uniacid'=>$_W['uniacid']));
+            $iscollection=pdo_get('mask_collection',array('gid'=>$gid,'uid'=>$uid,'uniacid'=>$_W['uniacid']));
+            //保存足迹表
+            if (empty($islike)){
+                pdo_insert('mask_footprint',array('gid'=>$gid,'uid'=>$uid,'uniacid'=>$_W['uniacid']));
+            }
+        }
+        $good=pdo_get('mask_goodmy',array('gID'=>$gid,'uniacid'=>$_W['uniacid']));
+        if($iscollection){
+            $good['iscollection']=true;
+        }else{
+            $good['iscollection']=false;
+        }
+        $good['content']=htmlspecialchars_decode($good['content']);
+        $imgs=explode(',',$good['Images']);
+        $good['imgarr']=$imgs;
+        if ($good){
+            echo $this->resultToJson(1,'商品详细',$good);
+        }else{
+            echo $this->resultToJson(0,'没数据','');
+        }
+
+    }
+    //购物车表
+    //添加和更新购物车
+    public function doPageShopcar(){
+        global $_W, $_GPC;
+        $gid=$_GPC['gid'];
+        $uid=$_GPC['uid'];
+        $state=$_GPC['state'];
+        $data['gid']=$gid;
+        $data['uid']=$uid;
+        $data['uniacid']=$_W['uniacid'];
+        if ($state==1){
+            //商品中的加购
+            $num=$_GPC['num'];
+            $getcart=pdo_get("mask_cart",array('uid'=>$uid,"gid"=>$gid,"uniacid"=>$_W['uniacid']));
+            if ($getcart){
+                //更新
+                $totalnum=$num+$getcart['num'];
+                $re=pdo_update('mask_cart',array('num'=>$totalnum),array('uid'=>$uid,"gid"=>$gid,"uniacid"=>$_W['uniacid']));
+            }else{
+                $data['num']=$num;
+                $re=pdo_insert('mask_cart',$data);
+            }
+            if ($re){
+                echo  $this->resultToJson(1,'加购成功','');
+            }else{
+                echo  $this->resultToJson(0,'加购失败','');
+            }
+        }else{
+            $data=htmlspecialchars_decode($_GPC['allgood']);
+            $arr=json_decode($data,true);
+            //购物车中的操作
+            $re=pdo_insert('mask_cart',$data);
+            if ($re){
+                $getcart=pdo_get("mask_cart",array('uid'=>$uid,"gid"=>$gid,"uniacid"=>$_W['uniacid']));
+                echo $this->resultToJson(1,'修改数量成功',$getcart);
+            }else{
+                echo $this->resultToJson(0,'修改数量失败','');
+            }
+        }
+
+    }
+    //返回购物车的数据
+    public function doPageGetcart(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $list = pdo_getall('mask_cart', array('uid' => $uid));
+        $allgood=array();
+        foreach ($list as $k=>$v){
+            $getgood=pdo_get('mask_goodmy', array('gID' => $v['gid']));
+            array_push($allgood,$getgood);
+            $allgood[$k]['num']=$v['num'];
+        }
+        if ($list){
+            echo $this->resultToJson(1,'购物车列表数据',$allgood);
+        }else{
+            echo $this->resultToJson(0,'没数据','');
+        }
+    }
+    //返回购物车数量
+    public function doPagegetTotalCount(){
+        global $_W, $_GPC;
+        $getuid=$_GPC['uid'];
+        $arr=array();
+        $totolcont=$this->getTotalCount($getuid);
+        $arr['Data']['CartItemQty']=$totolcont?$totolcont:0;
+        echo json_encode($arr);
+    }
+    //返回购物车总价格
+    public function doPagegetTotal(){
+        global $_W, $_GPC;
+        $data=htmlspecialchars_decode($_GPC['itemInfos']);
+        $arr=json_decode($data,true);
+        $gidsarr=array();
+        $arrtotal=array();
+        foreach ($arr as $k=>$v){
+            array_push($gidsarr,$v['AgentItemID']);
+        }
+
+        $getid=json_decode($_GPC['gids'],true);
+        $uid=$_GPC['uid'];
+        if(empty($gidsarr)){
+            $totol=$this->dototal($getid,$uid);
+            $arrtotal['Data']['TotalAmount']=number_format($totol,2);
+            echo json_encode($arrtotal);
+        }else{
+            $totol=$this->dototal($gidsarr,$uid);
+            $arrtotal['Data']['TotalAmount']=number_format($totol,2);
+            echo json_encode($arrtotal);
+        }
+
+    }
+    //删除购物车
+    public function doPageDelshopcat(){
+        global $_W, $_GPC;
+        $getgid=$_GPC['gid'];
+        $uid=$_GPC['uid'];
+        $res=pdo_delete('mask_cart',array('uid'=>$uid,"gid"=>$getgid));
+        if($res){
+            echo $this->resultToJson(1,'删除成功','');
+        }else{
+            echo $this->resultToJson(0,'删除失败','');
+        }
+    }
+    //收藏
+    public function doPageCollection() {
+        global $_W, $_GPC;
+        $getid=$_GPC['gid'];
+        $uid=$_GPC['uid'];
+        $data=array();
+        if (!empty($getid)&&!empty($uid)){
+            $res = pdo_get('mask_collection', array('gid' => $getid,'uid'=>$uid,'uniacid' => $_W['uniacid']));
+            if($res){
+                //存在就删除
+                $deleres=pdo_delete('mask_collection', array('gid' => $getid,'uid'=>$uid,'uniacid' => $_W['uniacid']));
+                if ($deleres){
+                    echo $this->resultToJson(1,'取消收藏成功','');
+                }else{
+                    echo $this->resultToJson(0,'取消收藏失败','');
+                }
+            }else{
+                //不存在就插入
+                $res=pdo_insert('mask_collection',array('gid'=>$getid,'uid'=>$uid,'uniacid' => $_W['uniacid']));
+                if ($res){
+                    echo $this->resultToJson(1,'收藏成功','');
+                }else{
+                    echo $this->resultToJson(0,'收藏失败','');
+                }
+            }
+        }else{
+            echo $this->resultToJson(0,'收藏操作失败，缺uid或者gid','');
+        }
+
+    }
+    //获取收藏数据
+    public function doPageGetcollection() {
+        global $_W, $_GPC;
+        $list = pdo_getall('mask_collection', array('uid' => $_GPC['uid']));
+        $allgood=array();
+        foreach ($list as $k=>$v){
+            $getgood=pdo_get('mask_goodmy', array('gID' => $v['gid']));
+            array_push($allgood,$getgood);
+        }
+        if ($list){
+            echo $this->resultToJson(1,'收藏数据',$allgood);
+        }else{
+            echo $this->resultToJson(0,'没收藏数据','');
+        }
+
+    }
+    //删除收藏
+    public function doPageDelcollection(){
+        global $_W, $_GPC;
+        $id=$_GPC['id'];
+        $res=pdo_delete('mask_collection',array('id'=>$id));
+        if($res){
+            echo $this->resultToJson(1,'删除成功','');
+        }else{
+            echo $this->resultToJson(0,'删除失败','');
+        }
+    }
+    //获取足迹数据
+    public function doPageGetfootprint() {
+        global $_W, $_GPC;
+        $list = pdo_getall('mask_footprint', array('uid' => $_GPC['uid']));
+        $allgood=array();
+        foreach ($list as $k=>$v){
+            $getgood=pdo_get('mask_goodmy', array('gID' => $v['gid']));
+            array_push($allgood,$getgood);
+        }
+        if ($list){
+            echo $this->resultToJson(1,'我的足迹数据',$allgood);
+        }else{
+            echo $this->resultToJson(0,'没足迹数据','');
+        }
+
+    }
+    //删除足迹
+    public function doPageDelfootprint(){
+        global $_W, $_GPC;
+        $id=$_GPC['id'];
+        $res=pdo_delete('mask_footprint',array('id'=>$id));
+        if($res){
+            echo $this->resultToJson(1,'删除成功','');
+        }else{
+            echo $this->resultToJson(0,'删除失败','');
+        }
+    }
+    //获取并判断是否有收货地址
+    public function doPageGetDefaultaddress(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $data=array();
+        //判断是否有地址
+        $ishave=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid']));
+        if ($ishave){
+            //获取默认地址
+            $res=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"is_default"=>1));
+            if ($res){
+                $data['addre']=$res;
+            }else{
+                $data['addre']=$ishave;
+            }
+            $data['Result']=true;
+            echo $this->resultToJson(1,'有地址',$data);
+        }else{
+            $data['Result']=false;
+            $data['addre']='';
+            echo $this->resultToJson(0,'没地址',$data);
+        }
+    }
+    //添加收货地址
+    public function doPageAddaddress(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $data=array();
+        $updatas=array();
+        $updatas['name']=$_GPC['name'];
+        $updatas['phone']=$_GPC['phone'];
+        $updatas['is_default']=$_GPC['is_default'];
+        $updatas['address']=$_GPC['address'];
+        $updatas['detailadd']=$_GPC['detailadd'];
+        $updatas['uniacid']=$_W['uniacid'];
+        $updatas['uid']=$uid;
+        $isdefault=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"is_default"=>1));
+        if($isdefault){
+            //已经有默认了
+            if($_GPC['is_default']){//此条地址是否设置默认
+                pdo_update('mask_address',array('is_default'=>0),array('aid'=>$isdefault['aid']));
+                $updatas['is_default']=1;
+            }else{
+                $updatas['is_default']=0;
+            }
+        }else{
+            //还没有默认
+            $updatas['is_default']=1;
+        }
+        $res=pdo_insert("mask_address",$updatas);
+        if($res){
+            echo $this->resultToJson(1,'添加成功','');
+        }else{
+            pdo_update('mask_address',array('is_default'=>1),array('aid'=>$isdefault['aid']));
+            echo $this->resultToJson(0,'添加失败','');
+        }
+    }
+    //修改地址
+    public function doPageUpdAddress(){
+        global $_W, $_GPC;
+        $id=$_GPC['aid'];
+        $uid=$_GPC['uid'];
+        $data['name']=$_GPC['name'];
+        $data['phone']=$_GPC['phone'];
+        $data['is_default']=$_GPC['is_default'];
+        $data['address']=$_GPC['address'];
+        $data['detailadd']=$_GPC['detailadd'];
+        $isdefault=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"is_default"=>1));
+        if($isdefault){
+            //已经有默认了
+            if($_GPC['is_default']){//此条地址是否设置默认
+                pdo_update('mask_address',array('is_default'=>0),array('aid'=>$isdefault['aid']));
+                $data['is_default']=1;
+            }else{
+                $data['is_default']=0;
+            }
+        }else{
+            //还没有默认
+            $data['is_default']=1;
+        }
+        $res=pdo_update('mask_address',$data,array('aid'=>$id));
+        if($res){
+            echo $this->resultToJson(1,'修改成功','');
+        }else{
+            pdo_update('mask_address',array('is_default'=>1),array('aid'=>$isdefault['aid']));
+            echo $this->resultToJson(0,'修改失败','');
+        }
+    }
+    //删除地址
+    public function doPageDelAdd(){
+        global $_W, $_GPC;
+        $id=$_GPC['aid'];
+        $res=pdo_delete('mask_address',array('aid'=>$id));
+        if($res){
+            echo $this->resultToJson(1,'删除成功','');
+        }else{
+            echo $this->resultToJson(0,'删除失败','');
+        }
+    }
+    //获取单一地址
+    public function doPagegetoneAdd(){
+        global $_W, $_GPC;
+        $ID=$_GPC['aid'];
+        $res=pdo_get('mask_address',array('aid'=>$ID));
+        echo $this->resultToJson(1,'返回地址成功',$res);
+    }
+    //我的地址
+    public function doPageMyAddress(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $res=pdo_getall('mask_address',array('uid'=>$uid), array() , '' , 'is_default DESC');
+        if ($res){
+            echo $this->resultToJson(1,'返回我的地址成功',$res);
+        }else{
+            echo $this->resultToJson(0,'你没有地址',$res);
+        }
+    }
+    //获取单一商品
+    public function doPageOnegood(){
+        global $_W, $_GPC;
+        $ID=$_GPC['gid'];
+        $res=pdo_getall('mask_goodmy',array('gID'=>$ID));
+        echo $this->resultToJson(1,'返回商品',$res);
+    }
+    //提交订单
+    public function doPageAddMyOrder(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $addid=$_GPC['aid'];//地址id
+        $goodinfo=json_decode(htmlspecialchars_decode($_GPC['arr']),true);//商品信息数组
+        //echo $this->resultToJson(0,'返回提交的信息',$goodinfo);die();
+        //查询用户地址信息
+        $addinfo=pdo_get('mask_address',array('aid'=>$addid));
+        $data['user_id']=$uid;//用户id
+        $data['name']=$addinfo['name'];//姓名
+        $data['address']=$addinfo['address'].' '.$addinfo['detailadd'];//地址
+        $data['money']=$_GPC['money'];//付款金额
+        $data['postfee']=$_GPC['totalfreght'];//总运费
+        $data['tel']=$addinfo['phone'];//手机号
+        $data['uniacid']=$_W['uniacid'];//小程序id
+        $data['order_num']=date('YmdHis',time()).rand(1111,9999);//订单号
+        $data['time']=date("Y-m-d H:i:s",time());//下单时间
+        //"共2款,3件,合计¥ 667.21"
+        $typenum=count($goodinfo);//款数
+        $misc=array();//件数
+        foreach ($goodinfo as $k=>$v){
+            array_push($misc,$v['num']);
+        }
+        $data['Summary']='共'.$typenum.'款,'.array_sum($misc).'件,合计￥'.$_GPC['money'];//购买数量情况
+        $res=pdo_insert('mask_order',$data);
+        $order_id=pdo_insertid();
+        $chidid=array();
+        if($res){
+            foreach ($goodinfo as $k=>$v){
+                $onegood=pdo_get('mask_goodmy',array('gID'=>$v['id']));
+                $data2['name']=$onegood['Title'];//商品名称
+                $data2['number']=$v['num'];//商品数量
+                $data2['integral']=$v['integral'];//商品积分
+                $data2['TotalQty']=$v['TotalQty'];//商品销量
+                $data2['money']=$v['price'];//商品单价
+                $data2['img']=$onegood['Itemcover'];//商品图片
+                //$data2['spec']=$v['msg'];//商品规格
+                $data2['dishes_id']=$v['id'];//商品id
+                // $data2['fid']=$v['fid'];//发货地id
+                $data2['uniacid']=$_W['uniacid'];//小程序id
+                $data2['order_id']=$order_id;
+                //$data2['Code']=date('Ymd',time()).'-'.$this->randNum(8);
+                $res2=pdo_insert('mask_order_goods',$data2);
+                array_push($chidid,pdo_insertid());
+            }
+            if($res2){
+                //清除购物车
+                foreach ($goodinfo as $k=>$v){
+                    pdo_delete('mask_cart',array('gid'=>$v['id'],"uid"=>$uid));
+                }
+                echo $this->resultToJson(1,'提交订单成功',$order_id);
+            }else{
+                echo $this->resultToJson(0,'提交订单失败','');
+            }
+
+        }else{
+            echo $this->resultToJson(0,'提交订单失败','');
+        }
+
+    }
+    //获取订单列表
+    public function doPageGetOrderlist(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $statuid=$_GPC['state'];//订单状态
+        // $data=array();
+        // $where=" WHERE o.uniacid=:uniacid";
+        // $data[':uniacid']=$_W['uniacid'];
+        if ($statuid==0){
+            //联表查询
+            // $sql="select o.id as oid,o.user_id,o.time,o.money as totalmoney ,g.*  from " . tablename("mask_order") . " o"
+            // . " left join " . tablename("mask_order_goods")
+            // . " g on o.oid=g.order_id ".$where."  order by o.state asc";
+
+            // $list = pdo_fetchall($sql,$data);
+            $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state !='=>5), array('id','order_num','money','state'), '', 'id DESC');
+        }else{
+            $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state'=>$statuid),array('id','order_num','money','state'), '', 'id DESC');
+        }
+        if (empty($getorder)){
+            //没有订单
+            echo $this->resultToJson(0,'没有订单','');
+        }
+        foreach ($getorder as $k=>$v){
+            $getorder[$k]['goodlist']=pdo_getall('mask_order_goods',array('order_id'=>$v['id']));
+        }
+        echo $this->resultToJson(1,'订单列表',$getorder);
+    }
+    //订单详细
+    public function doPageGetDetailOrder(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $oid=$_GPC['orderid'];
+        $getorder=pdo_get('mask_order',array('id'=>$oid));
+        $getorder['goodlist']=pdo_getall('mask_order_goods',array('order_id'=>$oid));
+        if ($getorder) {
+            echo $this->resultToJson(1,'订单详细',$getorder);
+        }else{
+            echo $this->resultToJson(0,'没有数据','');
+        }
+
+    }
+    //取消订单
+    public function doPageCancelMyOrder(){
+        global $_W, $_GPC;
+        $res=pdo_update('mask_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['oid']));
+        if ($res){
+            //取消所有子订单
+            pdo_update('mask_order_goods',array('state'=>5),array('order_id'=>$_GPC['oid']));
+            echo $this->resultToJson(1,'取消订单成功','');
+        }else{
+            echo $this->resultToJson(0,'取消订单失败','');
+        }
+
+    }
+    //微信支付
+    public function doPagedoPay(){
+        global $_W, $_GPC;
+        include IA_ROOT.'/addons/mask/wxpay.php';
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $res2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+        if($res2['url_name']){
+            $res2['url_name']=$res2['url_name'];
+        }else{
+            $res2['url_name']='紫色魁影';
+        }
+        //支付需要传入的参数 openid 订单id 支付金额
+        $appid=$res2['appid'];
+        $openid=$_GPC['openid'];//oQKgL0ZKHwzAY-KhiyEEAsakW5Zg
+        $mch_id=$res['mchid'];
+        $key=$res['wxkey'];
+        $out_trade_no = $mch_id. time();
+        $root=$_W['siteroot'];
+        pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$_GPC['orderid']));
+        $total_fee =$_GPC['money'];
+        if(empty($total_fee)) //默认1分
+        {
+            $body =$res2['url_name'];
+            $total_fee = floatval(1*100);
+        }else{
+            $body = $res2['url_name'];
+            $total_fee = floatval($total_fee*100);
+        }
+        $weixinpay = new WeixinPay($appid,$openid,$mch_id,$key,$out_trade_no,$body,$total_fee,$root);
+        $return=$weixinpay->pay();
+        echo $this->resultToJson(1,'支付参数',$return);
+    }
+    //分销二维码
+    public function doPageGoodsCode(){
+        global $_W, $_GPC;
+        function  getCoade($goods_id,$group_id){
+            function getaccess_token(){
+                global $_W, $_GPC;
+                $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
+                $appid=$res['appid'];
+                $secret=$res['appsecret'];
+                // print_r($res);die;
+                $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL,$url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+                $data = curl_exec($ch);
+                curl_close($ch);
+                $data = json_decode($data,true);
+                return $data['access_token'];
+            }
+            function set_msg($goods_id,$group_id){
+                $access_token = getaccess_token();
+                $data2=array(
+                    "scene"=>$goods_id,
+                    "page"=>"pages/home/index",
+                    "width"=>400
+                );
+                $data2 = json_encode($data2);
+                $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=".$access_token."";
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL,$url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+                curl_setopt($ch, CURLOPT_POST,1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS,$data2);
+                $data = curl_exec($ch);
+                curl_close($ch);
+                return $data;
+            }
+            $img=set_msg($goods_id,$group_id);
+            $img=base64_encode($img);
+            return $img;
+        }
+        $base64_image_content="data:image/jpeg;base64,".getCoade($_GPC['goods_id'],$_GPC['group_id']='');
+        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)){
+            $type = $result[2];
+            $new_file = IA_ROOT ."/addons/mask/img/";
+            if(!file_exists($new_file))
+            {
+                //检查是否有该文件夹，如果没有就创建，并给予最高权限
+                mkdir($new_file, 0777);
+            }
+            $wname="{$_GPC['goods_id']}".".{$type}";
+            //$wname="1511.jpeg";
+            $new_file = $new_file.$wname;
+            file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)));
+        }
+        echo $this->resultToJson(1,'返回专属码',$_W['siteroot']."addons/mask/img/".$wname);
+
+    }
+    //保存推荐人id
+    public function doPageSavaid(){
+        global $_W, $_GPC;
+        $pid=$_GPC['pid'];
+        $uid=$_GPC['uid'];
+        $data=array();
+        if (!empty($pid)&&!empty($uid)){
+            $res = pdo_get('mask_relation', array('uid'=>$uid,'uniacid' => $_W['uniacid']));
+            if($res){
+                //已被其他人推荐过
+                echo $this->resultToJson(0,'已推荐过','');
+            }else{
+                //不存在就插入
+                $res=pdo_insert('mask_relation',array('pid'=>$pid,'uid'=>$uid,'uniacid' => $_W['uniacid'],'addtime'=>date('Y-m-d H:i:s',time())));
+                if ($res){
+                    echo $this->resultToJson(1,'绑定成功','');
+                }else{
+                    echo $this->resultToJson(0,'绑定失败','');
+                }
+            }
+        }else{
+            echo $this->resultToJson(0,'绑定失败，缺uid或者pid','');
+        }
+    }
+    ///////////面膜接口结束//////////////
     //保存用户的openid
     public function doPageSavaopenid(){
         global $_GPC, $_W;
@@ -183,13 +830,13 @@ class maskModuleWxapp extends WeModuleWxapp {
         $indexnum=$_GPC['pageIndex']-1;
         //每页数量
         $everynum=$_GPC['pagesize'];
-         //只需要列表需要分页
+        //只需要列表需要分页
         //if($getstate==0){
-           $limits= " limit " . $everynum * $indexnum . ',' . $everynum;
-       // }else{
-       // //    $limits='';
-       // }
-     $filterValues=htmlspecialchars_decode($_GPC['filterValues']);
+        $limits= " limit " . $everynum * $indexnum . ',' . $everynum;
+        // }else{
+        // //    $limits='';
+        // }
+        $filterValues=htmlspecialchars_decode($_GPC['filterValues']);
         $filterValuesarr=json_decode($filterValues,true);
         $MaxPrice=$filterValuesarr['MaxPrice']?$filterValuesarr['MaxPrice']:100000;
         $MinPrice=$filterValuesarr['MinPrice']?$filterValuesarr['MinPrice']:0;
@@ -235,7 +882,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         // $sql="select * from " . tablename("mask_goodmy") .$where.$getlid.$orders;
         //如果是搜索进来的
         $keyword=$_GPC['key'];
-       
+
         if ($getstate==1){//搜索的
             $where="WHERE uniacid=:uniacid and isdelete=0 and Statu=1 and Title LIKE  concat('%', :name,'%') ";
             $data[':name']=$keyword;
@@ -283,7 +930,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $allgood[$k]['tips']="已拼".$v['DealCount']."件,我也要拼！";
         }
         $alldata['Data']['NewItems']=$allgood;
-      
+
         echo json_encode($alldata);
     }
     //筛选
@@ -348,7 +995,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['Data']['Panels'][1]['selected']=true;
         $data['Data']['Panels'][1]['TypeID']=2;
         //价格范围
-      $price=array(
+        $price=array(
             ['ID'=>1,'Name'=>"0-50",'selected'=>false],
             ['ID'=>2,'Name'=>"50-200",'selected'=>false],
             ['ID'=>3,'Name'=>"200-500",'selected'=>false]
@@ -359,7 +1006,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['Data']['Panels'][2]['selected']=true;
         $data['Data']['Panels'][2]['TypeID']=3;
         //货期情况
-       $huoqi=array(
+        $huoqi=array(
             ['ID'=>1,'Name'=>"现货",'selected'=>false],
             ['ID'=>2,'Name'=>"排单7天内",'selected'=>false],
             ['ID'=>3,'Name'=>"排单15天内",'selected'=>false]
@@ -371,172 +1018,103 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['Data']['Panels'][3]['TypeID']=4;
         echo json_encode($data);
     }
-    //获取商品详细
-    public function doPagegetdetailgood(){
-        global $_GPC, $_W;
-        $gid=$_GPC['gID'];//商品id
-        $uid=$_GPC['uid'];//用户id
-        $islike=pdo_get('mask_mylike',array('gid'=>$gid,'uid'=>$uid,'uniacid'=>$_W['uniacid']));
-        $good=pdo_get('mask_goodmy',array('gID'=>$gid,'uniacid'=>$_W['uniacid']));
-        $alldata=array();
-        $Activity=array();//专场信息
-        $Activity['ChengTuanCount']=1;
-        $Activity['IsStart']=true;
-        $Activity['ShowCoinPayIcon']=false;
-        $Activity['QsID']=$good['zid'];//栏目id
-        $Activity['TotalSaleCount']=$good['TotalQty'];
-        $Activity['TransCount']=$good['DealCount'];
-        $Activity['StartTime']=$this->getopentime();
-        $Activity['EndTime']=$this->getclosetime();
-        $alldata['Data']['Activity']=$Activity;
 
-        $ButtomBigButtons=array(
-            '0'=>array('action'=>'拼单','isEnable'=>true,'isPoint'=>true,'title'=>'我要拿货','type'=>'button')
-        );
-
-        $alldata['Data']['ButtomBigButtons']=$ButtomBigButtons;
-        $ButtomSmallButtons=array(
-            '0'=>array('action'=>'分享','isEnable'=>false,'isPoint'=>false,'title'=>'分享','type'=>'button'),
-            '1'=>array('action'=>'收藏','isEnable'=>true,'isPoint'=>false,'title'=>'收藏','type'=>'button'),
-            '2'=>array('action'=>'拿货车','isEnable'=>true,'isPoint'=>false,'title'=>'拿货车','type'=>'button'),
-        );
-        $alldata['Data']['ButtomSmallButtons']=$ButtomSmallButtons;
-
-        $Buttons=array(
-            '0'=>array('action'=>'补货','isEnable'=>true,'isPoint'=>false,'title'=>'我要补货','type'=>'button')
-        );
-        $alldata['Data']['Buttons']=$Buttons;
-        $alldata['Data']['Name']=$good['Title'];
-        $alldata['Data']['CanDownLoadPicAndVideo']=true;
-        $alldata['Data']['Cover']=$good['Itemcover'];
-        $alldata['Data']['coverurl']=$good['Itemcover'];
-        $alldata['Data']['Discount']='';
-        $alldata['Data']['DisplayStatu']='新款';
-        if($islike){
-            $alldata['Data']['IsFavorite']=true;
-        }else{
-            $alldata['Data']['IsFavorite']=false;
-        }
-        $alldata['Data']['IsTodayDeliver']=false;
-        $alldata['Data']['IsYuGao']=false;
-        $alldata['Data']['IsShowShareBtn']=true;
-        $alldata['Data']['ItemID']=$good['gID'];
-        $alldata['Data']['Price']=$good['Price'];
-        $alldata['Data']['OriPrice']=$good['OriPrice'];
-        $alldata['Data']['ItemStatu']='已上架';
-        $alldata['Data']['Color']=$good['Colors'];
-        $alldata['Data']['Size']=$good['Sizes'];
-        $alldata['Data']['Videos']=$good['Videos'];
-        //获取地区
-        $gettid=pdo_get('mask_lanmu', array('QsID' => $good['zid']), array('fid'));
-        $Name=pdo_get('mask_warehome', array('fid' => $gettid['fid']), array('Name'));
-        $endtime=date("m月d日",time());
-        $preendtime=date("m月d日",time()+604800);
-        $alldata['Data']['endmsg']="明天（".$endtime."）12点结束";
-        $alldata['Data']['preendmsg']="排单6~10天，预计".$preendtime."内可发货，如遇档口改期，延3～5天";
-        $alldata['Data']['sendaddress']=$Name['Name'];
-
-        $img=explode(',',$good['Images']);
-        $alldata['Data']['Images']=$img;
-        $tags=explode('/',$good['Tag']);
-        $alldata['Data']['Tags']=$tags;
-        //购物车部分
-        $getcolors=explode('/',$good['Colors']);
-        $getsizes=explode('/',$good['Sizes']);
-        $Sizes=array();
-        $SizeList=array();
-        foreach ($getsizes as $k=>$v){
-            $Sizes[$v]=2000;
-            $SizeList[$k]['Size']=$v;
-            $SizeList[$k]['Stock']=2000;
-            $SizeList[$k]['qty']=0;
-        }
-        //每种颜色下的所有信息
-        foreach ($getcolors as $k=>$v){
-            $alldata['Data']['Products'][]['Color']=$v;
-            $alldata['Data']['Products'][$k]['Sizes']=$Sizes;
-            $alldata['Data']['Products'][$k]['SizeList']=$SizeList;
-        }
-        echo json_encode($alldata);
-
-    }
     //用户登录
     public function doPageLogin(){
         global $_GPC, $_W;
         $uid=$_GPC['uid'];
         $phone=$_GPC['phone'];
-        $psw=$_GPC['psw'];
+        $psw=md5('itxiaolong'.$_GPC['psw']);
         $data=array();
         if(!empty($uid)){
-            $res=pdo_get('mask_user',array('u_id'=>$uid,'uniacid'=>$_W['uniacid']));
-            if ($phone==$res['phone']){
-                $data['code']=1;
-                $data['msg']='检验登录成功';
-                $data['info']=$res;
+            $res=pdo_get('mask_user',array('id'=>$uid,'uniacid'=>$_W['uniacid']));
+            if ($phone==$res['user_tel']){
+                echo $this->resultToJson(1,'检验登录成功','');
             }else{
-                $data['code']=0;
-                $data['msg']='检验登录失败';
-                $data['info']=array();
+                echo $this->resultToJson(0,'检验登录失败','');
             }
-            echo json_encode($data);
         }else if (!empty($phone)){
-            $res=pdo_get('mask_user',array('phone'=>$phone,'psw'=>$psw,'uniacid'=>$_W['uniacid']));
+            $res=pdo_get('mask_user',array('user_tel'=>$phone,'psw'=>$psw,'uniacid'=>$_W['uniacid']));
             if ($res){
-                $data['code']=1;
-                $data['msg']='用户登录成功';
-                $data['info']=$res;
+                echo $this->resultToJson(1,'用户登录成功',$res);
             }else{
-                $data['code']=0;
-                $data['msg']='用户登录失败';
-                $data['info']=array();
+                echo $this->resultToJson(0,'用户登录失败','');
             }
-            echo json_encode($data);
         }else{
-            $data['code']=0;
-            $data['msg']='手机号不可为空，登录失败';
-            echo json_encode($data);
+            echo $this->resultToJson(0,'手机号不可为空，登录失败','');
         }
     }
     //用户注册和找回密码
     public function doPageRegorFind(){
         global $_GPC, $_W;
         $getphone=$_GPC['phone'];
-        $getpsw=$_GPC['psw'];
-        $data=array();
-        $res=pdo_get('mask_user',array('phone'=>$getphone,'uniacid'=>$_W['uniacid']));
+        $getpsw=md5('itxiaolong'.$_GPC['psw']);
+        $getuid=$_GPC['uid'];
+        if (!$getuid){
+            echo $this->resultToJson(0,'请退出重新授权操作','');
+        }
+        $getpid=$_GPC['pid'];
+        $getcode=$_GPC['code'];
+        $res=pdo_get('mask_user',array('user_tel'=>$getphone,'uniacid'=>$_W['uniacid']));
+        $codeistrue=pdo_get('mask_smscode',array('phone'=>$getphone,'code'=>$getcode,'uniacid'=>$_W['uniacid']));
         if ($res){//找回密码，也就是重新设置密码
             $cdata=array();
             $cdata['psw']=$getpsw;
-            $cres=pdo_update('mask_user',$cdata,array('phone'=>$getphone));
-            if ($cres){
-                $data['code']=1;
-                $data['msg']='找回密码成功';
-                echo json_encode($data);
+            //判断验证码是否正常
+            if ($codeistrue){
+                $cres=pdo_update('mask_user',$cdata,array('user_tel'=>$getphone));
+                if ($cres){
+                    //删除验证码
+                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
+                    echo $this->resultToJson(1,'找回密码成功','');
+                }else{
+                    echo $this->resultToJson(0,'找回密码失败','');
+                }
             }else{
-                $data['code']=0;
-                $data['msg']='找回密码失败';
-                echo json_encode($data);
+                echo $this->resultToJson(-1,'验证码错误','');
             }
+
         }else{
             $inserdata=array();
-            $inserdata['phone']=$getphone;
+            $inserdata['user_tel']=$getphone;
             $inserdata['psw']=$getpsw;
-            $inserdata['uniacid']=$_W['uniacid'];
-            $inserdata['username']=$this->randName(7);
-            $res=pdo_insert('mask_user',$inserdata);
-            if ($res){
-                $data['code']=1;
-                $data['msg']='注册成功';
-                echo json_encode($data);
+            //$inserdata['uniacid']=$_W['uniacid'];
+            //$inserdata['username']=$this->randName(7);
+            if ($codeistrue){
+                $res=pdo_update('mask_user',$inserdata,array('id'=>$getuid));
+                if ($res){
+                    //删除验证码
+                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
+                    //绑定用户
+                     $isbang=pdo_get('mask_relation',array('uid'=>$getuid,'uniacid'=>$_W['uniacid']));
+                     if($isbang){
+                         //已被推荐过
+                         echo $this->resultToJson(1,'注册成功，已被推荐过','');
+                     }else{
+                         if ($getpid){
+                             $bingsucc=pdo_insert('mask_relation',array('uid'=>$getuid,'pid'=>$getpid,'uniacid'=>$_W['uniacid'],'addtime'=>date('Y-m-d H:i:s',time())));
+                             if ($bingsucc){
+                                 echo $this->resultToJson(1,'注册成功，绑定成功','');
+                             }else{
+                                 echo $this->resultToJson(1,'注册成功，绑定失败','');
+                             }
+                         }else{
+                             //没有绑定操作
+                             echo $this->resultToJson(1,'注册成功，未绑定操作','');
+                         }
+
+                     }
+                }else{
+                    echo $this->resultToJson(0,'注册失败','');
+                }
             }else{
-                $data['code']=0;
-                $data['msg']='注册失败';
-                echo json_encode($data);
+                echo $this->resultToJson(-1,'验证码错误','');
             }
+
         }
 
     }
-   
+
     //短信验证码,聚合或者腾讯云的或者阿里云的
     public function doPageSmscode(){
         global $_W, $_GPC;
@@ -575,7 +1153,20 @@ class maskModuleWxapp extends WeModuleWxapp {
             $resarr['status']=1;
             $resarr['msg']='send success!';
             $resarr['code']=$code;
-            return $this->result(0,'success',$resarr);
+            //保存验证码
+            if ($code){
+                $phone=$_GPC['tel'];
+                $issave=pdo_get('mask_smscode',array('phone'=>$phone,'uniacid'=>$_W['uniacid']));
+                if ($issave){
+                    pdo_update('mask_smscode',array('code'=>$code),array('phone'=>$phone));
+                }else{
+                    pdo_insert('mask_smscode',array('code'=>$code,'phone'=>$phone,'uniacid'=>$_W['uniacid']));
+                }
+                echo $this->resultToJson(1,'发送短信成功','');
+            }else{
+                echo $this->resultToJson(0,'发送短信失败','');
+            }
+
         }
     }
     //获取搜索标签
@@ -606,239 +1197,7 @@ class maskModuleWxapp extends WeModuleWxapp {
 
         echo json_encode($alldata);
     }
-    //收藏
-    public function doPageDolike() {
-        global $_W, $_GPC;
-        $getid=$_GPC['id'];
-        $uid=$_GPC['uid'];
-        $data=array();
-        if (!empty($getid)&&!empty($uid)){
-            $res = pdo_get('mask_mylike', array('gid' => $getid,'uid'=>$uid));
-            if($res){
-                //存在就删除
-                $deleres=pdo_delete('mask_mylike', array('gid' => $getid,'uid'=>$uid));
-                if ($deleres){
-                    $data['msg']="取消收藏成功";
-                    $data['code']=1;
-                }else{
-                    $data['msg']="取消收藏失败";
-                    $data['code']=0;
-                }
-            }else{
-                //不存在就插入
-                $res=pdo_insert('mask_mylike',array('gid'=>$getid,'uid'=>$uid,'uniacid' => $_W['uniacid']));
-                if ($res){
-                    $data['msg']="收藏成功";
-                    $data['code']=1;
-                }else{
-                    $data['msg']="收藏失败";
-                    $data['code']=0;
-                }
-            }
-        }else{
-            $data['msg']="收藏操作失败，缺uid或者gid";
-            $data['code']=0;
-        }
 
-        echo json_encode($data);
-    }
-    public function doPageGetlike() {
-        global $_W, $_GPC;
-        $list = pdo_getall('mask_mylike', array('uid' => $_GPC['uid']));
-        $allgood=array();
-        $echogood=array();
-        foreach ($list as $k=>$v){
-            $getgood=pdo_get('mask_goodmy', array('gID' => $v['gid']));
-            array_push($allgood,$getgood);
-        }
-        foreach ($allgood as $k=>$v){
-            $allgood[$k]['Discount']=0;
-            $alldata[$k]['Cover']=$v['Itemcover'];
-            $alldata[$k]['DealCount']=$v['Itemcover'];
-            $alldata[$k]['DisplayStatu']='新款';
-            if(empty($v['Videos'])){
-                $allgood[$k]['HasVideo']=false;
-            }else{
-                $allgood[$k]['HasVideo']=true;
-            }
-            $allgood[$k]['IsSaleOut']=false;
-            $allgood[$k]['ID']=$v['gID'];
-            $allgood[$k]['IsShowStatuIcon']=false;
-            $allgood[$k]['ChengTuanCount']=1;
-            $allgood[$k]['OriPrice']=$v['Price'];
-            $allgood[$k]['Statu']=$v['Statu']==1?'已上架':'已下架';
-            $allgood[$k]['tips']="已拼".$v['DealCount']."件,我也要拼！";
-
-        }
-        $echogood['Data']=$allgood;
-        echo json_encode($echogood);
-
-    }
-    //添加和更新购物车
-    public function doPageAddMycar(){
-        global $_W, $_GPC;
-        $data=htmlspecialchars_decode($_GPC['Products']);
-        $arr=json_decode($data,true);
-        $gid=$_GPC['itemId'];
-        $uid=$_GPC['uid'];
-        $zid=pdo_get("mask_goodmy",array('gID'=>$gid),array('zid'));
-        $getfid=pdo_get("mask_lanmu",array('QsID'=>$zid['zid']),array('fid'));
-        $data=array();
-        $resarr=array();
-        $state=$_GPC['state'];
-        foreach ($arr as $k=>$v){
-            $data['cUid']=$uid;
-            $data['Itemid']=$gid;
-            $data['Color']=$v['color'];
-            $data['Size']=$v['size'];
-            $data['Qty']=$v['qty'];
-            $data['fid']=$getfid['fid'];
-            $data['uniacid']=$_W['uniacid'];
-            //先查询是否存在该商品相同规格和颜色了，如果存在就更新
-            $issave=pdo_get("mask_cart",array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
-            if($issave){
-                if($state){
-                    if($v['qty']==0){
-                        pdo_delete('mask_cart',array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
-                    }else{
-                        $res=pdo_update('mask_cart',array('Qty'=>$v['qty']),array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
-
-                    }
-
-                }else{
-                    //添加购物车时如果已经存在就更新
-                    $res=pdo_update('mask_cart',array('Qty'=>($v['qty']+$issave['Qty'])),array('cUid'=>$uid,"Itemid"=>$gid,"Color"=>$v['color'],"Size"=>$v['size']));
-                }
-            }else{
-                if(!empty($v['qty'])){
-                    $res=pdo_insert('mask_cart',$data);
-                }
-
-            }
-        }
-
-        if ($res){
-            $resarr['code']=1;
-            $resarr['re']=$res;
-            $resarr['msg']='加入购物车成功';
-        }else{
-            $resarr['re']=$res;
-
-            $resarr['code']=0;
-            $resarr['msg']='加入购物车失败';
-        }
-        echo json_encode($resarr);
-    }
-    //返回购物车的数据
-    public function doPageGetcart(){
-        global $_W, $_GPC;
-        $uid=$_GPC['uid'];
-        $goodids=array();
-        $data=array();
-        $gids=pdo_getall('mask_cart', array('cUid' => $uid), array('Itemid'));
-        foreach ($gids as $k=>$v){
-            array_push($goodids,$v['Itemid']);
-        }
-        //剔除重复gid
-        $dealid=array_unique($goodids);
-        $goodids=$dealid;
-        $data['Data']['TotalAmount ']=$this->dototal($goodids,$uid);
-        $data['Data']['TotalCount ']=$this->getTotalCount($uid);
-        //查询所有商品的发货地点
-        $fids=pdo_getall('mask_cart', array('cUid' => $uid), array('fid'));
-        $fidarr=array();
-        foreach ($fids as $k=>$v){
-            array_push($fidarr,$v['fid']);
-        }
-        //剔除重复fid
-        $dealfid=array_unique($fidarr);
-        $fidarr=array_merge($dealfid);
-        $items=array();//有效商品集合
-        foreach ($fidarr as $k=>$v){
-            $itemidarr=array();//剔除重复id
-            $Itemid=pdo_getall('mask_cart', array('fid' => $v,'cUid'=>$uid), array('Itemid'));
-            foreach ($Itemid as $k1=>$v1){
-                array_push($itemidarr,$v1['Itemid']);
-            }
-            $dealitemid=array_unique($itemidarr);
-            $Itemid=array_merge($dealitemid);
-            $getname=pdo_get('mask_warehome', array('fid' => $v), array('Name'));
-            foreach ($Itemid as $kk=>$vv){
-                $getgood=pdo_get('mask_goodmy', array('gID' => $vv));
-                $items[$k]['TimeList'][0]["Items"][$kk]['AgentItemID']=$vv;
-                $items[$k]['TimeList'][0]["Items"][$kk]['Cover']=$getgood['Itemcover'];
-                $items[$k]['TimeList'][0]["Items"][$kk]['Name']=$getgood['Title'];
-                $items[$k]['TimeList'][0]["Items"][$kk]['Price']=number_format($getgood['Price'],2);
-                $items[$k]['TimeList'][0]["Items"][$kk]['TotalQty']=$this->getoneTotalCount($uid,$vv);
-                $getgoodinfo=pdo_getall('mask_cart', array('Itemid' => $vv,'cUid'=>$uid));
-                foreach ($getgoodinfo as $kkk=>$vvv){
-                    $items[$k]['TimeList'][0]["Items"][$kk]['Products'][$kkk]["Color"]=$vvv['Color'];
-                    $items[$k]['TimeList'][0]["Items"][$kk]['Products'][$kkk]["Size"]=$vvv['Size'];
-                    $items[$k]['TimeList'][0]["Items"][$kk]['Products'][$kkk]["Qty"]=$vvv['Qty'];
-                }
-
-            }
-
-            $items[$k]['WareHouseName']=$getname['Name'];
-        }
-
-        $data['Data']['Items']=$items;
-        echo json_encode($data);
-
-    }
-    //返回购物车数量
-    public function doPagegetTotalCount(){
-        global $_W, $_GPC;
-        $getuid=$_GPC['uid'];
-        $arr=array();
-        $totolcont=$this->getTotalCount($getuid);
-        $arr['Data']['CartItemQty']=$totolcont?$totolcont:0;
-        echo json_encode($arr);
-    }
-    //返回购物车总价格
-    public function doPagegetTotal(){
-        global $_W, $_GPC;
-        $data=htmlspecialchars_decode($_GPC['itemInfos']);
-        $arr=json_decode($data,true);
-        $gidsarr=array();
-        $arrtotal=array();
-        foreach ($arr as $k=>$v){
-            array_push($gidsarr,$v['AgentItemID']);
-        }
-
-        $getid=json_decode($_GPC['gids'],true);
-        $uid=$_GPC['uid'];
-        if(empty($gidsarr)){
-            $totol=$this->dototal($getid,$uid);
-            $arrtotal['Data']['TotalAmount']=number_format($totol,2);
-            echo json_encode($arrtotal);
-        }else{
-            $totol=$this->dototal($gidsarr,$uid);
-            $arrtotal['Data']['TotalAmount']=number_format($totol,2);
-            echo json_encode($arrtotal);
-        }
-
-    }
-    //删除购物车
-    public function doPageDelshopcat(){
-        global $_W, $_GPC;
-        $getgid=$_GPC['ids'];
-        $gidar=explode(',',$getgid);
-        $uid=$_GPC['uid'];
-        $data=array();
-        foreach ($gidar as $k=>$v){
-            $res=pdo_delete('mask_cart',array('Itemid'=>$v,"cUid"=>$uid));
-        }
-        if($res){
-            $data['Data']['Result']=1;
-            $data['Data']['msg']='删除成功';
-        }else{
-            $data['Data']['Result']=0;
-            $data['Data']['msg']='删除失败';
-        }
-        echo json_encode($data);
-
-    }
     //获取编辑购物车商品信息
     public function doPageGetUpdatecart(){
         global $_W, $_GPC;
@@ -873,130 +1232,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $alldata['Data']['ID']=$good['gID'];
         echo json_encode($alldata);
     }
-    //获取并判断是否有收货地址
-    public function doPageGetDefaultaddress(){
-        global $_W, $_GPC;
-        $uid=$_GPC['uid'];
-        $data=array();
-        //判断是否有地址
-        $ishave=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid']));
-        if ($ishave){
-            //获取默认地址
-            $res=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
-            if ($res){
-                $data['Data']=$res;
-            }else{
-                $data['Data']=$ishave;
-            }
-            $data['Result']=true;
-        }else{
-            $data['Result']=false;
-            $data['Data']=array();
-        }
-        echo json_encode($data);
-    }
-    //添加收货地址
-    public function doPageAddaddress(){
-        global $_W, $_GPC;
-        $uid=$_GPC['uid'];
-        $data=array();
-        $updatas=array();
-        $updatas['realName']=$_GPC['realName'];
-        $updatas['mobile']=$_GPC['mobile'];
-        $updatas['areaId']=$_GPC['areaId'];
-        $updatas['address']=$_GPC['address'];
-        $updatas['uniacid']=$_W['uniacid'];
-        $updatas['uid']=$uid;
-        $isdefault=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
-        if($isdefault){
-            //已经有默认了
-            if($_GPC['isDefault']){//此条地址是否设置默认
-                pdo_update('mask_address',array('isDefault'=>0),array('ID'=>$isdefault['ID']));
-                $updatas['isDefault']=1;
-            }else{
-                $updatas['isDefault']=0;
-            }
-        }else{
-            //还没有默认
-            $updatas['isDefault']=1;
-        }
-        $res=pdo_insert("mask_address",$updatas);
-        if($res){
-            $data['Data']['state']=1;
-            $data['Data']['msg']='添加成功';
-        }else{
-            pdo_update('mask_address',array('isDefault'=>1),array('ID'=>$isdefault['ID']));
-            $data['Data']['state']=0;
-            $data['Data']['msg']='添加失败';
-        }
-        echo json_encode($data);
-    }
-    //修改地址
-    public function doPageUpdAddress(){
-        global $_W, $_GPC;
-        $resdata=array();
-        $id=$_GPC['ID'];
-        $uid=$_GPC['uid'];
-        $data['realName']=$_GPC['realName'];
-        $data['mobile']=$_GPC['mobile'];
-        $data['areaId']=$_GPC['areaId'];
-        $data['address']=$_GPC['address'];
-        $data['isDefault']=$_GPC['isDefault'];
-        $isdefault=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"isDefault"=>1));
-        if($isdefault){
-            //已经有默认了
-            if($_GPC['isDefault']){//此条地址是否设置默认
-                pdo_update('mask_address',array('isDefault'=>0),array('ID'=>$isdefault['ID']));
-                $data['isDefault']=1;
-            }else{
-                $data['isDefault']=0;
-            }
-        }else{
-            //还没有默认
-            $data['isDefault']=1;
-        }
-        $res=pdo_update('mask_address',$data,array('ID'=>$id));
-        if($res){
-            $resdata['Data']['state']=1;
-            $resdata['Data']['msg']='修改成功';
-        }else{
-            pdo_update('mask_address',array('isDefault'=>1),array('ID'=>$isdefault['ID']));
-            $resdata['Data']['state']=0;
-            $resdata['Data']['msg']='修改失败';
-        }
-        echo json_encode($resdata);
-    }
-    //删除地址
-    public function doPageDelAdd(){
-        global $_W, $_GPC;
-        $resdata=array();
-        $id=$_GPC['ID'];
-        $res=pdo_delete('mask_address',array('ID'=>$id));
-        if($res){
-            $resdata['Data']['state']=1;
-            $resdata['Data']['msg']='删除成功';
-        }else{
-            $resdata['Data']['state']=0;
-            $resdata['Data']['msg']='删除失败';
-        }
-        echo json_encode($resdata);
-    }
-    //获取单一地址
-    public function doPagegetoneAdd(){
-        global $_W, $_GPC;
-        $ID=$_GPC['ID'];
-        $res=pdo_get('mask_address',array('ID'=>$ID));
-        $data['Data']=$res;
-        echo json_encode($data);
-    }
-    //我的地址
-    public function doPageMyAddress(){
-        global $_W, $_GPC;
-        $uid=$_GPC['uid'];
-        $res=pdo_getall('mask_address',array('uid'=>$uid), array() , '' , 'isDefault DESC');
-        $data['Data']=$res;
-        echo json_encode($data);
-    }
+
     //结算商品清单
     public function doPageCartlist(){
         global $_W, $_GPC;
@@ -1016,19 +1252,19 @@ class maskModuleWxapp extends WeModuleWxapp {
         $Orders=array();//购物车商品集
         $fidarr=array_unique($fidarr);
         $fidarr=array_merge($fidarr);
-      
+
         foreach ($fidarr as $k=>$v){
             $getname=pdo_get('mask_warehome', array('fid' => $v), array('Name'));
-          	$i=0;
+            $i=0;
             foreach ($gidsarr as $kk=>$vv){
                 $getgood=pdo_get('mask_goodmy', array('gID' => $vv));
-               //查找商品下的发货地
+                //查找商品下的发货地
                 $fid=pdo_get('mask_lanmu',array('QsID'=>$getgood['zid']),array('fid'));
-               if ($fid['fid']!=$v){
-                 array_merge($gidsarr);
-                  $i=0;
+                if ($fid['fid']!=$v){
+                    array_merge($gidsarr);
+                    $i=0;
                     continue;
-                
+
                 }else{
                     $Orders[$k]['Items'][$i]['AgentItemID']=$vv;
                     $Orders[$k]['Items'][$i]['fid']=$v;
@@ -1042,7 +1278,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                         $Orders[$k]['Items'][$i]['Products'][$kkk]["Size"]=$vvv['Size'];
                         $Orders[$k]['Items'][$i]['Products'][$kkk]["Qty"]=$vvv['Qty'];
                     }
-                 	$i++;
+                    $i++;
                 }
             }
             //发货地下的所有商品数量
@@ -1065,300 +1301,12 @@ class maskModuleWxapp extends WeModuleWxapp {
         $resarr['Data']['TotalPayableAmount']=number_format($allgoodtotal+array_sum($PostFee),2);
         //总运费
         $resarr['Data']['TotalOriPostFeeAmount']=number_format(array_sum($PostFee),2);
-       // $resarr=array();
+        // $resarr=array();
         //$resarr['Data']=$Orders;
         echo json_encode($resarr);
 
     }
-    //提交订单
-    public function doPageAddMyOrder(){
-        global $_W, $_GPC;
-        $uid=$_GPC['uid'];
-        $addid=$_GPC['aid'];//地址id
-        $goodinfo=json_decode(htmlspecialchars_decode($_GPC['arr']),true);//商品信息数组
-        //查询用户地址信息
-        $addinfo=pdo_get('mask_address',array('ID'=>$addid));
-        $data['user_id']=$uid;//用户id
-        $data['name']=$addinfo['realName'];//姓名
-        $data['address']=$addinfo['areaId'].' '.$addinfo['address'];//地址
-        $data['money']=$_GPC['money'];//付款金额
-        $data['postfee']=$_GPC['postfee'];//运费
-        $data['tel']=$addinfo['mobile'];//手机号
-        $data['uniacid']=$_W['uniacid'];//小程序id
-        $data['order_num']=date('YmdHis',time()).rand(1111,9999);//订单号
-        $data['time']=date("Y-m-d H:i:s",time());//下单时间
-       //"共2款,3件,合计¥ 667.21"
-        $typenum=count($goodinfo);//款数
-        $misc=array();//件数
-        foreach ($goodinfo as $k=>$v){
-            array_push($misc,$v['num']);
-        }
-        $data['Summary']='共'.$typenum.'款,'.array_sum($misc).'件,合计￥'.$_GPC['money'];//购买数量情况
-        $res=pdo_insert('mask_order',$data);
-        $order_id=pdo_insertid();
-        $chidid=array();
-            if($res){
-                foreach ($goodinfo as $k=>$v){
-                    $onegood=pdo_get('mask_goodmy',array('gID'=>$v['id']));
-                    $data2['name']=$onegood['Title'];//商品名称
-                    $data2['number']=$v['num'];//商品数量
-                    $data2['money']=$v['price'];//商品单价
-                    $data2['img']=$onegood['Itemcover'];//商品图片
-                    $data2['spec']=$v['msg'];//商品规格
-                    $data2['dishes_id']=$v['id'];//商品id
-                    $data2['fid']=$v['fid'];//商品id
-                    $data2['uniacid']=$_W['uniacid'];//小程序id
-                    $data2['order_id']=$order_id;
-                    $data2['Code']=date('Ymd',time()).'-'.$this->randNum(8);
-                    $res2=pdo_insert('mask_order_goods',$data2);
-                   array_push($chidid,pdo_insertid());
-                }
-                if($res2){
-                  //清除购物车
-                    foreach ($goodinfo as $k=>$v){
-                        pdo_delete('mask_cart',array('Itemid'=>$v['id'],"cUid"=>$uid));
-                    }
-                   $resdata['Data']['OrderIds']=implode(',',$chidid);
-                   $resdata['Data']['orderid']=$order_id;
-                    $resdata['code']=1;
-                    $resdata['msg']='提交订单成功';
-                    echo json_encode($resdata);
-                }else{
-                    $resdata['code']=0;
-                    $resdata['msg']='提交订单失败';
-                    echo json_encode($resdata);
-                }
 
-            }else{
-                $resdata['code']=0;
-                $resdata['msg']='提交订单失败';
-                echo json_encode($resdata);
-            }
-
-    }
-      //获取订单列表
-       public function doPageGetOrder(){
-        global $_W, $_GPC;
-        $uid=$_GPC['uid'];
-        $statuid=$_GPC['StatuID'];//订单状态
-        $data=array();
-        if ($statuid==1){
-            $data['Data']['Notice']="未支付的订单将在专场结束后自动取消，请尽快付款！";
-        }else if ($statuid==5){
-            $data['Data']['Notice']="";
-        }else{
-            $data['Data']['Notice']='';
-        }
-       
-        if ($statuid==0){
-            $getorder=pdo_getall('mask_order',array('user_id'=>$uid), array(), '', 'id DESC');
-        }else{
-            $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state'=>$statuid), array(), '', 'id DESC');
-        }
-         
-         
-          if (empty($getorder)){
-            $data['Data']['OrderList']=array();
-        }
-        foreach ($getorder as $k=>$v){
-           if ($v['state']==3){
-                $Buttons=array(
-                    '0'=>array('isPoint'=>true,'isEnable'=>false,'title'=>'支付','action'=>'买家支付'),
-                    '1'=>array('isPoint'=>false,'isEnable'=>true,'title'=>'确认收货','action'=>'买家确认收货'),
-                );
-            }else{
-                $Buttons=array(
-                    '0'=>array('isPoint'=>true,'isEnable'=>$v['state']==1?true:false,'title'=>'支付','action'=>'买家支付'),
-                    '1'=>array('isPoint'=>false,'isEnable'=>$v['state']==1?true:false,'title'=>'取消订单','action'=>'买家取消'),
-                );
-            }
-            $data['Data']['OrderList'][$k]['Buttons']=$Buttons;
-            $data['Data']['OrderList'][$k]['Code']=$v['order_num'];
-            $data['Data']['OrderList'][$k]['ID']=$v['id'];
-            $getchid=pdo_getall('mask_order_goods',array('order_id'=>$v['id']), array('id'));
-            $getimg=pdo_getall('mask_order_goods',array('order_id'=>$v['id']), array(), '', 'id DESC', array(1,3));
-            $cid=array();
-            $img=array();
-            foreach ($getchid as $kk=>$vv){
-                array_push($cid,$vv['id']);
-            }
-            foreach ($getimg as $kk=>$vv){
-                array_push($img,$vv['img']);
-            }
-            $data['Data']['OrderList'][$k]['OrderIDS']=implode(',',$cid);//子订单
-            $data['Data']['OrderList'][$k]['Images']=$img;
-            $data['Data']['OrderList'][$k]['PayableAmount']=$v['money'];
-            switch ($v['state']){
-                case 1:
-                    $data['Data']['OrderList'][$k]['Statu']='待支付';
-                    break;
-                case 2:
-                    $data['Data']['OrderList'][$k]['Statu']='待发货';
-                    break;
-                case 3:
-                    $data['Data']['OrderList'][$k]['Statu']='待收货';
-                    break;
-                case 4:
-                    $data['Data']['OrderList'][$k]['Statu']='已完成';
-                    break;
-                case 5:
-                    $data['Data']['OrderList'][$k]['Statu']='已取消';
-                    break;
-                default:
-                    $data['Data']['OrderList'][$k]['Statu']='全部';
-            }
-            $data['Data']['OrderList'][$k]['Summary']=$v['Summary'];
-            if (count($img)==1){
-                $data['Data']['OrderList'][$k]['Title']=$getimg[0]['name'];
-            }
-        }
-        echo json_encode($data);
-    }
-    //订单详细
-    public function doPageGetDetailOrder(){
-        global $_W, $_GPC;
-        $uid=$_GPC['uid'];
-        $oid=$_GPC['orderid'];
-        $getorder=pdo_get('mask_order',array('id'=>$oid));
-        $Summary=$getorder['Summary'];
-        $numandfont=explode(",合计",$Summary);
-        $data=array();
-        $data['Data']['Buttonbool']=true;
-        if ($getorder['state']==3){
-            $Buttons=array(
-                '0'=>array('isPoint'=>true,'isEnable'=>false,'title'=>'支付','action'=>'买家支付'),
-                '1'=>array('isPoint'=>false,'isEnable'=>true,'title'=>'确认收货','action'=>'买家确认收货'),
-            );
-        }else{
-            $Buttons=array(
-                '0'=>array('isPoint'=>true,'isEnable'=>$getorder['state']==1?true:false,'title'=>'支付','action'=>'买家支付'),
-                '1'=>array('isPoint'=>false,'isEnable'=>$getorder['state']==1?true:false,'title'=>'取消订单','action'=>'买家取消'),
-            );
-        }
-        $data['Data']['Buttons']=$Buttons;
-        $data['Data']['BottomInfo']['ButtomLine1']=$numandfont[0];
-        $data['Data']['BottomInfo']['ButtomLine2']=$numandfont[1];
-        $data['Data']['ConsigneeInfo']['Address']=$getorder['address'];
-        $data['Data']['ConsigneeInfo']['Mobile']=$getorder['tel'];
-        $data['Data']['ConsigneeInfo']['Recipient']=$getorder['name'];
-        $data['Data']['CreateTime']=$getorder['time'];
-        $data['Data']['DiscountAmount']='0.00';
-        $data['Data']['ID']=$getorder['id'];
-        $data['Data']['Code']=$getorder['order_num'];
-        $getchid=pdo_getall('mask_order_goods',array('order_id'=>$getorder['id']), array('id'));
-        $cid=array();
-        foreach ($getchid as $kk=>$vv){
-            array_push($cid,$vv['id']);
-        }
-        $data['Data']['OrderIDS']=implode(',',$cid);//子订单id
-       if(empty($getorder['postfeenum'])){
-            $data['Data']['PackageList']=array();
-        }else{
-            $data['Data']['PackageList']['Code']=$getorder['postfeenum'];
-            $data['Data']['PackageList']['Name']=$getorder['postfeename'];
-            $data['Data']['PackageList']['ShipTime']=$getorder['jd_time'];
-        }
-        $data['Data']['PostFee']=$getorder['postfee'];//运费
-        $data['Data']['ProductAmount']=floatval(str_replace(',','',$getorder['money']))-floatval($getorder['postfee']);//商品金额=实付金额-运费
-        $data['Data']['PayableAmount']=$getorder['money'];//实付金额
-        switch ($getorder['state']){
-            case 1:
-                $data['Data']['Statu']='待支付';
-                break;
-            case 2:
-                $data['Data']['Statu']='待发货';
-                break;
-            case 3:
-                $data['Data']['Statu']='待收货';
-                break;
-            case 4:
-                $data['Data']['Statu']='已完成';
-                break;
-            case 5:
-                $data['Data']['Statu']='已取消';
-                break;
-            default:
-                $data['Data']['Statu']='未知';
-        }
-        //各发货地下的商品
-        $allfid=pdo_getall('mask_order_goods',array('order_id'=>$oid),array('fid'));
-        $allgoodinfo=pdo_getall('mask_order_goods',array('order_id'=>$oid));
-         $fids=array();//发货地id
-         foreach ($allfid as $k=>$v){
-             array_push($fids,$v['fid']);
-         }
-         $fids=array_unique($fids);
-         $fids=array_merge($fids);
-        foreach ($fids as $k=>$v){
-            $getname=pdo_get('mask_warehome', array('fid' => $v), array('Name'));
-            $i=0;
-            foreach ($allgoodinfo as $kk=>$vv){
-                if ($vv['fid']!=$v){
-                    $i=0;
-                    continue;
-                }else{
-                   if($vv['Summary']==2||$vv['Summary']==3||$vv['Summary']==4){
-                        $Buttons=array(
-                            '0'=>array('isPoint'=>false,'isEnable'=>false,'title'=>'取消','action'=>'买家取消'),
-                            '1'=>array('isPoint'=>false,'isEnable'=>false,'title'=>'我要补货','action'=>'补货'),
-                        );
-                    }else{
-                        $Buttons=array(
-                            '0'=>array('isPoint'=>false,'isEnable'=>$vv['Summary']==5?false:true,'title'=>'取消','action'=>'买家取消'),
-                            '1'=>array('isPoint'=>false,'isEnable'=>$vv['Summary']==5?true:false,'title'=>'我要补货','action'=>'补货'),
-                        ); 
-                    }
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Buttons']=$Buttons;
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Code']=$vv['Code'];
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Cover']=$vv['img'];
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['ItemID']=$vv['dishes_id'];
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['OrderID']=$vv['id'];
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Title']=$vv['name'];
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Price']=$vv['money'];
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['TotalQty']=$vv['number'];
-                    $data['Data']['SenderList'][$k]['ChildOrders'][$i]['desc']=explode(',',$vv['spec']);
-                    switch ($vv['Summary']){
-                        case 1:
-                            $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Summary']='待支付';
-                            break;
-                        case 2:
-                            $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Summary']='待发货';
-                            break;
-                        case 3:
-                            $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Summary']='待收货';
-                            break;
-                        case 4:
-                            $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Summary']='已完成';
-                            break;
-                        case 5:
-                            $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Summary']='已取消';
-                            break;
-                        default:
-                            $data['Data']['SenderList'][$k]['ChildOrders'][$i]['Summary']='未知';
-                    }
-                    $i++;
-                }
-            }
-            $data['Data']['SenderList'][$k]['Name']=$getname['Name'];
-        }
-        echo json_encode($data);
-    }
-    //取消订单
-    public function doPageCancelMyOrder(){
-        global $_W, $_GPC;
-        $res=pdo_update('mask_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['id']));
-        if ($res){
-          //取消所有子订单
-            $allchild=pdo_getall('mask_order_goods',array('order_id'=>$_GPC['id']));
-            foreach ($allchild as $k=>$v){
-                pdo_update('mask_order_goods',array('Summary'=>5),array('id'=>$v['id']));
-            }
-            $data['Result']=true;
-        }else{
-            $data['Result']=false;
-        }
-        echo  json_encode($data);
-    }
     //取消子订单
     public function doPageCancelChildOrder(){
         global $_W, $_GPC;
@@ -1379,7 +1327,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $newsummary='共'.($ks-1).'款,'.($jshu-$chidorder['number']).'件,合计￥'.$newalltotal;
 
             $re=pdo_update('mask_order',array('money'=>$newalltotal,'Summary'=>$newsummary,'postfee'=>($order['postfee']-$postfee['emsprice']*$chidorder['number'])),array('id'=>$chidorder['order_id']));
-			if($re){
+            if($re){
                 $newmoney=pdo_get('mask_order',array('id'=>$chidorder['order_id']),array('money'));
                 if ($newmoney['money']<=0){
                     pdo_update('mask_order',array('state'=>5),array('id'=>$chidorder['order_id']));
@@ -1391,7 +1339,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         echo  json_encode($data);
     }
-  //确认收货
+    //确认收货
     public function doPageOkMyOrder(){
         global $_W, $_GPC;
         $res=pdo_update('mask_order',array('state'=>4,'complete_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['id']));
@@ -1405,7 +1353,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         echo json_encode($data);
     }
-  //字符串中去数字
+    //字符串中去数字
     function findNum($str=''){
         $str=trim($str);
         if(empty($str)){return '';}
@@ -1479,7 +1427,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         return $c;
 
     }
-   //随机生成用户名
+    //随机生成用户名
     function randName($length)
     {
         $pattern = '1234567890abcdefghijklmnopqrstuvwxyz   
@@ -1506,38 +1454,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         return $key;
     }
-      //微信支付
-    public function doPagedoPay(){
-        global $_W, $_GPC;
-        include IA_ROOT.'/addons/mask/wxpay.php';
-        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
-        $res2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
-        if($res2['url_name']){
-            $res2['url_name']=$res2['url_name'];
-        }else{
-            $res2['url_name']='天天拼团';
-        }
-        //支付需要传入的参数 openid 订单id 支付金额
-        $appid=$res2['appid'];
-        $openid=$_GPC['openid'];//oQKgL0ZKHwzAY-KhiyEEAsakW5Zg
-        $mch_id=$res['mchid'];
-        $key=$res['wxkey'];
-        $out_trade_no = $mch_id. time();
-        $root=$_W['siteroot'];
-        pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$_GPC['orderid']));
-        $total_fee =$_GPC['money'];
-        if(empty($total_fee)) //默认1分
-        {
-            $body =$res2['url_name'];
-            $total_fee = floatval(1*100);
-        }else{
-            $body = $res2['url_name'];
-            $total_fee = floatval($total_fee*100);
-        }
-        $weixinpay = new WeixinPay($appid,$openid,$mch_id,$key,$out_trade_no,$body,$total_fee,$root);
-        $return=$weixinpay->pay();
-        echo json_encode($return);
-    }
+
     ////////////////////////////////////////////////////////
 
     //通过用户id请求用户信息
@@ -3206,60 +3123,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['status'] = $res['status'];
         echo json_encode($data);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public function doPageQtPrint(){ //前台打印
@@ -6707,24 +6570,6 @@ class maskModuleWxapp extends WeModuleWxapp {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /////////////////////////////////////////////////////////////////////
 //以下拼团
 //拼团分类
@@ -6942,67 +6787,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         $sql=" select a.id,b.name,b.img from".tablename('mask_grouporder')." a left join ".tablename('mask_user')."b on a.user_id=b.id where a.group_id=:group_id and a.state=2";
         $group=pdo_fetchall($sql,array(':group_id'=>$_GPC['group_id']));
         echo json_encode($group);
-    }
-
-//分销二维码
-    public function doPageGoodsCode(){
-        global $_W, $_GPC;
-        function  getCoade($goods_id,$group_id){
-            function getaccess_token(){
-                global $_W, $_GPC;
-                $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
-                $appid=$res['appid'];
-                $secret=$res['appsecret'];
-                // print_r($res);die;
-                $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL,$url);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
-                $data = curl_exec($ch);
-                curl_close($ch);
-                $data = json_decode($data,true);
-                return $data['access_token'];
-            }
-            function set_msg($goods_id,$group_id){
-                $access_token = getaccess_token();
-                $data2=array(
-                    "scene"=>$goods_id.",".$group_id,
-                    "page"=>"mask/pages/collage/index",
-                    "width"=>400
-                );
-                $data2 = json_encode($data2);
-                $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=".$access_token."";
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL,$url);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
-                curl_setopt($ch, CURLOPT_POST,1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS,$data2);
-                $data = curl_exec($ch);
-                curl_close($ch);
-                return $data;
-            }
-            $img=set_msg($goods_id,$group_id);
-            $img=base64_encode($img);
-            return $img;
-        }
-        $base64_image_content="data:image/jpeg;base64,".getCoade($_GPC['goods_id'],$_GPC['group_id']='');
-        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)){
-            $type = $result[2];
-            $new_file = IA_ROOT ."/addons/mask/img/";
-            if(!file_exists($new_file))
-            {
-                //检查是否有该文件夹，如果没有就创建，并给予最高权限
-                mkdir($new_file, 0777);
-            }
-            $wname="{$_GPC['goods_id']}".".{$type}";
-            //$wname="1511.jpeg";
-            $new_file = $new_file.$wname;
-            file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)));
-        }
-        echo "/addons/mask/img/".$wname;
-
     }
 
 //团详情

@@ -19,21 +19,39 @@ class Core extends WeModuleSite
                     0 => $this->createMainMenu('门店列表', $do, 'store',''),
 
                 )
-            );}elseif($_W['isfounder'] || $_W['role'] == 'manager' || $_W['role'] == 'operator') {
-           $navemenu[0] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=store&m=mask" class="panel-title wytitle" id="yframe-0"><icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  栏目管理</a>',
-                'items' => array(
-                    // 0 => $this->createMainMenu('数据概况 ', $do, 'gaikuangdata', ''),
-                    1 => $this->createMainMenu('栏目列表', $do, 'store', ''),
-					2 => $this->createMainMenu('发货地点', $do, 'warehome', ''),
-                    3 => $this->createMainMenu('搜索标签', $do, 'seachtag', ''),
-                    // 3 => $this->createMainMenu('小程序端账号', $do, 'admin', ''),
-
-//                    4 => $this->createMainMenu('入驻期限', $do, 'rzqx',''),
-//                    5=> $this->createMainMenu('入驻设置 ', $do, 'rzset',''),
-//                    6 => $this->createMainMenu('入驻审核', $do, 'rzcheck',''),
-                )
             );
+        }elseif($_W['isfounder'] || $_W['role'] == 'manager' || $_W['role'] == 'operator') {
+            $navarr=array(
+                //0 => $this->createMainMenu('基本信息 ', $do, 'settings', ''),
+                1 => $this->createMainMenu('小程序配置', $do, 'peiz', ''),
+                2 => $this->createMainMenu('支付配置', $do, 'pay', ''),
+                //  3 => $this->createMainMenu('达达配置 ', $do, 'dasettings', ''),
+                //  4 => $this->createMainMenu('快服务', $do, 'kfw', ''),
+                5 => $this->createMainMenu('模板消息', $do, 'template', ''),
+                //6 => $this->createMainMenu('帮助中心', $do, 'help', ''),
+                // 6 => $this->createMainMenu('系统更新', $do, 'heli', ''),
+                7 => $this->createMainMenu('短信设置', $do, 'sms', ''),
+                //8 => $this->createMainMenu('配送设置', $do, 'dispatch', ''),
+            );
+            $navemenu[14] = array(
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=peiz&m=mask" class="panel-title wytitle" id="yframe-14"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>系统设置</a>',
+                'items' =>$navarr,
+            );
+//           $navemenu[0] = array(
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=store&m=mask" class="panel-title wytitle" id="yframe-0">
+//                            <icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  栏目管理</a>',
+//                'items' => array(
+//                    // 0 => $this->createMainMenu('数据概况 ', $do, 'gaikuangdata', ''),
+//                    1 => $this->createMainMenu('栏目列表', $do, 'store', ''),
+//					2 => $this->createMainMenu('发货地点', $do, 'warehome', ''),
+//                    3 => $this->createMainMenu('搜索标签', $do, 'seachtag', ''),
+//                    // 3 => $this->createMainMenu('小程序端账号', $do, 'admin', ''),
+//
+////                    4 => $this->createMainMenu('入驻期限', $do, 'rzqx',''),
+////                    5=> $this->createMainMenu('入驻设置 ', $do, 'rzset',''),
+////                    6 => $this->createMainMenu('入驻审核', $do, 'rzcheck',''),
+//                )
+//            );
 
             $navemenu[1] = array(
                'title' => '<a href="index.php?c=site&a=entry&op=display&do=order&m=mask" class="panel-title wytitle" id="yframe-1"><icon style="color:#8d8d8d;" class="fa fa-bars"></icon>  订单管理</a>',
@@ -44,14 +62,13 @@ class Core extends WeModuleSite
            );
 
 
-            $navemenu[2] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=ad&m=mask" class="panel-title wytitle" id="yframe-2"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>轮播图</a>',
-                'items' => array(
-                    0 => $this->createMainMenu('轮播图列表 ', $do, 'ad', ''),
-                    1 => $this->createMainMenu('轮播图添加', $do, 'addad', ''),
-//                  2 => $this->createMainMenu('流量主管理', $do, 'llz', '')
-                )
-            );
+//            $navemenu[2] = array(
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=ad&m=mask" class="panel-title wytitle" id="yframe-2"><icon style="color:#8d8d8d;" class="fa fa-life-ring"></icon>轮播图</a>',
+//                'items' => array(
+//                    0 => $this->createMainMenu('轮播图列表 ', $do, 'ad', ''),
+//                    1 => $this->createMainMenu('轮播图添加', $do, 'addad', ''),
+//                )
+//            );
             //             $navemenu[3] = array(
 //                'title' => '<a href="index.php?c=site&a=entry&op=display&do=nav&m=mask" class="panel-title wytitle" id="yframe-3"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-compass"></icon>  导航管理</a>',
 //                'items' => array(
@@ -59,13 +76,15 @@ class Core extends WeModuleSite
 //                     1 => $this->createMainMenu('分类导航管理 ', $do, 'typead', ''),
 //                )
 //            );
-            $navemenu[3] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=area&m=mask" class="panel-title wytitle" id="yframe-3"><icon style="color:#8d8d8d;" class="fa fa-map-marker"></icon>  栏目区域</a>',
-                'items' => array(
-                    0 => $this->createMainMenu('区域列表', $do, 'area', ''),
-                    1 => $this->createMainMenu('区域添加', $do, 'addarea', ''),
-                )
-            );
+
+//            $navemenu[3] = array(
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=area&m=mask" class="panel-title wytitle" id="yframe-3">
+//<icon style="color:#8d8d8d;" class="fa fa-map-marker"></icon>  栏目区域</a>',
+//                'items' => array(
+//                    0 => $this->createMainMenu('区域列表', $do, 'area', ''),
+//                    1 => $this->createMainMenu('区域添加', $do, 'addarea', ''),
+//                )
+//            );
 //            $navemenu[4] = array(
 //                'title' => '<a href="index.php?c=site&a=entry&op=display&do=typeset&m=mask" class="panel-title wytitle" id="yframe-4"><icon style="color:#8d8d8d;" class="fa fa-university"></icon>  门店类型</a>',
 //                'items' => array(
@@ -88,13 +107,15 @@ class Core extends WeModuleSite
             //         0 => $this->createMainMenu('推荐管理 ', $do, 'cptj', ''),
             //     )
             // );
-            // $navemenu[5] = array(
-            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=ruzhu&m=mask" class="panel-title wytitle" id="yframe-5"><icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  入驻管理</a>',
-            //     'items' => array(
-            //         0 => $this->createMainMenu('申请列表 ', $do, 'ruzhu', ''),
-            //         1 => $this->createMainMenu('入驻设置 ', $do, 'ruzhusz', ''),
-            //     )
-            // );
+             $navemenu[5] = array(
+                 'title' => '<a href="index.php?c=site&a=entry&op=display&do=ruzhu&m=mask" class="panel-title wytitle" id="yframe-5">
+<icon style="color:#8d8d8d;" class="fa fa-cubes"></icon>  分销管理</a>',
+                 'items' => array(
+                     0 => $this->createMainMenu('记录列表 ', $do, 'dealrecord', ''),
+                     1 => $this->createMainMenu('区域商审核 ', $do, 'ruzhu', ''),
+                     2 => $this->createMainMenu('提现管理 ', $do, 'txlist', ''),
+                 )
+             );
 
 
 
@@ -202,34 +223,22 @@ class Core extends WeModuleSite
             //         // 2 => $this->createMainMenu('商家分析', $do, 'selleranaly', '')
             //     )
             // );
+//
             $navemenu[7] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=allgood&m=mask" class="panel-title wytitle" id="yframe-7"><icon style="color:#8d8d8d;" class="fa fa-money"></icon>商品管理</a>',
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=allgood&m=mask" class="panel-title wytitle" id="yframe-7">
+<icon style="color:#8d8d8d;" class="fa fa-money"></icon>商品管理</a>',
                 'items' => array(
                     //0 => $this->createMainMenu('栏目列表', $do, 'allgood', ''),
                 )
             );
-             $navarr=array(
-                //0 => $this->createMainMenu('基本信息 ', $do, 'settings', ''),
-                1 => $this->createMainMenu('小程序配置', $do, 'peiz', ''),
-                2 => $this->createMainMenu('支付配置', $do, 'pay', ''),
-                //  3 => $this->createMainMenu('达达配置 ', $do, 'dasettings', ''),
-                //  4 => $this->createMainMenu('快服务', $do, 'kfw', ''),
-               5 => $this->createMainMenu('模板消息', $do, 'template', ''),
-                //6 => $this->createMainMenu('帮助中心', $do, 'help', ''),
-                // 6 => $this->createMainMenu('系统更新', $do, 'heli', ''),
-                7 => $this->createMainMenu('短信设置', $do, 'sms', ''),
-                //8 => $this->createMainMenu('配送设置', $do, 'dispatch', ''),
-            );
+
             if($system['is_dada']==1){
                 array_push($navarr, $this->createMainMenu('达达配置 ', $do, 'dasettings', ''));
             }
             if($system['is_kfw']==1){
                 array_push($navarr, $this->createMainMenu('快服务 ', $do, 'kfw', ''));
             }
-            $navemenu[14] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=peiz&m=mask" class="panel-title wytitle" id="yframe-14"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>系统设置</a>',
-                'items' =>$navarr,
-            );
+
             if ($_W['role'] == 'founder'){
                 $navemenu[15] = array(
                     'title' => '<a href="index.php?c=site&a=entry&op=display&do=wxapplist&m=mask" class="panel-title wytitle" id="yframe-15"><icon style="color:#8d8d8d;margin-right:15px;" class="fa fa-unlock-alt"></icon>  权限设置</a>',

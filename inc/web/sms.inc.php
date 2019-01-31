@@ -22,7 +22,7 @@ if(checksubmit('submit')){
 //		message('短信模板id不能为空!','','error'); 
 //	}
 	$data['uniacid']=trim($_W['uniacid']);
-	if($_GPC['id']==''){                
+	if($_GPC['id']==''){
 		$res=pdo_insert('mask_message',$data);
 		if($res){
 			message('添加成功',$this->createWebUrl('sms',array()),'success');

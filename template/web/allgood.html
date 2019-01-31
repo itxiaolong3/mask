@@ -52,7 +52,7 @@
     .tab li{float: left;padding:10px;}
     .tab li.on{border-bottom: 2px solid #44ABF7;color:#44ABF7}
     .th th{font-size: 14px;font-weight: normal;padding: 10px 30px;background: #FAFAFA}
-    .img{width: 50px;height: 50px;background: #ccc; display: block;margin: 10px auto;}
+    .img{width: 50px;height: 50px;background: #ccc; display: block;margin: 10px auto;cursor: pointer}
     .all_style{padding: 3px 10px}
     .orange{background: #FF7F50;color: #fff;}
     .orange:hover{color: #fff;}
@@ -62,19 +62,24 @@
 <style>
     #enlarge_images{position:absolute;display:none;z-index:2;border:5px solid #f4f4f4}
 </style>
+<ul class="tab">
+    <li class="on"><a href="{php echo $this->createWebUrl('allgood')}">商品列表</a></li>
+    <li><a href="{php echo $this->createWebUrl('goodtype')}">分类</a></li>
+</ul>
 <div class="top_tip">
     <div class="dishes">
+        <a class="btn storewarning  dish_left" href="{php echo $this->createWebUrl('editallgood')}">添加商品</a>
         <button class="btn ygyouhui2  dish_left" id="allshang">批量上架</button>
         <button class="btn storegrey2  dish_left" id="alldown">批量下架</button>
         <button class="btn ygshouqian2 dish_left" id="allselect">批量删除</button>
-        <form method="post" action="" enctype="multipart/form-data" class="dishes">
-            <!-- <div class="dishses_font">导入Excel表：</div> -->
+        <!--<form method="post" action="" enctype="multipart/form-data" class="dishes">-->
+            <!--&lt;!&ndash; <div class="dishses_font">导入Excel表：</div> &ndash;&gt;-->
 
-            <div class="input_box"><input  type="file" name="file_stu" class="dishes_inp"/></div>
-            <input type="hidden" name="token" value="{$_W['token']}"/>
-            <input type="submit" name="submit2"  value="导入" class="dishes_inp2 btn btn-info btn-sm" />
-        </form>
-        <a class="btn btn-sm btn-info ms_mb" href="{$_W['siteroot']}addons/mask/excel/dishes.xls">下载导入模板</a>
+            <!--<div class="input_box"><input  type="file" name="file_stu" class="dishes_inp"/></div>-->
+            <!--<input type="hidden" name="token" value="{$_W['token']}"/>-->
+            <!--<input type="submit" name="submit2"  value="导入" class="dishes_inp2 btn btn-info btn-sm" />-->
+        <!--</form>-->
+        <!--<a class="btn btn-sm btn-info ms_mb" href="{$_W['siteroot']}addons/mask/excel/dishes.xls">下载导入模板</a>-->
     </div>
     &nbsp;
     <div class="row ygmartop" style="margin-top: 12px">
@@ -110,9 +115,9 @@
 <div class="main" style="margin-top: 0">
     <div class="col-md-1 nav_box">
         <ul class="nav_name">
-            <li {if !$_GPC['type_id']}class="active"{/if}><a href="{php echo $this->createWebUrl('allgood')}">全部</a></li>
+            <li {if !$_GPC['tid']}class="active"{/if}><a href="{php echo $this->createWebUrl('allgood')}">全部</a></li>
             {loop $type  $item2}
-            <li {if $_GPC['type_id']==$item2['QsID']}class="active"{/if}><a href="{php echo $this->createWebUrl('allgood',array('type_id'=>$item2['QsID']))}">{$item2['Name']}</a></li>
+            <li {if $_GPC['tid']==$item2['id']}class="active"{/if}><a href="{php echo $this->createWebUrl('allgood',array('tid'=>$item2['id']))}">{$item2['typename']}</a></li>
             {/loop}
 
         </ul>
@@ -134,13 +139,10 @@
                         <td class="col-md-1">商品图片</td>
                         <td class="col-md-1">商品名称</td>
                         <td class="col-md-1">商品价格</td>
-                        <td  style="width:3%;">已拼数</td>
                         <td class="" style="width:3%;">总销量</td>
-                        <td class="col-md-1">颜色</td>
-                      <td class="col-md-1">尺寸</td>
                         <td class="col-md-1">所属分类</td>
-                        <td class="col-md-1">所在大厦</td>
-                        <td class="col-md-1">所属栏目</td>
+                        <td class="col-md-1">赠送积分</td>
+                        <td class="col-md-1">邮费</td>
                         <td class="col-md-1">状态</td>
                         <td class="col-md-2">操作</td>
                     </tr>
@@ -151,13 +153,16 @@
                         <td class="col-md-1 bigimg"><img src="{media $item['Itemcover']}" alt="" class="img"></td>
                         <td>{$item['Title']}</td>
                         <td>{$item['Price']}</td>
-                        <td>{$item['DealCount']}</td>
                         <td>{$item['TotalQty']}</td>
-                        <td>{$item['Colors']}</td>
-                       <td>{$item['Sizes']}</td>
-                        <td>{$item['typename']}</td>
-                        <td>{$item['hname']}</td>
-                        <td>{$item['Name']}</td>
+                        <td>
+                            {loop $type  $item2}
+                                {if $item2['id']==$item['tid']}
+                                {$item2['typename']}
+                                {/if}
+                            {/loop}
+                        </td>
+                        <td>{$item['integral']}</td>
+                        <td>{$item['freight']}</td>
                         <td class="col-md-1 dish_btn">
                             {if $item['Statu']==1}
                             <button class="btn orange">售卖中</button>

@@ -1,27 +1,17 @@
 {template 'public/header'}
-
 {template 'public/comhead'}
 <link rel="stylesheet" type="text/css" href="../addons/mask/template/public/ygcsslist.css">
 <style type="text/css">
     .yg5_key>div{float: left;line-height: 34px;}
-
     .store_td1{height: 45px;}
-
     .store_list_img{width: 60px;height: 60px;}
-
     .yg5_tabel{border-color: #e5e5e5;outline: 1px solid #e5e5e5;text-align: center;}
-
     .yg5_tr2>td{padding: 15px;border: 1px solid #e5e5e5;}
-
     .yg5_tr1>td{
-
         border: 1px solid #e5e5e5;
         background-color: #FAFAFA;
-
         font-weight: bold;
-
     }
-
     .yg5_btn{background-color: #EEEEEE;color: #333;border: 1px solid #E4E4E4;border-radius: 6px;width: 100px;height: 34px;}
     .check_img{width: 45px;height: 45px;}
     .ygrow{margin-top: 20px;}
@@ -61,7 +51,7 @@
                    <input type="hidden" name="do" value="txlist" />
             <div class="input-group" style="width: 300px">
 
-                <input type="text" name="keywords" class="form-control" placeholder="请输入门店名称">
+                <input type="text" name="keywords" class="form-control" placeholder="请输入姓名">
 
                 <span class="input-group-btn">
 
@@ -158,7 +148,7 @@
                       </a>
                       {if $item['state']==1}
                  
-                      <a class="btn btn-info btn-xs" href="{php echo $this->createWebUrl('txlist',array('id'=>$item['id'],'op'=>'adopt2'))}" >微信打款</a>
+                      <!--<a class="btn btn-info btn-xs" href="{php echo $this->createWebUrl('txlist',array('id'=>$item['id'],'op'=>'adopt2'))}" >微信打款</a>-->
                 
                       <a class="btn ygyouhui2 btn-xs" href="{php echo $this->createWebUrl('txlist',array('id'=>$item['id'],'op'=>'adopt'))}" >线下打款</a>
                       <a class="btn ygshouqian2 btn-xs" href="{php echo $this->createWebUrl('txlist', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
@@ -198,8 +188,12 @@
             <label for="" class="col-md-3">银行卡号 :</label>
             <input type="text" value="{$item['yhk_num']}" name="yhk_num" class="col-md-6 con">
           </div>
+            <div class="qs_box col-md-12 pa_0">
+                <label for=""  class="col-md-3">开户行:</label>
+                <input type="text" value="{$item['yh_info']}" name="yh_info" class="col-md-6 con">
+            </div>
           <div class="qs_box col-md-12 pa_0">
-            <label for=""  class="col-md-3">银行卡户信息:</label>
+            <label for=""  class="col-md-3">所属支行:</label>
             <input type="text" value="{$item['yh_info']}" name="yh_info" class="col-md-6 con">
           </div>
          
@@ -250,7 +244,7 @@
 <script type="text/javascript">
     $(function(){
         // $("#frame-13").addClass("in");
-        $("#frame-13").show();
-        $("#yframe-13").addClass("wyactive");
+        $("#frame-5").show();
+        $("#yframe-5").addClass("wyactive");
     })
 </script>

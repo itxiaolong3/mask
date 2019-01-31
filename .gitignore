@@ -1,5 +1,4 @@
 .idea
-.idea\vcs.xml
 composer.lock
 *.log
 runtime
