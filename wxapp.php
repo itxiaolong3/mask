@@ -69,12 +69,12 @@ class maskModuleWxapp extends WeModuleWxapp {
             $sdata['dq_time']=date('Y-m-d H:i:s',time());
             $getuserinfo=pdo_get('mask_user',array('openid'=>$getopenid));
             if ($getuserinfo){
-                echo $this->resultToJson(1,'登录成功',$getuserinfo);
+                echo $this->resultToJson(1,'保存openid成功',$getuserinfo);
             }else{
                 $insres=pdo_insert('mask_user',$sdata);
                 if ($insres){
                     $getuser=pdo_get('mask_user',array('openid'=>$getopenid));
-                    echo $this->resultToJson(1,'登录成功',$getuser);
+                    echo $this->resultToJson(1,'保存openid成功',$getuser);
                 }else{
                     echo $this->resultToJson(0,'保存用户信息失败','');
                 }
