@@ -9,6 +9,7 @@ $item=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $data['appsecret']=trim($_GPC['appsecret']);
             $data['uniacid']=trim($_W['uniacid']);
             $data['map_key']=trim($_GPC['map_key']);
+            $data['tel']=trim($_GPC['tel']);
 //            if($_GPC['map_key']==''){
 //                message('腾讯地图key不能为空!','','error');
 //            }

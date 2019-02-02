@@ -33,6 +33,12 @@ class maskModuleWxapp extends WeModuleWxapp {
     }
     //我的接口
     ////////////面膜接口开始/////////////////////////////////////////////
+    //测试接口
+    public function doPagetest(){
+        $username = pdo_get('mask_user', array('id' => 1), array('nickname', 'headerimg'));
+        echo $this->resultToJson(1,'test',$username['nickname']);
+        //echo $this->doPageGoodsCode(6);
+    }
     //获取openid并保存用户信息
     public function doPageOpenid(){
         global $_W, $_GPC;
@@ -81,12 +87,11 @@ class maskModuleWxapp extends WeModuleWxapp {
 
             }
         }else{
-            echo $this->resultToJson(0,'无法登录','');
+            echo $this->resultToJson(0,'无法登录',$getopenid);
         }
 
         //print_r($res);
     }
-
     //返回结果的封装
     function resultToJson($code,$msg,$data){
         $re['code']=$code;
@@ -634,7 +639,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         echo $this->resultToJson(1,'支付参数',$return);
     }
     //分销二维码
-    public function doPageGoodsCode(){
+    public function doPageGoodsCode($uid){
         global $_W, $_GPC;
         function  getCoade($goods_id,$group_id){
             function getaccess_token(){
@@ -676,7 +681,11 @@ class maskModuleWxapp extends WeModuleWxapp {
             $img=base64_encode($img);
             return $img;
         }
-        $base64_image_content="data:image/jpeg;base64,".getCoade($_GPC['goods_id'],$_GPC['group_id']='');
+        $gid=$_GPC['goods_id'];
+        if (!$gid){
+            $gid=$uid;
+        }
+        $base64_image_content="data:image/jpeg;base64,".getCoade($gid,$_GPC['group_id']='');
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)){
             $type = $result[2];
             $new_file = IA_ROOT ."/addons/mask/img/";
@@ -716,6 +725,307 @@ class maskModuleWxapp extends WeModuleWxapp {
         }else{
             echo $this->resultToJson(0,'绑定失败，缺uid或者pid','');
         }
+    }
+    //通过方法获取专属码
+    public function getqrcodecode($uid){
+        global $_W, $_GPC;
+        function  getCoade($goods_id,$group_id){
+            function getaccess_token(){
+                global $_W, $_GPC;
+                $res=pdo_get('mask_system',array('uniacid' => $_W['uniacid']));
+                $appid=$res['appid'];
+                $secret=$res['appsecret'];
+                // print_r($res);die;
+                $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL,$url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+                $data = curl_exec($ch);
+                curl_close($ch);
+                $data = json_decode($data,true);
+                return $data['access_token'];
+            }
+            function set_msg($goods_id,$group_id){
+                $access_token = getaccess_token();
+                $data2=array(
+                    "scene"=>$goods_id,
+                    "page"=>"pages/home/index",
+                    "width"=>400
+                );
+                $data2 = json_encode($data2);
+                $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=".$access_token."";
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL,$url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+                curl_setopt($ch, CURLOPT_POST,1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS,$data2);
+                $data = curl_exec($ch);
+                curl_close($ch);
+                return $data;
+            }
+            $img=set_msg($goods_id,$group_id);
+            $img=base64_encode($img);
+            return $img;
+        }
+        $base64_image_content="data:image/jpeg;base64,".getCoade($uid,$_GPC['group_id']='');
+        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)){
+            $type = $result[2];
+            $new_file = IA_ROOT ."/addons/mask/img/";
+            if(!file_exists($new_file))
+            {
+                //检查是否有该文件夹，如果没有就创建，并给予最高权限
+                mkdir($new_file, 0777);
+            }
+            $wname="{$uid}".".{$type}";
+            //$wname="1511.jpeg";
+            $new_file = $new_file.$wname;
+            file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)));
+        }
+        return $_W['siteroot']."addons/mask/img/".$wname;
+    }
+    //用户登录
+    public function doPageLogin(){
+        global $_GPC, $_W;
+        $uid=$_GPC['uid'];
+        $phone=$_GPC['phone'];
+        $psw=md5('itxiaolong'.$_GPC['psw']);
+        $data=array();
+        if(!empty($uid)){
+            $res=pdo_get('mask_user',array('id'=>$uid,'uniacid'=>$_W['uniacid']));
+            if ($phone==$res['user_tel']){
+                echo $this->resultToJson(1,'检验登录成功','');
+            }else{
+                echo $this->resultToJson(0,'检验登录失败','');
+            }
+        }else if (!empty($phone)){
+            $res=pdo_get('mask_user',array('user_tel'=>$phone,'psw'=>$psw,'uniacid'=>$_W['uniacid']));
+            if ($res){
+                //生成专属二维码保存起来
+                echo $this->resultToJson(1,'用户登录成功',$res);
+            }else{
+                echo $this->resultToJson(0,'用户登录失败','');
+            }
+        }else{
+            echo $this->resultToJson(0,'手机号不可为空，登录失败','');
+        }
+    }
+    //用户注册和找回密码
+    public function doPageRegorFind(){
+        global $_GPC, $_W;
+        $getphone=$_GPC['phone'];
+        $getpsw=md5('itxiaolong'.$_GPC['psw']);
+        $getuid=$_GPC['uid'];
+        if (!$getuid){
+            echo $this->resultToJson(0,'请退出重新授权操作','');
+        }
+        $getpid=$_GPC['pid'];
+        $getcode=$_GPC['code'];
+        $res=pdo_get('mask_user',array('user_tel'=>$getphone,'uniacid'=>$_W['uniacid']));
+        $codeistrue=pdo_get('mask_smscode',array('phone'=>$getphone,'code'=>$getcode,'uniacid'=>$_W['uniacid']));
+        if ($res){//找回密码，也就是重新设置密码
+            $cdata=array();
+            $cdata['psw']=$getpsw;
+            //判断验证码是否正常
+            if ($codeistrue){
+                $cres=pdo_update('mask_user',$cdata,array('user_tel'=>$getphone));
+                if ($cres){
+                    //删除验证码
+                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
+                    //生成专属二维码
+                    $qrcodeimg = pdo_get('mask_user', array('id' => $getuid), array('id','img'));
+                    if (!$qrcodeimg['img']){
+                        //生成二维码
+                        $getimg=$this->getqrcodecode($getuid);
+                        pdo_update('mask_user',array('img'=>$getimg),array('id'=>$getuid));
+                    }
+                    echo $this->resultToJson(1,'找回密码成功',$getimg);
+                }else{
+                    echo $this->resultToJson(0,'找回密码失败','');
+                }
+            }else{
+                echo $this->resultToJson(0,'验证码错误','');
+            }
+
+        }else{
+            $inserdata=array();
+            $inserdata['user_tel']=$getphone;
+            $inserdata['psw']=$getpsw;
+            //$inserdata['uniacid']=$_W['uniacid'];
+            //$inserdata['username']=$this->randName(7);
+            if ($codeistrue){
+                $res=pdo_update('mask_user',$inserdata,array('id'=>$getuid));
+                if ($res){
+                    //删除验证码
+                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
+                    //绑定用户
+                    $isbang=pdo_get('mask_relation',array('uid'=>$getuid,'uniacid'=>$_W['uniacid']));
+                    if($isbang){
+                        //已被推荐过
+                        //生成专属二维码
+                        $qrcodeimg = pdo_get('mask_user', array('id' => $getuid), array('id','img'));
+                        if (!$qrcodeimg['img']){
+                            //生成二维码
+                            $getimg=$this->getqrcodecode($getuid);
+                            pdo_update('mask_user',array('img'=>$getimg),array('id'=>$getuid));
+                        }
+                        echo $this->resultToJson(1,'注册成功，已被推荐过','');
+                    }else{
+                        if ($getpid){
+                            $bingsucc=pdo_insert('mask_relation',array('uid'=>$getuid,'pid'=>$getpid,'uniacid'=>$_W['uniacid'],'addtime'=>date('Y-m-d H:i:s',time())));
+                            if ($bingsucc){
+                                //生成专属二维码
+                                $qrcodeimg = pdo_get('mask_user', array('id' => $getuid), array('id','img'));
+                                if (!$qrcodeimg['img']){
+                                    //生成二维码
+                                    $getimg=$this->getqrcodecode($getuid);
+                                    pdo_update('mask_user',array('img'=>$getimg),array('id'=>$getuid));
+                                }
+                                echo $this->resultToJson(1,'注册成功，绑定成功','');
+                            }else{
+                                echo $this->resultToJson(1,'注册成功，绑定失败','');
+                            }
+                        }else{
+                            //生成专属二维码
+                            $qrcodeimg = pdo_get('mask_user', array('id' => $getuid), array('id','img'));
+                            if (!$qrcodeimg['img']){
+                                //生成二维码
+                                $getimg=$this->getqrcodecode($getuid);
+                                pdo_update('mask_user',array('img'=>$getimg),array('id'=>$getuid));
+                            }
+                            //没有绑定操作
+                            echo $this->resultToJson(1,'注册成功，未绑定操作','');
+                        }
+
+                    }
+                }else{
+                    echo $this->resultToJson(0,'注册失败','');
+                }
+            }else{
+                echo $this->resultToJson(-1,'验证码错误','');
+            }
+
+        }
+
+    }
+
+    //短信验证码,聚合或者腾讯云的或者阿里云的
+    public function doPageSmscode(){
+        global $_W, $_GPC;
+        $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+        $resarr=array();
+        if($res['item']==1){
+            $tpl_id=$res['tpl_id'];
+            $tel=$_GPC['tel'];
+            $code=$_GPC['code'];
+            $key=$res['appkey'];
+            $url = "http://v.juhe.cn/sms/send?mobile=".$tel."&tpl_id=".$tpl_id."&tpl_value=%23code%23%3D".$code."&key=".$key;
+            $data=file_get_contents($url);
+            print_r($data);
+        }
+        if($res['item']==2){
+            include IA_ROOT.'/addons/mask/txsms/SmsSingleSender.php';
+            $appid = $res['appid'];; // 1400开头
+            $appkey = $res['tx_appkey'];;
+            $phoneNumbers = $_GPC['tel'];;
+            $templateId = $res['template_id'];
+            $smsSign = "iMacau";
+            try {
+                $ssender = new SmsSingleSender($appid, $appkey);
+                $params = [$_GPC['code']];
+                $result = $ssender->sendWithParam($res['code'], $phoneNumbers, $templateId,
+                    $params, $smsSign, "", "");  // 签名参数未提供或者为空时，会使用默认签名发送短信
+                $rsp = json_decode($result);
+                echo $result;
+            } catch(\Exception $e) {
+                echo var_dump($e);
+            }
+        }
+        if ($res['item']==3){
+            require_once MODULE_ROOT.'/aliyun-dysms-php-sdk/api_demo/SmsDemo.php';
+            $code = cache_load('code');
+            $resarr['status']=1;
+            $resarr['msg']='send success!';
+            $resarr['code']=$code;
+            //保存验证码
+            if ($code){
+                $phone=$_GPC['tel'];
+                $issave=pdo_get('mask_smscode',array('phone'=>$phone,'uniacid'=>$_W['uniacid']));
+                if ($issave){
+                    pdo_update('mask_smscode',array('code'=>$code),array('phone'=>$phone));
+                }else{
+                    pdo_insert('mask_smscode',array('code'=>$code,'phone'=>$phone,'uniacid'=>$_W['uniacid']));
+                }
+                echo $this->resultToJson(1,'发送短信成功','');
+            }else{
+                echo $this->resultToJson(0,'发送短信失败','');
+            }
+
+        }
+    }
+    //海报数据
+    public function doPageQrcodeinfo(){
+        global $_GPC, $_W;
+        $info=pdo_get('mask_user',array('id'=>$_GPC['uid']),array('nickname','id','headerimg','img'));
+        if ($info){
+            echo $this->resultToJson(1,'海报数据成功',$info);
+        }else{
+            echo $this->resultToJson(0,'返回海报数据失败','');
+        }
+    }
+    //投诉电话
+    public function doPageTousu(){
+        global $_GPC, $_W;
+        $info=pdo_get('mask_system',array('uniacid' => $_W['uniacid']),array('tel'));
+        if ($info){
+            echo $this->resultToJson(1,'投诉电话成功',$info);
+        }else{
+            echo $this->resultToJson(0,'返回投诉电话失败','');
+        }
+    }
+    //查看我的团队
+    public function doPageTeam() {
+        global $_W, $_GPC;
+        $pageindex = max(1, intval($_GPC['page']));
+        $pagesize=15;
+        $where=" WHERE a.uniacid=:uniacid";
+        $datas[':uniacid']=$_W['uniacid'];
+        //关键字查询
+        if($_GPC['keywords']){
+            $where .=" and b.nickname LIKE :name || b.id LIKE :name";
+            $op=$_GPC['keywords'];
+            $datas[':name']="%$op%";
+
+        }
+        $sql = "select a.* ,b.nickname,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
+            " left join " . tablename("mask_user") . " b on b.id=a.uid  ".$where." and a.pid=:p_id order by b.id DESC";
+        $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
+        $datas[':p_id']=$_GPC['uid'];
+        $res = pdo_fetchall($select_sql, $datas);
+        foreach ($res as $k=>$v){
+            $res[$k]['tjname']=pdo_getcolumn('mask_user', array('id' => $v['pid']), 'nickname',1);
+        }
+        $res2 = array();
+        for ($i = 0;$i < count($res);$i++) {
+            $sql2 = "select a.* ,b.nickname,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
+                " left join " . tablename("mask_user") . " b on b.id=a.uid   WHERE a.pid=:p_id order by b.id DESC";
+            $res3 = pdo_fetchall($sql2, array(':p_id' => $res[$i]['uid']));
+            $res2[] = $res3;
+        }
+        $res4 = array();
+        for ($k = 0;$k < count($res2);$k++) {
+            for ($j = 0;$j < count($res2[$k]);$j++) {
+                $res4[] = $res2[$k][$j];
+            }
+        }
+        foreach ($res4 as $k=>$v){
+            $res4[$k]['tjname']=pdo_getcolumn('mask_user', array('id' => $v['pid']), 'nickname',1);
+        }
+        $data['one'] = $res;
+        $data['two'] = $res4;
+        // print_r($data);die;
+        echo json_encode($data);
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid
@@ -1019,156 +1329,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         echo json_encode($data);
     }
 
-    //用户登录
-    public function doPageLogin(){
-        global $_GPC, $_W;
-        $uid=$_GPC['uid'];
-        $phone=$_GPC['phone'];
-        $psw=md5('itxiaolong'.$_GPC['psw']);
-        $data=array();
-        if(!empty($uid)){
-            $res=pdo_get('mask_user',array('id'=>$uid,'uniacid'=>$_W['uniacid']));
-            if ($phone==$res['user_tel']){
-                echo $this->resultToJson(1,'检验登录成功','');
-            }else{
-                echo $this->resultToJson(0,'检验登录失败','');
-            }
-        }else if (!empty($phone)){
-            $res=pdo_get('mask_user',array('user_tel'=>$phone,'psw'=>$psw,'uniacid'=>$_W['uniacid']));
-            if ($res){
-                echo $this->resultToJson(1,'用户登录成功',$res);
-            }else{
-                echo $this->resultToJson(0,'用户登录失败','');
-            }
-        }else{
-            echo $this->resultToJson(0,'手机号不可为空，登录失败','');
-        }
-    }
-    //用户注册和找回密码
-    public function doPageRegorFind(){
-        global $_GPC, $_W;
-        $getphone=$_GPC['phone'];
-        $getpsw=md5('itxiaolong'.$_GPC['psw']);
-        $getuid=$_GPC['uid'];
-        if (!$getuid){
-            echo $this->resultToJson(0,'请退出重新授权操作','');
-        }
-        $getpid=$_GPC['pid'];
-        $getcode=$_GPC['code'];
-        $res=pdo_get('mask_user',array('user_tel'=>$getphone,'uniacid'=>$_W['uniacid']));
-        $codeistrue=pdo_get('mask_smscode',array('phone'=>$getphone,'code'=>$getcode,'uniacid'=>$_W['uniacid']));
-        if ($res){//找回密码，也就是重新设置密码
-            $cdata=array();
-            $cdata['psw']=$getpsw;
-            //判断验证码是否正常
-            if ($codeistrue){
-                $cres=pdo_update('mask_user',$cdata,array('user_tel'=>$getphone));
-                if ($cres){
-                    //删除验证码
-                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
-                    echo $this->resultToJson(1,'找回密码成功','');
-                }else{
-                    echo $this->resultToJson(0,'找回密码失败','');
-                }
-            }else{
-                echo $this->resultToJson(-1,'验证码错误','');
-            }
 
-        }else{
-            $inserdata=array();
-            $inserdata['user_tel']=$getphone;
-            $inserdata['psw']=$getpsw;
-            //$inserdata['uniacid']=$_W['uniacid'];
-            //$inserdata['username']=$this->randName(7);
-            if ($codeistrue){
-                $res=pdo_update('mask_user',$inserdata,array('id'=>$getuid));
-                if ($res){
-                    //删除验证码
-                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
-                    //绑定用户
-                     $isbang=pdo_get('mask_relation',array('uid'=>$getuid,'uniacid'=>$_W['uniacid']));
-                     if($isbang){
-                         //已被推荐过
-                         echo $this->resultToJson(1,'注册成功，已被推荐过','');
-                     }else{
-                         if ($getpid){
-                             $bingsucc=pdo_insert('mask_relation',array('uid'=>$getuid,'pid'=>$getpid,'uniacid'=>$_W['uniacid'],'addtime'=>date('Y-m-d H:i:s',time())));
-                             if ($bingsucc){
-                                 echo $this->resultToJson(1,'注册成功，绑定成功','');
-                             }else{
-                                 echo $this->resultToJson(1,'注册成功，绑定失败','');
-                             }
-                         }else{
-                             //没有绑定操作
-                             echo $this->resultToJson(1,'注册成功，未绑定操作','');
-                         }
-
-                     }
-                }else{
-                    echo $this->resultToJson(0,'注册失败','');
-                }
-            }else{
-                echo $this->resultToJson(-1,'验证码错误','');
-            }
-
-        }
-
-    }
-
-    //短信验证码,聚合或者腾讯云的或者阿里云的
-    public function doPageSmscode(){
-        global $_W, $_GPC;
-        $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
-        $resarr=array();
-        if($res['item']==1){
-            $tpl_id=$res['tpl_id'];
-            $tel=$_GPC['tel'];
-            $code=$_GPC['code'];
-            $key=$res['appkey'];
-            $url = "http://v.juhe.cn/sms/send?mobile=".$tel."&tpl_id=".$tpl_id."&tpl_value=%23code%23%3D".$code."&key=".$key;
-            $data=file_get_contents($url);
-            print_r($data);
-        }
-        if($res['item']==2){
-            include IA_ROOT.'/addons/mask/txsms/SmsSingleSender.php';
-            $appid = $res['appid'];; // 1400开头
-            $appkey = $res['tx_appkey'];;
-            $phoneNumbers = $_GPC['tel'];;
-            $templateId = $res['template_id'];
-            $smsSign = "iMacau";
-            try {
-                $ssender = new SmsSingleSender($appid, $appkey);
-                $params = [$_GPC['code']];
-                $result = $ssender->sendWithParam($res['code'], $phoneNumbers, $templateId,
-                    $params, $smsSign, "", "");  // 签名参数未提供或者为空时，会使用默认签名发送短信
-                $rsp = json_decode($result);
-                echo $result;
-            } catch(\Exception $e) {
-                echo var_dump($e);
-            }
-        }
-        if ($res['item']==3){
-            require_once MODULE_ROOT.'/aliyun-dysms-php-sdk/api_demo/SmsDemo.php';
-            $code = cache_load('code');
-            $resarr['status']=1;
-            $resarr['msg']='send success!';
-            $resarr['code']=$code;
-            //保存验证码
-            if ($code){
-                $phone=$_GPC['tel'];
-                $issave=pdo_get('mask_smscode',array('phone'=>$phone,'uniacid'=>$_W['uniacid']));
-                if ($issave){
-                    pdo_update('mask_smscode',array('code'=>$code),array('phone'=>$phone));
-                }else{
-                    pdo_insert('mask_smscode',array('code'=>$code,'phone'=>$phone,'uniacid'=>$_W['uniacid']));
-                }
-                echo $this->resultToJson(1,'发送短信成功','');
-            }else{
-                echo $this->resultToJson(0,'发送短信失败','');
-            }
-
-        }
-    }
     //获取搜索标签
     public function doPageSeachTag() {
         global $_W, $_GPC;
@@ -5547,7 +5708,8 @@ class maskModuleWxapp extends WeModuleWxapp {
     //查看我的团队
     public function doPageMyTeam() {
         global $_W, $_GPC;
-        $sql = "select a.* ,b.name,b.img from " . tablename("mask_fxuser") . " a" . " left join " . tablename("mask_user") . " b on b.id=a.fx_user   WHERE a.user_id=:user_id order by id DESC";
+        $sql = "select a.* ,b.name,b.img from " . tablename("mask_fxuser") . " a" .
+            " left join " . tablename("mask_user") . " b on b.id=a.fx_user   WHERE a.user_id=:user_id order by id DESC";
         $res = pdo_fetchall($sql, array(':user_id' => $_GPC['user_id']));
         $res2 = array();
         for ($i = 0;$i < count($res);$i++) {
