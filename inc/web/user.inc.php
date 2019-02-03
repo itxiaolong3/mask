@@ -16,7 +16,8 @@ if($_GPC['keywords']){
 	$sql="select *  from " . tablename("mask_user") ." WHERE  username LIKE :name || phone LIKE :name and uniacid=:uniacid and username!='' order by  u_id desc";
 	$select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 	$list = pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':name'=>$where));	   
-	$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") ." WHERE  username LIKE :name || phone LIKE :name and uniacid=:uniacid  and username!=''",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
+	$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") .
+        " WHERE  username LIKE :name || phone LIKE :name and uniacid=:uniacid  and username!=''",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
 	$pager = pagination($total, $pageindex, $pagesize);
 	if($_GPC['id']){
 		$res4=pdo_delete("mask_user",array('u_id'=>$_GPC['id']));

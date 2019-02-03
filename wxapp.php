@@ -984,7 +984,19 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(0,'返回投诉电话失败','');
         }
     }
-    //查看我的团队
+    //我的分销页面
+    public function doPageGettream(){
+        global $_W, $_GPC;
+        $onecount=pdo_getall('mask_relation', array('pid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
+        $twocount=array();
+        foreach ($onecount as $k=>$v){
+            $count=pdo_fetchcolumn("select count(*) as con from " . tablename("mask_relation") ." WHERE  uniacid=:uniacid  and pid =:pid",array(':uniacid'=>$_W['uniacid'],':pid'=>$v['uid']));
+            array_push($twocount,$count['con']);
+        }
+        $redata['teamcount']=array_sum($twocount)+count($onecount);
+        echo $this->resultToJson(1,'我的分销数据',$redata);
+    }
+    //团队详细
     public function doPageTeam() {
         global $_W, $_GPC;
         $pageindex = max(1, intval($_GPC['page']));
@@ -998,17 +1010,18 @@ class maskModuleWxapp extends WeModuleWxapp {
             $datas[':name']="%$op%";
 
         }
-        $sql = "select a.* ,b.nickname,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
+        $sql = "select a.* ,b.nickname,b.level,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
             " left join " . tablename("mask_user") . " b on b.id=a.uid  ".$where." and a.pid=:p_id order by b.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $datas[':p_id']=$_GPC['uid'];
         $res = pdo_fetchall($select_sql, $datas);
+
         foreach ($res as $k=>$v){
             $res[$k]['tjname']=pdo_getcolumn('mask_user', array('id' => $v['pid']), 'nickname',1);
         }
         $res2 = array();
         for ($i = 0;$i < count($res);$i++) {
-            $sql2 = "select a.* ,b.nickname,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
+            $sql2 = "select a.* ,b.nickname,b.level,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
                 " left join " . tablename("mask_user") . " b on b.id=a.uid   WHERE a.pid=:p_id order by b.id DESC";
             $res3 = pdo_fetchall($sql2, array(':p_id' => $res[$i]['uid']));
             $res2[] = $res3;
@@ -1022,8 +1035,77 @@ class maskModuleWxapp extends WeModuleWxapp {
         foreach ($res4 as $k=>$v){
             $res4[$k]['tjname']=pdo_getcolumn('mask_user', array('id' => $v['pid']), 'nickname',1);
         }
+
         $data['one'] = $res;
         $data['two'] = $res4;
+        //一级团队人数
+        $count=pdo_get('mask_relation', array('pid'=>$_GPC['uid']), array('count(id) as count'));
+        //一级团队合伙人数量以及粉丝数量
+        $hcountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level>0";
+        $fscountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level=0";
+        $countdatas[':uniacid']=$_W['uniacid'];
+        $countdatas[':pid']=$_GPC['uid'];
+        $hehuocount=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$hcountwhere,$countdatas);
+        $fscount=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$fscountwhere,$countdatas);
+
+        $data['onecount']=$count['count'];
+        $data['onehhcount']=$hehuocount;
+        $data['onefscount']=$fscount;
+        //二级团队人数计算
+        $onedata=pdo_getall('mask_relation', array('pid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
+        $twoarr=array();
+        $twoarrhh=array();
+        $twoarrfs=array();
+        //一级下的所有数据
+        foreach ($onedata as $k=>$v){
+            $sql2 = "select count(*) as count  from " . tablename("mask_relation") . " a" .
+                " left join " . tablename("mask_user") . " b on b.id=a.uid   WHERE a.pid=:p_id order by b.id DESC";
+            $sql2hh = "select count(*) as count  from " . tablename("mask_relation") . " a" .
+                " left join " . tablename("mask_user") . " b on b.id=a.uid   WHERE a.pid=:p_id and b.level>0 order by b.id DESC";
+            $sql2fs = "select count(*) as count  from " . tablename("mask_relation") . " a" .
+                " left join " . tablename("mask_user") . " b on b.id=a.uid   WHERE a.pid=:p_id and b.level=0 order by b.id DESC";
+            $getallarr=pdo_fetchall($sql2, array(':p_id' => $v['uid']));
+            $gethharr=pdo_fetchall($sql2hh, array(':p_id' => $v['uid']));
+            $getfsarr=pdo_fetchall($sql2fs, array(':p_id' => $v['uid']));
+            array_push($twoarr,$getallarr);//总
+            array_push($twoarrhh,$gethharr);//合伙人
+            array_push($twoarrfs,$getfsarr);//粉丝
+        }
+        //数组处理
+        $twoarr2=array();
+        foreach ($twoarr as $k=>$v){
+            foreach ($v as $kk=>$vv){
+                array_push($twoarr2,$vv);
+            }
+        }
+        $twoarr2hh=array();
+        foreach ($twoarrhh as $k=>$v){
+            foreach ($v as $kk=>$vv){
+                array_push($twoarr2hh,$vv);
+            }
+        }
+        $twoarr2fs=array();
+        foreach ($twoarrfs as $k=>$v){
+            foreach ($v as $kk=>$vv){
+                array_push($twoarr2fs,$vv);
+            }
+        }
+        //把每个一级下的下级数量放到一个数组
+        $twocountarr=array();
+        $twocountarrhh=array();
+        $twocountarrfs=array();
+        foreach ($twoarr2 as $k=>$v){
+            array_push($twocountarr,$v['count']);
+        }
+        foreach ($twoarr2hh as $k=>$v){
+            array_push($twocountarrhh,$v['count']);
+        }
+        foreach ($twoarr2fs as $k=>$v){
+            array_push($twocountarrfs,$v['count']);
+        }
+        $data['twocount']=array_sum($twocountarr);
+        $data['twocounthh']=array_sum($twocountarrhh);
+        $data['twocountfs']=array_sum($twocountarrfs);
         // print_r($data);die;
         echo json_encode($data);
     }
