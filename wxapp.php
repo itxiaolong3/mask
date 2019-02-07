@@ -332,7 +332,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageDelcollection(){
         global $_W, $_GPC;
         $id=$_GPC['id'];
-        $res=pdo_delete('mask_collection',array('id'=>$id));
+        $res=pdo_delete('mask_collection',array('id'=>$id,'uid'=>$_GPC['uid']));
         if($res){
             echo $this->resultToJson(1,'删除成功','');
         }else{
@@ -359,7 +359,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageDelfootprint(){
         global $_W, $_GPC;
         $id=$_GPC['id'];
-        $res=pdo_delete('mask_footprint',array('id'=>$id));
+        $res=pdo_delete('mask_footprint',array('gid'=>$id,'uid'=>$_GPC['uid']));
         if($res){
             echo $this->resultToJson(1,'删除成功','');
         }else{
@@ -503,6 +503,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['name']=$addinfo['name'];//姓名
         $data['address']=$addinfo['address'].' '.$addinfo['detailadd'];//地址
         $data['money']=$_GPC['money'];//付款金额
+        $data['type']=$_GPC['type'];//订单类型
         $data['postfee']=$_GPC['totalfreght'];//总运费
         $data['tel']=$addinfo['phone'];//手机号
         $data['uniacid']=$_W['uniacid'];//小程序id
@@ -573,11 +574,13 @@ class maskModuleWxapp extends WeModuleWxapp {
         if (empty($getorder)){
             //没有订单
             echo $this->resultToJson(0,'没有订单','');
+        }else{
+            foreach ($getorder as $k=>$v){
+                $getorder[$k]['goodlist']=pdo_getall('mask_order_goods',array('order_id'=>$v['id']));
+            }
+            echo $this->resultToJson(1,'订单列表',$getorder);
         }
-        foreach ($getorder as $k=>$v){
-            $getorder[$k]['goodlist']=pdo_getall('mask_order_goods',array('order_id'=>$v['id']));
-        }
-        echo $this->resultToJson(1,'订单列表',$getorder);
+
     }
     //订单详细
     public function doPageGetDetailOrder(){
@@ -604,6 +607,27 @@ class maskModuleWxapp extends WeModuleWxapp {
         }else{
             echo $this->resultToJson(0,'取消订单失败','');
         }
+
+    }
+    //确认收货
+    public function doPageOkMyOrder(){
+        global $_W, $_GPC;
+        $res=pdo_update('mask_order',array('state'=>4,'complete_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['id']));
+        $res2=pdo_update('mask_order_goods',array('state'=>4),array('order_id'=>$_GPC['id']));
+        if($res&&$res2){
+            //修改交易记录状态
+            pdo_update('mask_record',array('rsettlement'=>1),array('rordernumber'=>$_GPC['ordernumber']));
+            echo $this->resultToJson(1,'签收成功','');
+        }else{
+            echo $this->resultToJson(1,'签收失败','');
+        }
+    }
+    //售后订单
+    public function doPageAftersale(){
+        global $_W, $_GPC;
+        $type=$_GPC['type'];
+        $gid=$_GPC['id'];
+
 
     }
     //微信支付
@@ -1633,20 +1657,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         echo  json_encode($data);
     }
-    //确认收货
-    public function doPageOkMyOrder(){
-        global $_W, $_GPC;
-        $res=pdo_update('mask_order',array('state'=>4,'complete_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['id']));
-        $res2=pdo_update('mask_order_goods',array('Summary'=>4),array('order_id'=>$_GPC['id']));
-        if($res&&$res2){
-            $data['Result']=true;
-            $data['Message']='签收成功';
-        }else{
-            $data['Result']=false;
-            $data['Message']='签收失败';
-        }
-        echo json_encode($data);
-    }
+
     //字符串中去数字
     function findNum($str=''){
         $str=trim($str);

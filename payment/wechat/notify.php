@@ -55,6 +55,10 @@ $url=substr($str,0,$n);
 	//更新订单状态和子订单状态
     pdo_update('mask_order_goods',array('state'=>2),array('order_id'=>$order['id']));
     pdo_update('mask_order',array('state'=>2),array('code'=>$logno));
+    //新增交易记录，佣金分配
+        //1,判断推荐人身份（直推），间推
+        //2，省代，市代
+    //修改库存量
   
 //	$czorder=pdo_get('mask_czorder',array('code'=>$logno));
 //	$hyorder=pdo_get('mask_hyorder',array('code'=>$logno));
