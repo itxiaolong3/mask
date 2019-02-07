@@ -994,6 +994,23 @@ class maskModuleWxapp extends WeModuleWxapp {
             array_push($twocount,$count['con']);
         }
         $redata['teamcount']=array_sum($twocount)+count($onecount);
+        //个人信息
+        $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level'));
+        $pid=pdo_getcolumn('mask_relation', array('id' => $_GPC['uid']), 'pid',1);
+        if ($pid){
+            //有推荐人
+            $nickname=pdo_get('mask_user', array('id'=>$pid,'uniacid'=>$_W['uniacid']),array('nickname'));
+            $userinfo['tjname']=$nickname['nickname'];
+        }else{
+            //无推荐人
+            $userinfo['tjname']='无';
+        }
+        $redata['userinfo']=$userinfo;
+        //当月结算统计
+        $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
+        $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$_GPC['uid']} and rsettlement=1 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
+        $redata['nosettlement']=$nodeal['con'];
+        $redata['settlement']=$deal['con'];
         echo $this->resultToJson(1,'我的分销数据',$redata);
     }
     //团队详细
@@ -1108,6 +1125,40 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['twocountfs']=array_sum($twocountarrfs);
         // print_r($data);die;
         echo json_encode($data);
+    }
+    //队员信息
+    public function doPageteaminfodetail(){
+        global $_W, $_GPC;
+        $xiaofei=pdo_fetch("SELECT sum(money) as con FROM ".tablename('mask_order')." WHERE  user_id ={$_GPC['uid']} and state=2");
+        $redata['consumption']=number_format($xiaofei['con'],2);
+        $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
+        $redata['userinfo']=$userinfo;
+        echo $this->resultToJson(1,'队员信息详细',$redata);
+    }
+    //收益页
+    public function doPageMyEarnings(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $type=$_GPC['type'];
+        $dates=$_GPC['dates'];
+        //指定日期的前30天数据
+        if ($type){
+            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+        }else{
+            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']}  and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+        }
+        $redata['alltotal']=$allrecord['con'];
+        $redata['nodealtotal']=$nodeal['con'];
+        $redata['dealtotal']=$deal['con'];
+        $redata['list']=$list;
+        echo $this->resultToJson(1,'收益页数据',$redata);
+
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid
@@ -3854,10 +3905,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -5706,8 +5757,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                    "page"=>"mask/pages/Liar/loginindex",
-                    "width" => 400);
+                               "page"=>"mask/pages/Liar/loginindex",
+                               "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -7580,10 +7631,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
