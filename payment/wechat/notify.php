@@ -55,9 +55,158 @@ $url=substr($str,0,$n);
 	//更新订单状态和子订单状态
     pdo_update('mask_order_goods',array('state'=>2),array('order_id'=>$order['id']));
     pdo_update('mask_order',array('state'=>2),array('code'=>$logno));
+    //自己的信息
+    $nickname=pdo_getcolumn('mask_user', array('id' => $order['user_id']), 'nickname',1);
+
+    //////////////////限制字符串长度/////////////////////////////
+    $str=$nickname;
+    //处理长度  不管中英文，都代表1个长度
+    preg_match_all("/./us", $str, $match);
+    $str_arr=$match[0];
+    $length_val=count($str_arr);//字符串长度
+    $show_str=implode('',$str_arr);//最后要显示的字符串
+    //控制的显示长度
+    $length_limit=5;
+    //字符串超出控制长度，显示处理
+    if($length_val>$length_limit){
+        $show_str="";
+        for ($i=0;$i<$length_limit;$i++){
+            $show_str.=$str_arr[$i];
+        }
+        $show_str.="...";//最后以...代表后面字符省略
+    }
+    $nickname=$show_str;
+    //////////////////////////////
     //新增交易记录，佣金分配
+    //订单类型
+    $type=$order['type'];
+    if ($type){
         //1,判断推荐人身份（直推），间推
-        //2，省代，市代
+        $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
+        if ($pid){
+            //直推等级
+            $puserinfo=pdo_get('mask_user', array('id'=>$pid,'uniacid'=>$_W['uniacid']));
+            $onelevel=$puserinfo['level'];
+            //代理记录
+            $dldata['rtype']=1;
+            $dldata['rstate']=0;
+            $dldata['rmoney']=150;//直推奖励
+            $dldata['ruid']=$pid;
+            $dldata['rbuyername']=$nickname;
+            $dldata['rordernumber']=$order['order_num']; //银卡
+            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid']));
+            $dldata['rcardid']=$card['id'];
+            $dldata['rcomment']="直推(".$nickname.")奖励：150元";
+            $dldata['raddtime']=date('Y-m-d H:i:s',time());
+            //银卡记录
+            $ykdata['rtype']=1;
+            $ykdata['rstate']=0;
+            $ykdata['rmoney']=30;//直推奖励
+            $ykdata['ruid']=$pid;
+            $ykdata['rbuyername']=$nickname;
+            $ykdata['rordernumber']=$order['order_num'];
+            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid']));//银卡
+            $ykdata['rcardid']=$card['id'];
+            $ykdata['rcomment']="直推(".$nickname.")银卡奖励：30元";
+            $ykdata['raddtime']=date('Y-m-d H:i:s',time());
+            //金卡记录
+            $jkdata['rtype']=1;
+            $jkdata['rstate']=0;
+            $jkdata['rmoney']=40;//直推奖励
+            $jkdata['ruid']=$pid;
+            $jkdata['rbuyername']=$nickname;
+            $jkdata['rordernumber']=$order['order_num'];
+            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
+            $jkdata['rcardid']=$card['id'];
+            $jkdata['rcomment']="直推(".$nickname.")金卡奖励：40元";
+            $jkdata['raddtime']=date('Y-m-d H:i:s',time());
+            //市代记录
+            $sddata['rtype']=1;
+            $sddata['rstate']=0;
+            $sddata['rmoney']=4;//直推奖励
+            $sddata['ruid']=$pid;
+            $sddata['rbuyername']=$nickname;
+            $sddata['rordernumber']=$order['order_num'];
+            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
+            $sddata['rcardid']=$card['id'];
+            $sddata['rcomment']="直推(".$nickname.")市代奖励：4元";
+            $sddata['raddtime']=date('Y-m-d H:i:s',time());
+            //省代记录
+            $shendaidata['rtype']=1;
+            $shendaidata['rstate']=0;
+            $shendaidata['rmoney']=8;//直推奖励
+            $shendaidata['ruid']=$pid;
+            $shendaidata['rbuyername']=$nickname;
+            $shendaidata['rordernumber']=$order['order_num'];
+            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
+            $shendaidata['rcardid']=$card['id'];
+            $shendaidata['rcomment']="直推(".$nickname.")奖励：8元";
+            $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
+
+           switch ($onelevel){
+               case 1:
+                   pdo_insert('mask_record',$dldata);
+                   break;
+               case 2:
+                   pdo_insert('mask_record',$dldata);
+                   pdo_insert('mask_record',$ykdata);
+                   //银卡
+                   break;
+               case 3:
+                   //金卡
+                   pdo_insert('mask_record',$dldata);
+                   pdo_insert('mask_record',$ykdata);
+                   pdo_insert('mask_record',$jkdata);
+                   break;
+               case 4:
+                   //市代
+                   //先判断是否本市的
+                   $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
+                   $addressarr=explode('-',$cityaddress);
+                   $orderaddressarr=explode('-',$order['address']);
+                   pdo_insert('mask_record',$dldata);
+                   pdo_insert('mask_record',$ykdata);
+                   pdo_insert('mask_record',$jkdata);
+                   if ($addressarr[1]==$orderaddressarr[1]){
+                       pdo_insert('mask_record',$sddata);
+                   }
+                   break;
+               case 5:
+                   //省代
+                   pdo_insert('mask_record',$dldata);
+                   pdo_insert('mask_record',$ykdata);
+                   pdo_insert('mask_record',$jkdata);
+                   //先判断是否省代的
+                   $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
+                   $addressarr=explode('-',$cityaddress);
+                   $orderaddressarr=explode('-',$order['address']);
+                   pdo_insert('mask_record',$dldata);
+                   pdo_insert('mask_record',$ykdata);
+                   pdo_insert('mask_record',$jkdata);
+                   if ($addressarr[0]==$orderaddressarr[0]){
+                       pdo_insert('mask_record',$sddata);
+                       pdo_insert('mask_record',$shendaidata);
+                   }
+                   break;
+           }
+            //间推等级
+            $twopid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
+            if ($twopid){
+                $jtdata['rtype']=2;
+                $jtdata['rstate']=0;
+                $jtdata['rmoney']=48;//间推奖励
+                $jtdata['ruid']=$twopid;
+                $jtdata['rbuyername']=$nickname;
+                $jtdata['rordernumber']=$order['order_num'];
+                $card=pdo_get('mask_bankcard', array('uid'=>$twopid,'uniacid'=>$_W['uniacid']));
+                $jtdata['rcardid']=$card['id'];
+                $jtdata['rcomment']="间推(".$nickname.")奖励：48元";
+                $jtdata['raddtime']=date('Y-m-d H:i:s',time());
+                pdo_insert('mask_record',$jtdata);
+            }
+        }
+    }
+
     //修改库存量
   
 //	$czorder=pdo_get('mask_czorder',array('code'=>$logno));

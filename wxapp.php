@@ -35,8 +35,14 @@ class maskModuleWxapp extends WeModuleWxapp {
     ////////////面膜接口开始/////////////////////////////////////////////
     //测试接口
     public function doPagetest(){
+        global $_W, $_GPC;
         $username = pdo_get('mask_user', array('id' => 1), array('nickname', 'headerimg'));
-        echo $this->resultToJson(1,'test',$username['nickname']);
+        $sdata['uid']=1;
+        $sdata['pid']=2;
+        $sdata['uniacid']=$_W['uniacid'];
+        $sdata['addtime']=date('Y-m-d H:i:s',time());
+       // pdo_insert('mask_relation',$sdata);
+         echo $this->resultToJson(1,'test',$username['nickname']);
         //echo $this->doPageGoodsCode(6);
     }
     //获取openid并保存用户信息
@@ -1020,7 +1026,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $redata['teamcount']=array_sum($twocount)+count($onecount);
         //个人信息
         $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level'));
-        $pid=pdo_getcolumn('mask_relation', array('id' => $_GPC['uid']), 'pid',1);
+        $pid=pdo_getcolumn('mask_relation', array('uid' => $_GPC['uid']), 'pid',1);
         if ($pid){
             //有推荐人
             $nickname=pdo_get('mask_user', array('id'=>$pid,'uniacid'=>$_W['uniacid']),array('nickname'));
@@ -1041,7 +1047,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageTeam() {
         global $_W, $_GPC;
         $pageindex = max(1, intval($_GPC['page']));
-        $pagesize=15;
+        $pagesize=10;
         $where=" WHERE a.uniacid=:uniacid";
         $datas[':uniacid']=$_W['uniacid'];
         //关键字查询
@@ -1051,7 +1057,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $datas[':name']="%$op%";
 
         }
-        $sql = "select a.* ,b.nickname,b.level,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
+        $sql = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
             " left join " . tablename("mask_user") . " b on b.id=a.uid  ".$where." and a.pid=:p_id order by b.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $datas[':p_id']=$_GPC['uid'];
@@ -1062,7 +1068,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $res2 = array();
         for ($i = 0;$i < count($res);$i++) {
-            $sql2 = "select a.* ,b.nickname,b.level,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
+            $sql2 = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
                 " left join " . tablename("mask_user") . " b on b.id=a.uid   WHERE a.pid=:p_id order by b.id DESC";
             $res3 = pdo_fetchall($sql2, array(':p_id' => $res[$i]['uid']));
             $res2[] = $res3;
@@ -1148,7 +1154,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['twocounthh']=array_sum($twocountarrhh);
         $data['twocountfs']=array_sum($twocountarrfs);
         // print_r($data);die;
-        echo json_encode($data);
+        echo $this->resultToJson(1,'团队详细数据',$data);
     }
     //队员信息
     public function doPageteaminfodetail(){
@@ -1183,6 +1189,65 @@ class maskModuleWxapp extends WeModuleWxapp {
         $redata['list']=$list;
         echo $this->resultToJson(1,'收益页数据',$redata);
 
+    }
+    //编辑新增银卡
+    public function doPageCard(){
+        global $_W, $_GPC;
+        $id=$_GPC['id'];
+        $adddata['uid']=$_GPC['uid'];
+        $adddata['name']=$_GPC['name'];
+        $adddata['phone']=$_GPC['phone'];
+        $adddata['openbranch']=$_GPC['openbranch'];
+        $adddata['branch']=$_GPC['branch'];
+        $adddata['cardnumber']=$_GPC['cardnumber'];
+        $adddata['uniacid']=$_W['uniacid'];
+        if ($id){
+            //编辑
+            $res=pdo_update('mask_bankcard',$adddata,array('id'=>$id));
+            if ($res){
+                echo $this->resultToJson(1,'编辑银行卡成功','');
+            }else{
+                echo $this->resultToJson(0,'编辑银行卡失败','');
+            }
+        }else{
+            //添加
+            $res=pdo_insert('mask_bankcard',$adddata);
+            if ($res){
+                echo $this->resultToJson(1,'添加银行卡成功','');
+            }else{
+                echo $this->resultToJson(0,'添加银行卡失败','');
+            }
+        }
+    }
+    //获取银行卡
+    public function doPageGetCard(){
+        global $_W, $_GPC;
+        $ID=$_GPC['uid'];
+        $res=pdo_get('mask_bankcard',array('uid'=>$ID));
+        echo $this->resultToJson(1,'返回银行卡',$res);
+    }
+    //申请省代市代
+    public function doPageSqproorcity(){
+        global $_W, $_GPC;
+        $adddata['uid']=$_GPC['uid'];
+        $adddata['name']=$_GPC['name'];
+        $adddata['phone']=$_GPC['phone'];
+        $adddata['address']=$_GPC['address'];
+        $adddata['comment']=$_GPC['comment'];
+        $adddata['addtime']=date('Y-m-d H:i:s',time());
+        $adddata['uniacid']=$_W['uniacid'];
+        $ishava=pdo_get('mask_areaagent',array('uid'=>$_GPC['uid']));
+        if ($ishava){
+            //已申请
+            echo $this->resultToJson(1,'已在申请',$ishava);
+        }else{
+            $res=pdo_insert('mask_areaagent',$adddata);
+            if ($res){
+                echo $this->resultToJson(1,'申请成功','');
+            }else{
+                echo $this->resultToJson(0,'申请失败','');
+            }
+        }
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid
