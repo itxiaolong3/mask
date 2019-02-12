@@ -73,6 +73,9 @@ class SmsDemo
     public static function sendSms() {
         global $_GPC, $_W;
         $phoneNum = $_REQUEST['tel'];
+        if (empty($phoneNum)){
+            $phoneNum=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
+        }
         $values=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
         // 初始化SendSmsRequest实例用于设置发送短信的参数
         $request = new SendSmsRequest();

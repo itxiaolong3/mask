@@ -41,8 +41,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         $sdata['pid']=2;
         $sdata['uniacid']=$_W['uniacid'];
         $sdata['addtime']=date('Y-m-d H:i:s',time());
-       // pdo_insert('mask_relation',$sdata);
-         echo $this->resultToJson(1,'test',$username['nickname']);
+        // pdo_insert('mask_relation',$sdata);
+        echo $this->resultToJson(1,'test',$username['nickname']);
         //echo $this->doPageGoodsCode(6);
     }
     //获取openid并保存用户信息
@@ -666,7 +666,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $weixinpay = new WeixinPay($appid,$openid,$mch_id,$key,$out_trade_no,$body,$total_fee,$root);
         $return=$weixinpay->pay();
-        echo $this->resultToJson(1,'支付参数',$return);
+        echo $this->resultToJson(1,'支付参数'.$total_fee,$return);
     }
     //分销二维码
     public function doPageGoodsCode($uid){
@@ -980,10 +980,14 @@ class maskModuleWxapp extends WeModuleWxapp {
             $resarr['code']=$code;
             //保存验证码
             if ($code){
-                $phone=$_GPC['tel'];
+                if ($_GPC['uid']){
+                    $phone=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
+                }else{
+                    $phone=$_GPC['tel'];
+                }
                 $issave=pdo_get('mask_smscode',array('phone'=>$phone,'uniacid'=>$_W['uniacid']));
                 if ($issave){
-                    pdo_update('mask_smscode',array('code'=>$code),array('phone'=>$phone));
+                    pdo_update('mask_smscode',array('code'=>$code),array('phone'=>$phone,'uniacid'=>$_W['uniacid']));
                 }else{
                     pdo_insert('mask_smscode',array('code'=>$code,'phone'=>$phone,'uniacid'=>$_W['uniacid']));
                 }
@@ -1248,6 +1252,258 @@ class maskModuleWxapp extends WeModuleWxapp {
                 echo $this->resultToJson(0,'申请失败','');
             }
         }
+    }
+    //判断是否有支付密码
+    public function doPageGetpaypsw(){
+        global $_W, $_GPC;
+        $paypsw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'paypsw',1);
+        if ($paypsw){
+            echo $this->resultToJson(1,'有支付密码',true);
+        }else{
+            echo $this->resultToJson(0,'没支付密码',false);
+        }
+    }
+    //判断用户输入支付密码
+    public function doPageIspaypsw(){
+        global $_W, $_GPC;
+        $paypsw=pdo_get('mask_user', array('id' => $_GPC['uid'],'paypsw'=>$_GPC['paypsw']));
+        if ($paypsw){
+            echo $this->resultToJson(1,'支付密码正确',true);
+        }else{
+            echo $this->resultToJson(0,'支付密码错误',false);
+        }
+    }
+    //修改支付密码
+    public function doPageUpdatepaypsw(){
+        global $_W, $_GPC;
+        $psw=$_GPC['paypsw'];
+        $uid=$_GPC['uid'];
+        $res=pdo_update('mask_user',array('paypsw'=>$psw),array('id'=>$uid));
+        if ($res){
+            echo $this->resultToJson(1,'支付密码修改成功',true);
+        }else{
+            echo $this->resultToJson(0,'支付密码修改失败',false);
+        }
+    }
+    //忘记密码或新增密码
+    public function doPageForgetOrAddpaypsw(){
+        global $_W, $_GPC;
+        $psw=$_GPC['paypsw'];
+        $uid=$_GPC['uid'];
+        $smscode=$_GPC['code'];
+        $phone=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
+        //修改密码
+        $paypsw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'paypsw',1);
+        if ($psw){
+            if ($paypsw==$psw){
+                //原来密码一致
+                echo $this->resultToJson(0,'不能与原密码一致',false);
+            }else{
+                $codeistrue=pdo_get('mask_smscode',array('phone'=>$phone,'code'=>$smscode,'uniacid'=>$_W['uniacid']));
+                if ($codeistrue){
+                    $res=pdo_update('mask_user',array('paypsw'=>$psw),array('id'=>$uid));
+                    if ($res){
+                        pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
+                        echo $this->resultToJson(1,'支付密码操作成功',true);
+                    }else{
+                        echo $this->resultToJson(0,'支付密码操作失败',false);
+                    }
+                }else{
+                    echo $this->resultToJson(0,'验证码不对',false);
+                }
+            }
+        }else{
+            echo $this->resultToJson(0,'密码不可为空',false);
+        }
+
+    }
+    //编辑新增个人资料
+    public function doPageUpdateInfo(){
+        global $_W, $_GPC;
+        $id=$_GPC['uid'];
+        $adddata['user_name']=$_GPC['user_name'];
+        $adddata['sex']=$_GPC['sex'];
+        $adddata['qq']=$_GPC['qq'];
+        $adddata['wechat']=$_GPC['wechat'];
+        $adddata['user_tel']=$_GPC['user_tel'];
+        $adddata['birthday']=$_GPC['birthday'];
+        $adddata['uniacid']=$_W['uniacid'];
+        //编辑
+        $res=pdo_update('mask_user',$adddata,array('id'=>$id));
+        if ($res){
+            echo $this->resultToJson(1,'编辑个人资料成功','');
+        }else{
+            echo $this->resultToJson(0,'编辑个人信息失败','');
+        }
+    }
+    //获取个人资料
+    public function doPageGetUserinfo(){
+        global $_W, $_GPC;
+        $ID=$_GPC['uid'];
+        $res=pdo_get('mask_user',array('id'=>$ID),array('user_name','id','sex','qq','wechat','user_tel','birthday'));
+        $paypsw=pdo_getcolumn('mask_user', array('id' => $ID), 'paypsw',1);
+        if ($paypsw){
+            $res['issetpsw']=1;
+        }else{
+            $res['issetpsw']=0;
+        }
+        echo $this->resultToJson(1,'返回个人信息',$res);
+    }
+    //我的资产部分
+    //我的大米
+    public function doPageGetwallet(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $info=pdo_get('mask_user',array('id'=>$uid),array('id','wallet','level'));
+        if ($info){
+            echo $this->resultToJson(1,'余额和身份',$info);
+        }else{
+            echo $this->resultToJson(0,'返回余额和身份失败',$info);
+        }
+    }
+    //消费记录
+    public function doPageGetrecord(){
+        global $_W, $_GPC;
+        $type=$_GPC['type'];//2表示全部
+        if ($type<2){
+            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rstate'=>$type),array('rid','rcomment','raddtime','rmoney','rstate'));
+        }else{
+            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid']),array('rid','rcomment','raddtime','rmoney','rstate'));
+        }
+        if ($recoord){
+            echo $this->resultToJson(1,'消费记录数据',$recoord);
+        }else{
+            echo $this->resultToJson(0,'无消费记录数据',$recoord);
+        }
+    }
+    //提现记录
+    public function doPageGetwithdrawal(){
+        global $_W, $_GPC;
+        $dates=$_GPC['dates'];
+        $list=pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype=7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+        echo $this->resultToJson(1,'提现记录',$list);
+    }
+    //提现
+    public function doPageWithdrawal() {
+        global $_W, $_GPC;
+        $money=$_GPC['money'];
+        $uid=$_GPC['uid'];
+        $cid=$_GPC['cid'];
+        $paypsw=$_GPC['paypsw'];
+        $data['rtype'] = 7;
+        $data['rstate'] = 1; //支出
+        $data['rmoney'] = $money;
+        $data['rcomment'] = '申请提现'.$money.'元';
+        $data['rordernumber'] = date('YmdHis',time()).rand(1111,9999);
+        $data['ruid'] = $uid; //用户id
+        $data['rcardid'] = $cid;
+        $data['raddtime'] = date('Y-m-d H:i:s',time());
+        //用户信息
+        $userinfo=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','wallet','paypsw'));
+        $data['rbuyername'] = $userinfo['nickname']; //昵称
+        if ($money>$userinfo['wallet']){
+            //提现金额大于余额
+            echo $this->resultToJson(0,'提现金额超出余额'.'');
+        }else if($money<0){
+            echo $this->resultToJson(0,'提现金额必须大于0'.'');
+        }else if($paypsw!=$userinfo['paypsw']){
+            echo $this->resultToJson(0,'支付密码不对'.'');
+        }else{
+            $res = pdo_insert('mask_record', $data);
+            if ($res){
+                echo $this->resultToJson(1,'提现申请成功'.'');
+            }else{
+                echo $this->resultToJson(0,'提现申请失败'.'');
+            }
+        }
+
+    }
+    //会员卡
+    public function doPageVipcardinfo(){
+        global $_W, $_GPC;
+        $getmoney=pdo_fetch("SELECT sum(money) as totalmoney FROM ".tablename('mask_order')." WHERE  user_id ={$_GPC['uid']} and state=2");
+        $money=$getmoney['totalmoney'];
+        $wallet=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'wallet',1);
+        $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0");
+        $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1");
+        $jifen=$getjifenf['getscore']-$payjifenf['payscore'];
+        $datas['wallet']=$wallet;
+        $datas['totalmoney']=$money;
+        $datas['shengjifeng']=$jifen;
+        echo $this->resultToJson(1,'会员卡信息',$datas);
+    }
+    //判断今日已签到
+    public function doPageTodaySingin(){
+        global $_W, $_GPC;
+        $isqiangdao=pdo_fetch("SELECT count(*) as con FROM ".tablename('mask_integral')." WHERE user_id ={$_GPC['uid']} and  DATE_FORMAT(cerated_time, '%Y%m%d') = DATE_FORMAT(now(), '%Y%m%d')");
+        if ($isqiangdao['con']){
+            echo $this->resultToJson(1,'今日已签到',true);
+        }else{
+            echo $this->resultToJson(0,'今日未签到',false);
+        }
+    }
+    //积分列表
+    public function doPageSinginList(){
+        global $_W, $_GPC;
+        $type=$_GPC['type'];
+        $dates=date('Y-m-d H:i:s',time());
+        if ($type==1){
+            //消费积分
+            $list=pdo_fetchall("SELECT * FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(cerated_time)");
+        }else if($type==2){
+            //签到积分
+            $j = date("t"); //获取当前月份天数
+            $start_time = strtotime(date('Y-m-01'));  //获取本月第一天时间戳
+            $weekarr=array();
+            $weeks = ["周日","周一","周二","周三","周四","周五","周六"];
+            for($i=0;$i<$j;$i++){
+                $sql="SELECT count(*) as con FROM ".tablename('mask_integral')." WHERE user_id ={$_GPC['uid']} 
+                and type=0 and  DATE_FORMAT(cerated_time, '%Y%m%d') = DATE_FORMAT('".date('Y-m-d H:i:s',$start_time+$i*86400)."', '%Y%m%d')";
+                $isqiangdao=pdo_fetch($sql);
+                if ($isqiangdao['con']){
+                    $weekarr[$i]['cerated_time']=date('Y-m-d',$start_time+$i*86400).$weeks[date("w",$start_time+$i*86400)];
+                    $weekarr[$i]['note']='已签到';
+                    $weekarr[$i]['score']=1;
+                }else{
+                    $weekarr[$i]['cerated_time']=date('Y-m-d',$start_time+$i*86400).$weeks[date("w",$start_time+$i*86400)];
+                    $weekarr[$i]['note']='未签到';
+                    $weekarr[$i]['score']=0;
+                }
+            }
+            $list=$weekarr;
+        }else{
+            $list=pdo_fetchall("SELECT * FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(cerated_time)");
+        }
+        echo $this->resultToJson(1,'积分列表',$list);
+
+    }
+    //会员卡签到
+    public function doPageSingin(){
+        global $_W, $_GPC;
+        $data2['score']=1;
+        //当前积分
+        $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0");
+        $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1");
+        $jifen=$getjifenf['getscore']-$payjifenf['payscore'];
+        $data2['beforescore']=$jifen;
+        $data2['afterscore']=$jifen+1;
+        $data2['note']='签到积分';
+        $data2['type']=0;
+        $data2['cerated_time']=date('Y-m-d H:i:s');
+        $data2['uniacid']=$_W['uniacid'];//小程序id
+        $res=pdo_insert('mask_integral',$data2);//添加积分明细
+        if ($res){
+            echo $this->resultToJson(1,'签到成功','');
+        }else{
+            echo $this->resultToJson(0,'签到失败','');
+        }
+    }
+    //我的特权部分
+    //特权中的个人信息
+    public function doPageVipindexInfo(){
+        global $_W, $_GPC;
+        $info = pdo_get('mask_user', array('id' => $_GPC['uid']), array('nickname', 'headerimg','level'));
+        echo $this->resultToJson(1,'特权页信息',$info);
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid
