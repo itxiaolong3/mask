@@ -10,6 +10,8 @@ $item=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
             $data['uniacid']=trim($_W['uniacid']);
             $data['map_key']=trim($_GPC['map_key']);
             $data['tel']=trim($_GPC['tel']);
+            $data['zhituinum']=trim($_GPC['zhituinum']);
+            $data['yingkanum']=trim($_GPC['yingkanum']);
 //            if($_GPC['map_key']==''){
 //                message('腾讯地图key不能为空!','','error');
 //            }

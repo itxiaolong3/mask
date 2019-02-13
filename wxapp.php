@@ -522,6 +522,50 @@ class maskModuleWxapp extends WeModuleWxapp {
             array_push($misc,$v['num']);
         }
         $data['Summary']='共'.$typenum.'款,'.array_sum($misc).'件,合计￥'.$_GPC['money'];//购买数量情况
+        //判断提交订单是否合法，免费领取订单每个用户365天一次机会
+        foreach ($goodinfo as $k=>$v){
+            if ($v['id']==26){
+                //免费领取订单
+                $ishava=pdo_fetch("select o.time from ims_mask_order_goods g LEFT JOIN ims_mask_order  o ON g.order_id=o.id where g.dishes_id=26 and o.user_id={$uid} ORDER BY o.time desc LIMIT 1");
+                if ($ishava['time']){
+                    //有数据
+                    $Date_1 = date("Y-m-d");
+                    $Date_2 = $ishava['time'];
+                    $d1 = strtotime($Date_1);
+                    $d2 = strtotime($Date_2);
+                    $Days = round(($d1-$d2)/3600/24);
+                    if ($Days<360){
+                        //不可以购买
+                        echo $this->resultToJson(-1,'下单失败，365天只能买一次','');
+                        die();
+                    }
+                }
+            }else if ($v['id']==27){
+                //积分订单
+                ///所需积分
+                $jifen=$v['num']*5;
+                ///查询用户积分
+                $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0");
+                $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1");
+                $getjifen=$getjifenf['getscore']-$payjifenf['payscore'];
+                if ($jifen>$getjifenf){
+                    //积分不够
+                    echo $this->resultToJson(-2,'下单失败，积分不够','');
+                    die();
+                }else{
+                    //抵扣积分
+                    $data2['beforescore']=$getjifen;
+                    $data2['afterscore']=$getjifen-$jifen;
+                    $data2['note']='消费积分';
+                    $data2['type']=1;
+                    $data2['cerated_time']=date('Y-m-d H:i:s');
+                    $data2['uniacid']=$_W['uniacid'];//小程序id
+                    pdo_insert('mask_integral',$data2);//添加积分明细
+                }
+
+            }
+        }
+
         $res=pdo_insert('mask_order',$data);
         $order_id=pdo_insertid();
         $chidid=array();
@@ -1327,6 +1371,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $adddata['wechat']=$_GPC['wechat'];
         $adddata['user_tel']=$_GPC['user_tel'];
         $adddata['birthday']=$_GPC['birthday'];
+        $adddata['address']=$_GPC['address'];
         $adddata['uniacid']=$_W['uniacid'];
         //编辑
         $res=pdo_update('mask_user',$adddata,array('id'=>$id));
@@ -1340,7 +1385,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageGetUserinfo(){
         global $_W, $_GPC;
         $ID=$_GPC['uid'];
-        $res=pdo_get('mask_user',array('id'=>$ID),array('user_name','id','sex','qq','wechat','user_tel','birthday'));
+        $res=pdo_get('mask_user',array('id'=>$ID),array('user_name','id','sex','qq','wechat','user_tel','birthday','address'));
         $paypsw=pdo_getcolumn('mask_user', array('id' => $ID), 'paypsw',1);
         if ($paypsw){
             $res['issetpsw']=1;
@@ -1447,6 +1492,13 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $type=$_GPC['type'];
         $dates=date('Y-m-d H:i:s',time());
+        $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0");
+        $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1");
+        $jifen=$getjifenf['getscore']-$payjifenf['payscore'];
+        $datas['alljifeng']=$jifen;
+        $datas['shengjifeng']=$jifen;
+        $datas['payjifeng']=$payjifenf['payscore'];
+        $datas['qiandaojifeng']=$getjifenf['getscore'];
         if ($type==1){
             //消费积分
             $list=pdo_fetchall("SELECT * FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(cerated_time)");
@@ -1474,7 +1526,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         }else{
             $list=pdo_fetchall("SELECT * FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(cerated_time)");
         }
-        echo $this->resultToJson(1,'积分列表',$list);
+        $datas['list']=$list;
+        echo $this->resultToJson(1,'积分列表',$datas);
 
     }
     //会员卡签到
@@ -1504,6 +1557,259 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $info = pdo_get('mask_user', array('id' => $_GPC['uid']), array('nickname', 'headerimg','level'));
         echo $this->resultToJson(1,'特权页信息',$info);
+    }
+    //我的会员卡页面
+    public function doPageMyvip(){
+        global $_W, $_GPC;
+        $twonum = pdo_get('mask_system', array('uniacid' => $_W['uniacid']), array('zhituinum', 'yingkanum'));
+        $zhituinum=$twonum['zhituinum'];
+        $yingkanum=$twonum['yingkanum'];
+        $datas['zhituinum']=$zhituinum;
+        $datas['yingkanum']=$yingkanum;
+        //直推人数
+        $hcountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and o.state=4 ";
+        $countdatas[':uniacid']=$_W['uniacid'];
+        $countdatas[':pid']=$_GPC['uid'];
+        //直接销售额
+        $wm=pdo_fetch("select sum(money) as total from ". tablename("mask_order") . " o"
+            . " left join " . tablename("mask_relation") . " r on o.user_id=r.uid".$hcountwhere,$countdatas);
+        $completenum=number_format($wm['total'],2);
+        $datas['completenum']=$completenum;
+        //银卡成交数量
+        $yinkawhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level=2";
+        $jinkacount=pdo_fetch("select count(*) as con from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$yinkawhere,$countdatas);
+        $completeyinkanum=$jinkacount['con'];
+        $datas['completeyinkanum']=$completeyinkanum;
+        //判断是否达到要求
+        if ($wm['total']>=$zhituinum){
+            //达成银卡升级条件
+            pdo_update('mask_user',array('level'=>2),array('id'=>$_GPC['uid']));
+            if ($completeyinkanum>=$yingkanum){
+                //达成金卡升级条件
+                pdo_update('mask_user',array('level'=>3),array('id'=>$_GPC['uid']));
+            }
+        }
+        echo $this->resultToJson(1,'我的会员卡返回数据',$datas);
+    }
+    //用户协议
+    public function doPageXieyi(){
+        global $_W, $_GPC;
+        $info=pdo_get('mask_help', array('uniacid' => $_W['uniacid'],'question'=>'用户协议'));
+        $contents=htmlspecialchars_decode($info['answer']);
+        echo $this->resultToJson(1,'用户协议',$contents);
+    }
+    //区域商页面
+    public function doPageAreaIndexinfo(){
+        global $_W, $_GPC;
+        //推广总数
+        $count=pdo_get('mask_relation', array('pid'=>$_GPC['uid']), array('count(id) as count'));
+        $data['tgalltotal']=$count['count'];
+
+        //推广成交量
+        $hcountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level>0";
+        $countdatas[':uniacid']=$_W['uniacid'];
+        $countdatas[':pid']=$_GPC['uid'];
+        $hehuocount=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$hcountwhere,$countdatas);
+        $data['tgchengjiaocount']=$hehuocount;
+
+        //个人累积消费
+        $personfell=pdo_fetch("select sum(money) as total from ". tablename("mask_order")." where user_id={$_GPC['uid']} and state=4");
+        $data['Personalconsumption']=$personfell['total'];
+
+        //推广销售额
+        $where=" WHERE r.uniacid=:uniacid and r.pid=:pid and o.state=4 ";
+        $wm=pdo_fetch("select sum(money) as total from ". tablename("mask_order") . " o"
+            . " left join " . tablename("mask_relation") . " r on o.user_id=r.uid".$where,$countdatas);
+        $completenum=number_format($wm['total'],2);
+        $data['tgmoenycount']=$completenum;
+        echo $this->resultToJson(1,'区域商页面返回数据',$data);
+    }
+    //余额支付
+    public function doPageYuePay(){
+        global $_W, $_GPC;
+        //1，判断是否设置支付密码
+        $userinfo=pdo_get('mask_user', array('id' => $_GPC['uid']), array('paypsw', 'wallet'));
+        if ($userinfo['paypsw']){
+            //2，判断余额是否满足
+            $wallet=$userinfo['wallet'];
+            $paymoney=$_GPC['money'];
+            if ($wallet>=$paymoney){
+                //3，支付密码是否正确
+                $paypsw=$_GPC['paypsw'];
+                if ($paypsw==$userinfo['paypsw']){
+                    //可以支付
+                    $orderid=$_GPC['orderid'];
+                    $order=pdo_get('mask_order',array('id'=>$orderid));
+                    //更新订单状态和子订单状态
+                    pdo_update('mask_order_goods',array('state'=>2),array('order_id'=>$orderid));
+                    $payres=pdo_update('mask_order',array('state'=>2),array('id'=>$orderid));
+                    //自己的信息
+                    $nickname=pdo_getcolumn('mask_user', array('id' => $order['user_id']), 'nickname',1);
+                    //////////////////限制字符串长度/////////////////////////////
+                    $str=$nickname;
+                    //处理长度  不管中英文，都代表1个长度
+                    preg_match_all("/./us", $str, $match);
+                    $str_arr=$match[0];
+                    $length_val=count($str_arr);//字符串长度
+                    $show_str=implode('',$str_arr);//最后要显示的字符串
+                    //控制的显示长度
+                    $length_limit=5;
+                    //字符串超出控制长度，显示处理
+                    if($length_val>$length_limit){
+                        $show_str="";
+                        for ($i=0;$i<$length_limit;$i++){
+                            $show_str.=$str_arr[$i];
+                        }
+                        $show_str.="...";//最后以...代表后面字符省略
+                    }
+                    $nickname=$show_str;
+                    //////////////////////////////
+                    //新增交易记录，佣金分配
+                    //订单类型
+                    $type=$order['type'];
+                    if ($type){
+                        //1,判断推荐人身份（直推），间推
+                        $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
+                        if ($pid){
+                            //直推等级
+                            $puserinfo=pdo_get('mask_user', array('id'=>$pid,'uniacid'=>$_W['uniacid']));
+                            $onelevel=$puserinfo['level'];
+                            //代理记录
+                            $dldata['rtype']=1;
+                            $dldata['rstate']=0;
+                            $dldata['rmoney']=150;//直推奖励
+                            $dldata['ruid']=$pid;
+                            $dldata['rbuyername']=$nickname;
+                            $dldata['rordernumber']=$order['order_num']; //银卡
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid']));
+                            $dldata['rcardid']=$card['id'];
+                            $dldata['rcomment']="直推(".$nickname.")奖励：150元";
+                            $dldata['raddtime']=date('Y-m-d H:i:s',time());
+                            //银卡记录
+                            $ykdata['rtype']=1;
+                            $ykdata['rstate']=0;
+                            $ykdata['rmoney']=30;//直推奖励
+                            $ykdata['ruid']=$pid;
+                            $ykdata['rbuyername']=$nickname;
+                            $ykdata['rordernumber']=$order['order_num'];
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid']));//银卡
+                            $ykdata['rcardid']=$card['id'];
+                            $ykdata['rcomment']="直推(".$nickname.")银卡奖励：30元";
+                            $ykdata['raddtime']=date('Y-m-d H:i:s',time());
+                            //金卡记录
+                            $jkdata['rtype']=1;
+                            $jkdata['rstate']=0;
+                            $jkdata['rmoney']=40;//直推奖励
+                            $jkdata['ruid']=$pid;
+                            $jkdata['rbuyername']=$nickname;
+                            $jkdata['rordernumber']=$order['order_num'];
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
+                            $jkdata['rcardid']=$card['id'];
+                            $jkdata['rcomment']="直推(".$nickname.")金卡奖励：40元";
+                            $jkdata['raddtime']=date('Y-m-d H:i:s',time());
+                            //市代记录
+                            $sddata['rtype']=1;
+                            $sddata['rstate']=0;
+                            $sddata['rmoney']=4;//直推奖励
+                            $sddata['ruid']=$pid;
+                            $sddata['rbuyername']=$nickname;
+                            $sddata['rordernumber']=$order['order_num'];
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
+                            $sddata['rcardid']=$card['id'];
+                            $sddata['rcomment']="直推(".$nickname.")市代奖励：4元";
+                            $sddata['raddtime']=date('Y-m-d H:i:s',time());
+                            //省代记录
+                            $shendaidata['rtype']=1;
+                            $shendaidata['rstate']=0;
+                            $shendaidata['rmoney']=8;//直推奖励
+                            $shendaidata['ruid']=$pid;
+                            $shendaidata['rbuyername']=$nickname;
+                            $shendaidata['rordernumber']=$order['order_num'];
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
+                            $shendaidata['rcardid']=$card['id'];
+                            $shendaidata['rcomment']="直推(".$nickname.")奖励：8元";
+                            $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
+
+                            switch ($onelevel){
+                                case 1:
+                                    pdo_insert('mask_record',$dldata);
+                                    break;
+                                case 2:
+                                    pdo_insert('mask_record',$dldata);
+                                    pdo_insert('mask_record',$ykdata);
+                                    //银卡
+                                    break;
+                                case 3:
+                                    //金卡
+                                    pdo_insert('mask_record',$dldata);
+                                    pdo_insert('mask_record',$ykdata);
+                                    pdo_insert('mask_record',$jkdata);
+                                    break;
+                                case 4:
+                                    //市代
+                                    //先判断是否本市的
+                                    $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
+                                    $addressarr=explode('-',$cityaddress);
+                                    $orderaddressarr=explode('-',$order['address']);
+                                    pdo_insert('mask_record',$dldata);
+                                    pdo_insert('mask_record',$ykdata);
+                                    pdo_insert('mask_record',$jkdata);
+                                    if ($addressarr[1]==$orderaddressarr[1]){
+                                        pdo_insert('mask_record',$sddata);
+                                    }
+                                    break;
+                                case 5:
+                                    //省代
+                                    pdo_insert('mask_record',$dldata);
+                                    pdo_insert('mask_record',$ykdata);
+                                    pdo_insert('mask_record',$jkdata);
+                                    //先判断是否省代的
+                                    $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
+                                    $addressarr=explode('-',$cityaddress);
+                                    $orderaddressarr=explode('-',$order['address']);
+                                    pdo_insert('mask_record',$dldata);
+                                    pdo_insert('mask_record',$ykdata);
+                                    pdo_insert('mask_record',$jkdata);
+                                    if ($addressarr[0]==$orderaddressarr[0]){
+                                        pdo_insert('mask_record',$sddata);
+                                        pdo_insert('mask_record',$shendaidata);
+                                    }
+                                    break;
+                            }
+                            //间推等级
+                            $twopid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
+                            if ($twopid){
+                                $jtdata['rtype']=2;
+                                $jtdata['rstate']=0;
+                                $jtdata['rmoney']=48;//间推奖励
+                                $jtdata['ruid']=$twopid;
+                                $jtdata['rbuyername']=$nickname;
+                                $jtdata['rordernumber']=$order['order_num'];
+                                $card=pdo_get('mask_bankcard', array('uid'=>$twopid,'uniacid'=>$_W['uniacid']));
+                                $jtdata['rcardid']=$card['id'];
+                                $jtdata['rcomment']="间推(".$nickname.")奖励：48元";
+                                $jtdata['raddtime']=date('Y-m-d H:i:s',time());
+                                pdo_insert('mask_record',$jtdata);
+                            }
+                        }
+                    }
+                    if ($payres){
+                        pdo_update('mask_user', array('wallet -=' => $paymoney), array('id' => $order['user_id']));
+                        echo $this->resultToJson(1,'余额支付成功',true);
+                    }else{
+                        echo $this->resultToJson(0,'余额支付失败',false);
+                    }
+                    //修改库存量
+                }else{
+                    echo $this->resultToJson(-3,'支付密码不对',false);
+                }
+            }else{
+                echo $this->resultToJson(-2,'余额不够',false);
+            }
+        }else{
+            echo $this->resultToJson(-1,'没支付密码',false);
+        }
+
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid
