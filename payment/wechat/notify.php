@@ -79,7 +79,9 @@ $url=substr($str,0,$n);
     //////////////////////////////
     //新增交易记录，佣金分配
     //订单类型
-    $type=$order['type'];
+    //$type=$order['type'];
+    //通过商品id来判断分销类型
+    $type=pdo_get('mask_order_goods', array('order_id'=>$order['id'],'dishes_id'=>24,'uniacid'=>$_W['uniacid']));
     if ($type){
         //1,判断推荐人身份（直推），间推
         $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
@@ -123,33 +125,37 @@ $url=substr($str,0,$n);
             //市代记录
             $sddata['rtype']=1;
             $sddata['rstate']=0;
-            $sddata['rmoney']=4;//直推奖励
+            $sddata['rmoney']=8;//直推奖励
             $sddata['ruid']=$pid;
             $sddata['rbuyername']=$nickname;
             $sddata['rordernumber']=$order['order_num'];
             $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
             $sddata['rcardid']=$card['id'];
-            $sddata['rcomment']="直推(".$nickname.")市代奖励：4元";
+            $sddata['rcomment']="直推(".$nickname.")市代奖励：8元";
             $sddata['raddtime']=date('Y-m-d H:i:s',time());
             //省代记录
             $shendaidata['rtype']=1;
             $shendaidata['rstate']=0;
-            $shendaidata['rmoney']=8;//直推奖励
+            $shendaidata['rmoney']=4;//直推奖励
             $shendaidata['ruid']=$pid;
             $shendaidata['rbuyername']=$nickname;
             $shendaidata['rordernumber']=$order['order_num'];
             $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
             $shendaidata['rcardid']=$card['id'];
-            $shendaidata['rcomment']="直推(".$nickname.")奖励：8元";
+            $shendaidata['rcomment']="直推(".$nickname.")省代奖励：4元";
             $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
 
            switch ($onelevel){
                case 1:
                    pdo_insert('mask_record',$dldata);
+                   //更新余额
+                   pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
                    break;
                case 2:
                    pdo_insert('mask_record',$dldata);
                    pdo_insert('mask_record',$ykdata);
+                   //更新余额
+                   pdo_update('mask_user', array('wallet +=' => 180), array('id' => $pid));
                    //银卡
                    break;
                case 3:
@@ -157,6 +163,8 @@ $url=substr($str,0,$n);
                    pdo_insert('mask_record',$dldata);
                    pdo_insert('mask_record',$ykdata);
                    pdo_insert('mask_record',$jkdata);
+                   //更新余额
+                   pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
                    break;
                case 4:
                    //市代
@@ -169,6 +177,8 @@ $url=substr($str,0,$n);
                    pdo_insert('mask_record',$jkdata);
                    if ($addressarr[1]==$orderaddressarr[1]){
                        pdo_insert('mask_record',$sddata);
+                       //更新余额
+                       pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
                    }
                    break;
                case 5:
@@ -186,6 +196,8 @@ $url=substr($str,0,$n);
                    if ($addressarr[0]==$orderaddressarr[0]){
                        pdo_insert('mask_record',$sddata);
                        pdo_insert('mask_record',$shendaidata);
+                       //更新余额
+                       pdo_update('mask_user', array('wallet +=' => 232), array('id' => $pid));
                    }
                    break;
            }
@@ -202,7 +214,11 @@ $url=substr($str,0,$n);
                 $jtdata['rcardid']=$card['id'];
                 $jtdata['rcomment']="间推(".$nickname.")奖励：48元";
                 $jtdata['raddtime']=date('Y-m-d H:i:s',time());
-                pdo_insert('mask_record',$jtdata);
+                $jup=pdo_insert('mask_record',$jtdata);
+                if ($jup){
+                    //更新余额
+                    pdo_update('mask_user', array('wallet +=' => 48), array('id' => $pid));
+                }
             }
         }
     }

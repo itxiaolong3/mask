@@ -550,7 +550,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                 $getjifen=$getjifenf['getscore']-$payjifenf['payscore'];
                 if ($jifen>$getjifenf){
                     //积分不够
-                    echo $this->resultToJson(-2,'下单失败，积分不够','');
+                    echo $this->resultToJson(-1,'下单失败，积分不够','');
                     die();
                 }else{
                     //抵扣积分
@@ -1045,7 +1045,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //海报数据
     public function doPageQrcodeinfo(){
         global $_GPC, $_W;
-        $info=pdo_get('mask_user',array('id'=>$_GPC['uid']),array('nickname','id','headerimg','img'));
+        $info=pdo_get('mask_user',array('id'=>$_GPC['uid']),array('nickname','id','headerimg','img','level'));
         if ($info){
             echo $this->resultToJson(1,'海报数据成功',$info);
         }else{
@@ -1497,8 +1497,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         $jifen=$getjifenf['getscore']-$payjifenf['payscore'];
         $datas['alljifeng']=$jifen;
         $datas['shengjifeng']=$jifen;
-        $datas['payjifeng']=$payjifenf['payscore'];
-        $datas['qiandaojifeng']=$getjifenf['getscore'];
+        $datas['payjifeng']=$payjifenf['payscore']?$payjifenf['payscore']:'0';
+        $datas['qiandaojifeng']=$getjifenf['getscore']?$getjifenf['getscore']:'0';
         if ($type==1){
             //消费积分
             $list=pdo_fetchall("SELECT * FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(cerated_time)");
@@ -1542,14 +1542,23 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data2['afterscore']=$jifen+1;
         $data2['note']='签到积分';
         $data2['type']=0;
+        $data2['user_id']=$_GPC['uid'];
         $data2['cerated_time']=date('Y-m-d H:i:s');
         $data2['uniacid']=$_W['uniacid'];//小程序id
-        $res=pdo_insert('mask_integral',$data2);//添加积分明细
-        if ($res){
-            echo $this->resultToJson(1,'签到成功','');
+        //查询当日身份已经签到
+        pdo_get('mask_integral', array('uniacid' => $_W['uniacid'],'user_id' => $_GPC['uid']));
+        $isqiandao=pdo_fetch("select * from ". tablename("mask_integral")." where user_id={$_GPC['uid']} and type=0 and to_days(cerated_time) = to_days(now())");
+        if ($isqiandao){
+            echo $this->resultToJson(0,'一天一次','');
         }else{
-            echo $this->resultToJson(0,'签到失败','');
+            $res=pdo_insert('mask_integral',$data2);//添加积分明细
+            if ($res){
+                echo $this->resultToJson(1,'签到成功','');
+            }else{
+                echo $this->resultToJson(0,'签到失败','');
+            }
         }
+
     }
     //我的特权部分
     //特权中的个人信息
@@ -1583,7 +1592,23 @@ class maskModuleWxapp extends WeModuleWxapp {
         //判断是否达到要求
         if ($wm['total']>=$zhituinum){
             //达成银卡升级条件
-            pdo_update('mask_user',array('level'=>2),array('id'=>$_GPC['uid']));
+            $upres=pdo_update('mask_user',array('level'=>2),array('id'=>$_GPC['uid']));
+            if ($upres){
+                $userinfo=pdo_get('mask_user',array('id'=>$_GPC['uid']),array('nickname','id','headerimg','img','level'));
+                //升级银卡成功奖励300元到余额
+                $jldata['rtype']=1;
+                $jldata['rstate']=0;
+                $jldata['rmoney']=8;//直推奖励
+                $jldata['ruid']=$_GPC['uid'];
+                $jldata['rbuyername']=$userinfo['nickname'];
+                $jldata['rordernumber']=0;
+                $card=pdo_get('mask_bankcard', array('uid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid'])); //银行卡
+                $jldata['rcardid']=$card['id'];
+                $jldata['rcomment']="银卡升级奖励：300元";
+                $jldata['raddtime']=date('Y-m-d H:i:s',time());
+                //更新余额
+                pdo_update('mask_user', array('wallet +=' => 30), array('id' => $_GPC['uid']));
+            }
             if ($completeyinkanum>=$yingkanum){
                 //达成金卡升级条件
                 pdo_update('mask_user',array('level'=>3),array('id'=>$_GPC['uid']));
@@ -1666,7 +1691,9 @@ class maskModuleWxapp extends WeModuleWxapp {
                     //////////////////////////////
                     //新增交易记录，佣金分配
                     //订单类型
-                    $type=$order['type'];
+                    //$type=$order['type'];
+                    //通过商品id来判断分销类型
+                    $type=pdo_get('mask_order_goods', array('order_id'=>$orderid,'dishes_id'=>24,'uniacid'=>$_W['uniacid']));
                     if ($type){
                         //1,判断推荐人身份（直推），间推
                         $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
@@ -1710,7 +1737,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             //市代记录
                             $sddata['rtype']=1;
                             $sddata['rstate']=0;
-                            $sddata['rmoney']=4;//直推奖励
+                            $sddata['rmoney']=8;//直推奖励
                             $sddata['ruid']=$pid;
                             $sddata['rbuyername']=$nickname;
                             $sddata['rordernumber']=$order['order_num'];
@@ -1721,7 +1748,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             //省代记录
                             $shendaidata['rtype']=1;
                             $shendaidata['rstate']=0;
-                            $shendaidata['rmoney']=8;//直推奖励
+                            $shendaidata['rmoney']=4;//直推奖励
                             $shendaidata['ruid']=$pid;
                             $shendaidata['rbuyername']=$nickname;
                             $shendaidata['rordernumber']=$order['order_num'];
@@ -1733,10 +1760,14 @@ class maskModuleWxapp extends WeModuleWxapp {
                             switch ($onelevel){
                                 case 1:
                                     pdo_insert('mask_record',$dldata);
+                                    //更新余额
+                                    pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
                                     break;
                                 case 2:
                                     pdo_insert('mask_record',$dldata);
                                     pdo_insert('mask_record',$ykdata);
+                                    //更新余额
+                                    pdo_update('mask_user', array('wallet +=' => 180), array('id' => $pid));
                                     //银卡
                                     break;
                                 case 3:
@@ -1744,6 +1775,8 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     pdo_insert('mask_record',$dldata);
                                     pdo_insert('mask_record',$ykdata);
                                     pdo_insert('mask_record',$jkdata);
+                                    //更新余额
+                                    pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
                                     break;
                                 case 4:
                                     //市代
@@ -1756,6 +1789,8 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     pdo_insert('mask_record',$jkdata);
                                     if ($addressarr[1]==$orderaddressarr[1]){
                                         pdo_insert('mask_record',$sddata);
+                                        //更新余额
+                                        pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
                                     }
                                     break;
                                 case 5:
@@ -1773,6 +1808,8 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     if ($addressarr[0]==$orderaddressarr[0]){
                                         pdo_insert('mask_record',$sddata);
                                         pdo_insert('mask_record',$shendaidata);
+                                        //更新余额
+                                        pdo_update('mask_user', array('wallet +=' => 232), array('id' => $pid));
                                     }
                                     break;
                             }
@@ -1789,7 +1826,12 @@ class maskModuleWxapp extends WeModuleWxapp {
                                 $jtdata['rcardid']=$card['id'];
                                 $jtdata['rcomment']="间推(".$nickname.")奖励：48元";
                                 $jtdata['raddtime']=date('Y-m-d H:i:s',time());
-                                pdo_insert('mask_record',$jtdata);
+                                $jup=pdo_insert('mask_record',$jtdata);
+                                if ($jup){
+                                    //更新余额
+                                    pdo_update('mask_user', array('wallet +=' => 48), array('id' => $pid));
+                                }
+
                             }
                         }
                     }
