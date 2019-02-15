@@ -40,11 +40,11 @@ class maskModuleWxapp extends WeModuleWxapp {
         $dldata['rstate']=0;
         $dldata['rmoney']=150;//直推奖励
         $dldata['ruid']=100003;
-        $dldata['rbuyername']='小午苑庄紫色魅影凯特之美';
-        $dldata['rordernumber']='201902151632436356';
+        $dldata['rbuyername']='A未知';
+        $dldata['rordernumber']='201902151644268522';
         //$card=pdo_get('mask_bankcard', array('uid'=>$pid));//银卡
         //$dldata['rcardid']=$card['id'];
-        $dldata['rcomment']="直推(小午苑庄紫色魅影凯特之美)奖励：150元";
+        $dldata['rcomment']="直推(A未知)奖励：150元";
         $dldata['raddtime']=date('Y-m-d H:i:s',time());
 
         //echo $this->doPageGoodsCode(6);
@@ -195,6 +195,12 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $gid=$_GPC['gid'];
         $uid=$_GPC['uid'];
+        //先判断用户是否登录
+        $islogin=pdo_getcolumn('mask_user', array('id' => $uid), 'user_tel',1);
+        if (!$islogin){
+            echo $this->resultToJson(0,'请登录！','');
+            die();
+        }
         $state=$_GPC['state'];
         $data['gid']=$gid;
         $data['uid']=$uid;
@@ -504,6 +510,12 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageAddMyOrder(){
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
+        //先判断用户是否登录
+        $islogin=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
+        if (!$islogin){
+            echo $this->resultToJson(0,'请登录！','');
+            die();
+        }
         $addid=$_GPC['aid'];//地址id
         $goodinfo=json_decode(htmlspecialchars_decode($_GPC['arr']),true);//商品信息数组
         //echo $this->resultToJson(0,'返回提交的信息',$goodinfo);die();
@@ -886,7 +898,13 @@ class maskModuleWxapp extends WeModuleWxapp {
                 //生成专属二维码保存起来
                 echo $this->resultToJson(1,'用户登录成功',$res);
             }else{
-                echo $this->resultToJson(0,'用户登录失败','');
+                //是否注册
+                $isp=pdo_get('mask_user',array('user_tel'=>$phone,'uniacid'=>$_W['uniacid']));
+                if ($isp){
+                    echo $this->resultToJson(0,'没注册','');
+                }else{
+                    echo $this->resultToJson(0,'用户登录失败','');
+                }
             }
         }else{
             echo $this->resultToJson(0,'手机号不可为空，登录失败','');
@@ -4594,10 +4612,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6446,8 +6464,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                    "page"=>"mask/pages/Liar/loginindex",
-                    "width" => 400);
+                               "page"=>"mask/pages/Liar/loginindex",
+                               "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8320,10 +8338,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
