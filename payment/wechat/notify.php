@@ -5,30 +5,30 @@ global $_W, $_GPC;
 $input = file_get_contents('php://input');
 $isxml = true;
 if (!empty($input) && empty($_GET['out_trade_no'])) {
-	$obj = isimplexml_load_string($input, 'SimpleXMLElement', LIBXML_NOCDATA);
-	$res = $data = json_decode(json_encode($obj), true);
+    $obj = isimplexml_load_string($input, 'SimpleXMLElement', LIBXML_NOCDATA);
+    $res = $data = json_decode(json_encode($obj), true);
     $filename=$_W['attachurl'].'notifyinfo.txt';
-	file_put_contents($filename,$data['result_code'].'==result_code'.$data['return_code'].'===return_code');
-	if (empty($data)) {
-		$result = array(
-			'return_code' => 'FAIL',
-			'return_msg' => ''
-		);
-		echo array2xml($result);
-		exit;
-	}
-	if ($data['result_code'] != 'SUCCESS' || $data['return_code'] != 'SUCCESS') {
-		$result = array(
-			'return_code' => 'FAIL',
-			'return_msg' => empty($data['return_msg']) ? $data['err_code_des'] : $data['return_msg']
-		);
-		echo array2xml($result);
-		exit;
-	}
-	$get = $data;
+    file_put_contents($filename,$data['result_code'].'==result_code'.$data['return_code'].'===return_code');
+    if (empty($data)) {
+        $result = array(
+            'return_code' => 'FAIL',
+            'return_msg' => ''
+        );
+        echo array2xml($result);
+        exit;
+    }
+    if ($data['result_code'] != 'SUCCESS' || $data['return_code'] != 'SUCCESS') {
+        $result = array(
+            'return_code' => 'FAIL',
+            'return_msg' => empty($data['return_msg']) ? $data['err_code_des'] : $data['return_msg']
+        );
+        echo array2xml($result);
+        exit;
+    }
+    $get = $data;
 } else {
-	$isxml = false;
-	$get = $_GET;
+    $isxml = false;
+    $get = $_GET;
 }
 load()->web('common');
 load()->model('mc');
@@ -38,23 +38,24 @@ $_W['uniaccount'] = $_W['account'] = uni_fetch($_W['uniacid']);
 $_W['acid'] = $_W['uniaccount']['acid'];
 $paySetting = uni_setting($_W['uniacid'], array('payment'));
 if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
-	$logno = trim($res['out_trade_no']);
-  
-	if (empty($logno)) {
-		exit;
-	}
-$str=$_W['siteroot'];
-$n = 0;
-for($i = 1;$i <= 3;$i++) {
-    $n = strpos($str, '/', $n);
-    $i != 3 && $n++;
-}
-$url=substr($str,0,$n);
- 
-	$order=pdo_get('mask_order',array('code'=>$logno));
-	//更新订单状态和子订单状态
+    $logno = trim($res['out_trade_no']);
+
+    if (empty($logno)) {
+        exit;
+    }
+    $str=$_W['siteroot'];
+    $n = 0;
+    for($i = 1;$i <= 3;$i++) {
+        $n = strpos($str, '/', $n);
+        $i != 3 && $n++;
+    }
+    $url=substr($str,0,$n);
+
+    $order=pdo_get('mask_order',array('code'=>$logno));
+    //更新订单状态和子订单状态
     pdo_update('mask_order_goods',array('state'=>2),array('order_id'=>$order['id']));
     pdo_update('mask_order',array('state'=>2),array('code'=>$logno));
+
     //自己的信息
     $nickname=pdo_getcolumn('mask_user', array('id' => $order['user_id']), 'nickname',1);
 
@@ -81,10 +82,20 @@ $url=substr($str,0,$n);
     //订单类型
     //$type=$order['type'];
     //通过商品id来判断分销类型
-    $type=pdo_get('mask_order_goods', array('order_id'=>$order['id'],'dishes_id'=>24,'uniacid'=>$_W['uniacid']));
-    if ($type){
+    //$types=pdo_get('mask_order_goods', array('order_id'=>$order['id'],'dishes_id'=>24,'uniacid'=>$_W['uniacid']));
+    $testsql=" select * from ".tablename('mask_order_goods')." where dishes_id=24  and order_id='{$order['id']}'";
+    $ress=pdo_fetch($testsql);
+    $filenotify1=$_W['attachurl'].'wxloginfo1.txt';
+    $getoginfo=json_encode($res);
+    //file_put_contents($filenotify1,"sql=".$testsql."----结果=".$getoginfo);
+    if ($ress){
         //1,判断推荐人身份（直推），间推
         $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
+        //直接升级会员身份level
+        $uplevel=pdo_update('mask_user', array('level' => 1), array('id' => $order['user_id']));
+        $filenotify=$_W['attachurl'].'wxloginfo.txt';
+        //file_put_contents($filenotify,"用户id=".$order['user_id']."----结果=".$uplevel);
+
         if ($pid){
             //直推等级
             $puserinfo=pdo_get('mask_user', array('id'=>$pid,'uniacid'=>$_W['uniacid']));
@@ -145,62 +156,62 @@ $url=substr($str,0,$n);
             $shendaidata['rcomment']="直推(".$nickname.")省代奖励：4元";
             $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
 
-           switch ($onelevel){
-               case 1:
-                   pdo_insert('mask_record',$dldata);
-                   //更新余额
-                   pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
-                   break;
-               case 2:
-                   pdo_insert('mask_record',$dldata);
-                   pdo_insert('mask_record',$ykdata);
-                   //更新余额
-                   pdo_update('mask_user', array('wallet +=' => 180), array('id' => $pid));
-                   //银卡
-                   break;
-               case 3:
-                   //金卡
-                   pdo_insert('mask_record',$dldata);
-                   pdo_insert('mask_record',$ykdata);
-                   pdo_insert('mask_record',$jkdata);
-                   //更新余额
-                   pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
-                   break;
-               case 4:
-                   //市代
-                   //先判断是否本市的
-                   $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
-                   $addressarr=explode('-',$cityaddress);
-                   $orderaddressarr=explode('-',$order['address']);
-                   pdo_insert('mask_record',$dldata);
-                   pdo_insert('mask_record',$ykdata);
-                   pdo_insert('mask_record',$jkdata);
-                   if ($addressarr[1]==$orderaddressarr[1]){
-                       pdo_insert('mask_record',$sddata);
-                       //更新余额
-                       pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
-                   }
-                   break;
-               case 5:
-                   //省代
-                   pdo_insert('mask_record',$dldata);
-                   pdo_insert('mask_record',$ykdata);
-                   pdo_insert('mask_record',$jkdata);
-                   //先判断是否省代的
-                   $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
-                   $addressarr=explode('-',$cityaddress);
-                   $orderaddressarr=explode('-',$order['address']);
-                   pdo_insert('mask_record',$dldata);
-                   pdo_insert('mask_record',$ykdata);
-                   pdo_insert('mask_record',$jkdata);
-                   if ($addressarr[0]==$orderaddressarr[0]){
-                       pdo_insert('mask_record',$sddata);
-                       pdo_insert('mask_record',$shendaidata);
-                       //更新余额
-                       pdo_update('mask_user', array('wallet +=' => 232), array('id' => $pid));
-                   }
-                   break;
-           }
+            switch ($onelevel){
+                case 1:
+                    pdo_insert('mask_record',$dldata);
+                    //更新余额
+                    //pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
+                    break;
+                case 2:
+                    pdo_insert('mask_record',$dldata);
+                    pdo_insert('mask_record',$ykdata);
+                    //更新余额
+                    //pdo_update('mask_user', array('wallet +=' => 180), array('id' => $pid));
+                    //银卡
+                    break;
+                case 3:
+                    //金卡
+                    pdo_insert('mask_record',$dldata);
+                    pdo_insert('mask_record',$ykdata);
+                    pdo_insert('mask_record',$jkdata);
+                    //更新余额
+                    //pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
+                    break;
+                case 4:
+                    //市代
+                    //先判断是否本市的
+                    $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
+                    $addressarr=explode('-',$cityaddress);
+                    $orderaddressarr=explode('-',$order['address']);
+                    pdo_insert('mask_record',$dldata);
+                    pdo_insert('mask_record',$ykdata);
+                    pdo_insert('mask_record',$jkdata);
+                    if ($addressarr[1]==$orderaddressarr[1]){
+                        pdo_insert('mask_record',$sddata);
+                        //更新余额
+                        //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                    }
+                    break;
+                case 5:
+                    //省代
+                    pdo_insert('mask_record',$dldata);
+                    pdo_insert('mask_record',$ykdata);
+                    pdo_insert('mask_record',$jkdata);
+                    //先判断是否省代的
+                    $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
+                    $addressarr=explode('-',$cityaddress);
+                    $orderaddressarr=explode('-',$order['address']);
+                    pdo_insert('mask_record',$dldata);
+                    pdo_insert('mask_record',$ykdata);
+                    pdo_insert('mask_record',$jkdata);
+                    if ($addressarr[0]==$orderaddressarr[0]){
+                        pdo_insert('mask_record',$sddata);
+                        pdo_insert('mask_record',$shendaidata);
+                        //更新余额
+                        //pdo_update('mask_user', array('wallet +=' => 232), array('id' => $pid));
+                    }
+                    break;
+            }
             //间推等级
             $twopid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
             if ($twopid){
@@ -217,14 +228,15 @@ $url=substr($str,0,$n);
                 $jup=pdo_insert('mask_record',$jtdata);
                 if ($jup){
                     //更新余额
-                    pdo_update('mask_user', array('wallet +=' => 48), array('id' => $pid));
+                    //pdo_update('mask_user', array('wallet +=' => 48), array('id' => $pid));
                 }
             }
+
         }
     }
 
     //修改库存量
-  
+
 //	$czorder=pdo_get('mask_czorder',array('code'=>$logno));
 //	$hyorder=pdo_get('mask_hyorder',array('code'=>$logno));
 //	$qgorder=pdo_get('mask_qgorder',array('code'=>$logno));
@@ -260,17 +272,17 @@ $url=substr($str,0,$n);
 //		file_get_contents("".$url."/app/index.php?i=".$czorder['uniacid']."&c=entry&a=wxapp&do=Recharge&m=mask&user_id=".$czorder['user_id']."&money=".$czorder['money']."&money2=".$czorder['money2']);//改变订单状态
 //		file_get_contents("".$url."/app/index.php?i=".$czorder['uniacid']."&c=entry&a=wxapp&do=CzMessage&m=mask&order_id=".$czorder['id']);//改变订单状态
 //	}
-	if($order['state']==1){
-	    //下单成功模板消息
-		//file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=NewOrderMessage&m=mask&order_id=".$order['id']);//模板消息
-		//file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=payorder&m=mask&order_id=".$order['id']);
-		//file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=Message&m=mask&order_id=".$order['id']);//模板消息
-		//file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=mask&order_id=".$order['id']);//打印机
-		//file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=mask&order_id=".$order['id']);//打印机
-		//file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=1&store_id=".$order['store_id']);//短信
-			//分销佣金
+    if($order['state']==1){
+        //下单成功模板消息
+        //file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=NewOrderMessage&m=mask&order_id=".$order['id']);//模板消息
+        //file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=payorder&m=mask&order_id=".$order['id']);
+        //file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=Message&m=mask&order_id=".$order['id']);//模板消息
+        //file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=QtPrint&m=mask&order_id=".$order['id']);//打印机
+        //file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=HcPrint&m=mask&order_id=".$order['id']);//打印机
+        //file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=sms&m=mask&type=1&store_id=".$order['store_id']);//短信
+        //分销佣金
         //file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=JsCommission&m=mask&order_id=".$order['id']);
-	}
+    }
 //	if($order['type']==2 and $order['dn_state']==1){//店内
 //
 //		file_get_contents("".$url."/app/index.php?i=".$order['uniacid']."&c=entry&a=wxapp&do=payorder&m=mask&order_id=".$order['id']);
@@ -310,12 +322,12 @@ $url=substr($str,0,$n);
     );
     echo array2xml($result);
     exit;
-    }else{
-		//订单已经处理过了
-		$result = array(
-			'return_code' => 'SUCCESS',
-			'return_msg' => 'OK'
-		);
-		echo array2xml($result);
-		exit;
+}else{
+    //订单已经处理过了
+    $result = array(
+        'return_code' => 'SUCCESS',
+        'return_msg' => 'OK'
+    );
+    echo array2xml($result);
+    exit;
 }

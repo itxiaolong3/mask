@@ -1558,7 +1558,6 @@ class maskModuleWxapp extends WeModuleWxapp {
                 echo $this->resultToJson(0,'签到失败','');
             }
         }
-
     }
     //我的特权部分
     //特权中的个人信息
@@ -1607,7 +1606,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                 $jldata['rcomment']="银卡升级奖励：300元";
                 $jldata['raddtime']=date('Y-m-d H:i:s',time());
                 //更新余额
-                pdo_update('mask_user', array('wallet +=' => 30), array('id' => $_GPC['uid']));
+                //pdo_update('mask_user', array('wallet +=' => 30), array('id' => $_GPC['uid']));
             }
             if ($completeyinkanum>=$yingkanum){
                 //达成金卡升级条件
@@ -1761,13 +1760,13 @@ class maskModuleWxapp extends WeModuleWxapp {
                                 case 1:
                                     pdo_insert('mask_record',$dldata);
                                     //更新余额
-                                    pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
+                                    //pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
                                     break;
                                 case 2:
                                     pdo_insert('mask_record',$dldata);
                                     pdo_insert('mask_record',$ykdata);
                                     //更新余额
-                                    pdo_update('mask_user', array('wallet +=' => 180), array('id' => $pid));
+                                    //pdo_update('mask_user', array('wallet +=' => 180), array('id' => $pid));
                                     //银卡
                                     break;
                                 case 3:
@@ -1776,7 +1775,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     pdo_insert('mask_record',$ykdata);
                                     pdo_insert('mask_record',$jkdata);
                                     //更新余额
-                                    pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
+                                    //pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
                                     break;
                                 case 4:
                                     //市代
@@ -1790,7 +1789,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     if ($addressarr[1]==$orderaddressarr[1]){
                                         pdo_insert('mask_record',$sddata);
                                         //更新余额
-                                        pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                                        //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
                                     }
                                     break;
                                 case 5:
@@ -1809,7 +1808,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                                         pdo_insert('mask_record',$sddata);
                                         pdo_insert('mask_record',$shendaidata);
                                         //更新余额
-                                        pdo_update('mask_user', array('wallet +=' => 232), array('id' => $pid));
+                                        //pdo_update('mask_user', array('wallet +=' => 232), array('id' => $pid));
                                     }
                                     break;
                             }
@@ -1829,10 +1828,12 @@ class maskModuleWxapp extends WeModuleWxapp {
                                 $jup=pdo_insert('mask_record',$jtdata);
                                 if ($jup){
                                     //更新余额
-                                    pdo_update('mask_user', array('wallet +=' => 48), array('id' => $pid));
+                                    //pdo_update('mask_user', array('wallet +=' => 48), array('id' => $pid));
                                 }
 
                             }
+                            //直接升级会员身份level
+                            pdo_update('mask_user',array('level'=>1),array('id'=>$order['user_id']));
                         }
                     }
                     if ($payres){
@@ -4585,10 +4586,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-                   'auf' => 'audio/L16;rate=16000',
-                   'aue' => 'raw',
-                   'voice_name' => 'xiaoyan',
-                   'speed' => '0'
+            'auf' => 'audio/L16;rate=16000',
+            'aue' => 'raw',
+            'voice_name' => 'xiaoyan',
+            'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6437,8 +6438,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                               "page"=>"mask/pages/Liar/loginindex",
-                               "width" => 400);
+                    "page"=>"mask/pages/Liar/loginindex",
+                    "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8311,10 +8312,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-                   'auf' => 'audio/L16;rate=16000',
-                   'aue' => 'raw',
-                   'voice_name' => 'xiaoyan',
-                   'speed' => '0'
+            'auf' => 'audio/L16;rate=16000',
+            'aue' => 'raw',
+            'voice_name' => 'xiaoyan',
+            'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
