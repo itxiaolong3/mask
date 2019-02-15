@@ -1696,6 +1696,8 @@ class maskModuleWxapp extends WeModuleWxapp {
                     if ($type){
                         //1,判断推荐人身份（直推），间推
                         $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
+                        //直接升级会员身份level
+                        pdo_update('mask_user',array('level'=>1),array('id'=>$order['user_id']));
                         if ($pid){
                             //直推等级
                             $puserinfo=pdo_get('mask_user', array('id'=>$pid,'uniacid'=>$_W['uniacid']));
@@ -1832,8 +1834,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                                 }
 
                             }
-                            //直接升级会员身份level
-                            pdo_update('mask_user',array('level'=>1),array('id'=>$order['user_id']));
+
                         }
                     }
                     if ($payres){
