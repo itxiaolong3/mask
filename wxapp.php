@@ -36,13 +36,17 @@ class maskModuleWxapp extends WeModuleWxapp {
     //测试接口
     public function doPagetest(){
         global $_W, $_GPC;
-        $username = pdo_get('mask_user', array('id' => 1), array('nickname', 'headerimg'));
-        $sdata['uid']=1;
-        $sdata['pid']=2;
-        $sdata['uniacid']=$_W['uniacid'];
-        $sdata['addtime']=date('Y-m-d H:i:s',time());
-        // pdo_insert('mask_relation',$sdata);
-        echo $this->resultToJson(1,'test',$username['nickname']);
+        $dldata['rtype']=1;
+        $dldata['rstate']=0;
+        $dldata['rmoney']=150;//直推奖励
+        $dldata['ruid']=100003;
+        $dldata['rbuyername']='小午苑庄紫色魅影凯特之美';
+        $dldata['rordernumber']='201902151632436356';
+        //$card=pdo_get('mask_bankcard', array('uid'=>$pid));//银卡
+        //$dldata['rcardid']=$card['id'];
+        $dldata['rcomment']="直推(小午苑庄紫色魅影凯特之美)奖励：150元";
+        $dldata['raddtime']=date('Y-m-d H:i:s',time());
+
         //echo $this->doPageGoodsCode(6);
     }
     //获取openid并保存用户信息
@@ -667,6 +671,9 @@ class maskModuleWxapp extends WeModuleWxapp {
         if($res&&$res2){
             //修改交易记录状态
             pdo_update('mask_record',array('rsettlement'=>1),array('rordernumber'=>$_GPC['ordernumber']));
+            //更新用户余额
+            $uidandrmoney=pdo_get('mask_record',array('rordernumber'=>$_GPC['ordernumber']));
+            pdo_update('mask_user', array('wallet +=' => $uidandrmoney['rmoney']), array('id' => $uidandrmoney['ruid']));
             echo $this->resultToJson(1,'签收成功','');
         }else{
             echo $this->resultToJson(1,'签收失败','');
