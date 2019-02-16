@@ -625,9 +625,10 @@ class maskModuleWxapp extends WeModuleWxapp {
                 array_push($chidid,pdo_insertid());
             }
             if($res2){
-                //清除购物车
+                //清除购物车和新增销售量
                 foreach ($goodinfo as $k=>$v){
                     pdo_delete('mask_cart',array('gid'=>$v['id'],"uid"=>$uid));
+                    pdo_update('mask_goodmy', array('TotalQty +=' => $v['num']), array('gID' => $v['id']));
                 }
                 echo $this->resultToJson(1,'提交订单成功',$order_id);
             }else{
@@ -1292,7 +1293,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //队员信息
     public function doPageteaminfodetail(){
         global $_W, $_GPC;
-        $xiaofei=pdo_fetch("SELECT sum(money) as con FROM ".tablename('mask_order')." WHERE  user_id ={$_GPC['uid']} and state=2");
+        $xiaofei=pdo_fetch("SELECT sum(money) as con FROM ".tablename('mask_order')." WHERE  user_id ={$_GPC['uid']} and state>1 and isafter=0");
         $redata['consumption']=number_format($xiaofei['con'],2);
         $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
         $redata['userinfo']=$userinfo;
@@ -1949,6 +1950,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                         echo $this->resultToJson(0,'余额支付失败',false);
                     }
                     //修改库存量
+
                 }else{
                     echo $this->resultToJson(-3,'支付密码不对',false);
                 }
