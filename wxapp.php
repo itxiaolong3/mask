@@ -216,10 +216,10 @@ class maskModuleWxapp extends WeModuleWxapp {
                     die();
                 }
             }else if($gid=27){
-                    if ($num!=1&&$num!=5&&$num!=10){
-                        echo  $this->resultToJson(0,'只能1盒，5盒，10盒','');
-                        die();
-                    }
+                if ($num!=1&&$num!=5&&$num!=10){
+                    echo  $this->resultToJson(0,'只能1盒，5盒，10盒','');
+                    die();
+                }
             }
             if ($getcart){
                 //更新
@@ -1776,11 +1776,31 @@ class maskModuleWxapp extends WeModuleWxapp {
                     //新增交易记录，佣金分配
                     //订单类型
                     //$type=$order['type'];
+                    //1,判断推荐人身份（直推），间推
+                    $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
+                    //免费领取面膜随机红包
+                    $feelgood=pdo_get('mask_order_goods', array('order_id'=>$order['id'],'dishes_id'=>26));
+                    if ($feelgood){
+                        //领取免费面膜需要发给红包
+                        if ($pid){
+                            $hbdata['rtype']=1;
+                            $hbdata['rstate']=0;
+                            $hbdata['rmoney']=150;//直推奖励
+                            $hbdata['ruid']=$pid;
+                            $hbdata['rbuyername']=$nickname;
+                            $hbdata['rordernumber']=$order['order_num']; //银卡
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid));
+                            $hbdata['rcardid']=$card['id'];
+                            //随机红包
+                            $hbmoney=rand (0.88,1);
+                            $hbdata['rcomment']=$nickname."扫码随机红包奖励：".$hbmoney."元";
+                            $hbdata['raddtime']=date('Y-m-d H:i:s',time());
+                            pdo_insert('mask_record',$hbdata);
+                        }
+                    }
                     //通过商品id来判断分销类型
                     $type=pdo_get('mask_order_goods', array('order_id'=>$orderid,'dishes_id'=>24,'uniacid'=>$_W['uniacid']));
                     if ($type){
-                        //1,判断推荐人身份（直推），间推
-                        $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
                         //直接升级会员身份level
                         pdo_update('mask_user',array('level'=>1),array('id'=>$order['user_id']));
                         if ($pid){
@@ -4672,10 +4692,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6524,8 +6544,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                "page"=>"mask/pages/Liar/loginindex",
-                "width" => 400);
+                               "page"=>"mask/pages/Liar/loginindex",
+                               "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8398,10 +8418,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));

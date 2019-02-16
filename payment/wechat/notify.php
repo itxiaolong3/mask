@@ -81,21 +81,38 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
     //新增交易记录，佣金分配
     //订单类型
     //$type=$order['type'];
+    //1,判断推荐人身份（直推），间推
+    $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
     //通过商品id来判断分销类型
-    //$types=pdo_get('mask_order_goods', array('order_id'=>$order['id'],'dishes_id'=>24,'uniacid'=>$_W['uniacid']));
+    $feelgood=pdo_get('mask_order_goods', array('order_id'=>$order['id'],'dishes_id'=>26));
+    if ($feelgood){
+        //领取免费面膜需要发给红包
+        if ($pid){
+            $hbdata['rtype']=1;
+            $hbdata['rstate']=0;
+            $hbdata['rmoney']=150;//直推奖励
+            $hbdata['ruid']=$pid;
+            $hbdata['rbuyername']=$nickname;
+            $hbdata['rordernumber']=$order['order_num']; //银卡
+            $card=pdo_get('mask_bankcard', array('uid'=>$pid));
+            $hbdata['rcardid']=$card['id'];
+            //随机红包
+            $hbmoney=rand (0.88,1);
+            $hbdata['rcomment']=$nickname."扫码随机红包奖励：".$hbmoney."元";
+            $hbdata['raddtime']=date('Y-m-d H:i:s',time());
+            pdo_insert('mask_record',$hbdata);
+        }
+    }
     $testsql=" select * from ".tablename('mask_order_goods')." where dishes_id=24  and order_id='{$order['id']}'";
     $ress=pdo_fetch($testsql);
     $filenotify1=$_W['attachurl'].'wxloginfo1.txt';
     $getoginfo=json_encode($res);
     //file_put_contents($filenotify1,"sql=".$testsql."----结果=".$getoginfo);
     if ($ress){
-        //1,判断推荐人身份（直推），间推
-        $pid=pdo_getcolumn('mask_relation', array('uid' => $order['user_id']), 'pid',1);
         //直接升级会员身份level
         $uplevel=pdo_update('mask_user', array('level' => 1), array('id' => $order['user_id']));
         $filenotify=$_W['attachurl'].'wxloginfo.txt';
         //file_put_contents($filenotify,"用户id=".$order['user_id']."----结果=".$uplevel);
-
         if ($pid){
             //直推等级
             $puserinfo=pdo_get('mask_user', array('id'=>$pid));
