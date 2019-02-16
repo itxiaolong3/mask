@@ -209,6 +209,18 @@ class maskModuleWxapp extends WeModuleWxapp {
             //商品中的加购
             $num=$_GPC['num'];
             $getcart=pdo_get("mask_cart",array('uid'=>$uid,"gid"=>$gid,"uniacid"=>$_W['uniacid']));
+            //判断免费面膜只能领1盒
+            if ($gid==26){
+                if ($num>1){
+                    echo  $this->resultToJson(0,'最多一盒','');
+                    die();
+                }
+            }else if($gid=27){
+                    if ($num!=1&&$num!=5&&$num!=10){
+                        echo  $this->resultToJson(0,'只能1盒，5盒，10盒','');
+                        die();
+                    }
+            }
             if ($getcart){
                 //更新
                 $totalnum=$num+$getcart['num'];
@@ -554,12 +566,21 @@ class maskModuleWxapp extends WeModuleWxapp {
                         //不可以购买
                         echo $this->resultToJson(-1,'下单失败，365天只能买一次','');
                         die();
+                    }else{
+                        if ($v['num']>1){
+                            echo  $this->resultToJson(0,'最多一盒','');
+                            die();
+                        }
                     }
                 }
             }else if ($v['id']==27){
                 //积分订单
                 ///所需积分
                 $jifen=$v['num']*5;
+                if ($v['num']!=1&&$v['num']!=5&&$v['num']!=10){
+                    echo  $this->resultToJson(0,'只能1盒，5盒，10盒','');
+                    die();
+                }
                 ///查询用户积分
                 $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0");
                 $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1");
@@ -694,8 +715,47 @@ class maskModuleWxapp extends WeModuleWxapp {
     //售后订单
     public function doPageAftersale(){
         global $_W, $_GPC;
-        $type=$_GPC['type'];
-        $gid=$_GPC['id'];
+        $types=$_GPC['type'];
+        $oid=$_GPC['oid'];
+        $zfbnum=$_GPC['zfbnum'];//支付宝
+        $zfbname=$_GPC['zfbname'];//姓名
+        switch ($types){
+            case 1:
+                if(empty($zfbname)||empty($zfbnum)){
+                    echo $this->resultToJson(0,'请填写支付宝信息','');
+                    die();
+                }
+                //退货退款
+                $res=pdo_update('mask_order',array('state'=>6,'zfbnum'=>$zfbnum,'zfbname'=>$zfbname,'afterselltype'=>1),array('id'=>$oid));
+                if ($res){
+                    echo $this->resultToJson(1,'申请成功','');
+                }else{
+                    echo $this->resultToJson(0,'申请失败','');
+                }
+                break;
+            case 2:
+                //仅退款
+                if(empty($zfbname)||empty($zfbnum)){
+                    echo $this->resultToJson(0,'请填写支付宝信息','');
+                    die();
+                }
+                $res=pdo_update('mask_order',array('state'=>6,'zfbnum'=>$zfbnum,'zfbname'=>$zfbname,'afterselltype'=>2),array('id'=>$oid));
+                if ($res){
+                    echo $this->resultToJson(1,'申请成功','');
+                }else{
+                    echo $this->resultToJson(0,'申请失败','');
+                }
+                break;
+            case 3:
+                //仅还货
+                $res=pdo_update('mask_order',array('state'=>6,'afterselltype'=>3),array('id'=>$oid));
+                if ($res){
+                    echo $this->resultToJson(1,'申请成功','');
+                }else{
+                    echo $this->resultToJson(0,'申请失败','');
+                }
+                break;
+        }
 
 
     }

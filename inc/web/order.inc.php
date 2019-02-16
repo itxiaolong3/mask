@@ -203,7 +203,7 @@ if($_GPC['op']=='jd'){
         curl_setopt($ch, CURLOPT_POSTFIELDS,$formwork);
         $data = curl_exec($ch);
         curl_close($ch);
-       pdo_delete('mask_formid',array('id'=>$form['id']));
+        pdo_delete('mask_formid',array('id'=>$form['id']));
         // return $data;
     }
     echo set_msg($_W,$_GPC);
@@ -651,7 +651,7 @@ if(checksubmit('export_submit', true)) {
     $time="'%$time%'";
     $start=$_GPC['time']['start'];
     $end=$_GPC['time']['end'];
-    $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE uniacid={$_W['uniacid']} and time >='{$start}' and time<='{$end}'");
+    $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE uniacid={$_W['uniacid']} and state=2 and time >='{$start}' and time<='{$end}'");
     $pagesize = ceil($count/5000);
     //array_unshift( $names,  '活动名称');
 
@@ -676,7 +676,7 @@ if(checksubmit('export_submit', true)) {
     }
     $html .= "\n";
     for ($j = 1; $j <= $pagesize; $j++) {
-        $sql = "select a.* from " . tablename("mask_order")."  a"  . "   WHERE a.uniacid={$_W['uniacid']}  and a.time >='{$start}' and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
+        $sql = "select a.* from " . tablename("mask_order")."  a"  . "   WHERE a.uniacid={$_W['uniacid']} and a.state=2 and a.time >='{$start}' and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
         $list = pdo_fetchall($sql);
     }
     if (!empty($list)) {
@@ -689,7 +689,7 @@ if(checksubmit('export_submit', true)) {
                 if($row['state']==1){
                     $row['state']='待付款';
                 }elseif($row['state']==2){
-                    $row['state']='等待接单';
+                    $row['state']='等待发货';
                 }elseif($row['state']==3){
                     $row['state']='等待送达';
                 }elseif($row['state']==4){
@@ -712,9 +712,9 @@ if(checksubmit('export_submit', true)) {
                 }
 
                 $good=pdo_getall('mask_order_goods',array('order_id'=>$row['id']));
-               $date6='';
+                $date6='';
                 for($i=0;$i<count($good);$i++){
-                   
+
                     if($good[$i]['spec']){
                         $date6 .=$good[$i]['name'].'('.$good[$i]['spec'].')*一共'.$good[$i]['number']."  件";
                     }else{
