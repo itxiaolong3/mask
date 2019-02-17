@@ -12,6 +12,7 @@ if(isset($_GPC['keywords'])){
     $where.=" and (a.name LIKE  concat('%', :name,'%') || a.order_num LIKE  concat('%', :name,'%'))";
     $data[':name']=$_GPC['keywords'];
     $type='all';
+    $type2='';
 }
 if($_GPC['time']){
     $start=$_GPC['time']['start'];

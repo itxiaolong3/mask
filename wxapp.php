@@ -554,6 +554,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         foreach ($goodinfo as $k=>$v){
             if ($v['id']==26){
                 //免费领取订单
+                if ($v['num']>1){
+                    echo  $this->resultToJson(0,'最多领一盒','');
+                    die();
+                }
                 $ishava=pdo_fetch("select o.time from ims_mask_order_goods g LEFT JOIN ims_mask_order  o ON g.order_id=o.id where g.dishes_id=26 and o.user_id={$uid} ORDER BY o.time desc LIMIT 1");
                 if ($ishava['time']){
                     //有数据
@@ -564,13 +568,8 @@ class maskModuleWxapp extends WeModuleWxapp {
                     $Days = round(($d1-$d2)/3600/24);
                     if ($Days<360){
                         //不可以购买
-                        echo $this->resultToJson(-1,'下单失败，365天只能买一次','');
+                        echo $this->resultToJson(-1,'下单失败，365天只能买一次'.$v['num'],'');
                         die();
-                    }else{
-                        if ($v['num']>1){
-                            echo  $this->resultToJson(0,'最多一盒','');
-                            die();
-                        }
                     }
                 }
             }else if ($v['id']==27){
@@ -585,9 +584,9 @@ class maskModuleWxapp extends WeModuleWxapp {
                 $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0");
                 $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1");
                 $getjifen=$getjifenf['getscore']-$payjifenf['payscore'];
-                if ($jifen>$getjifenf){
+                if ($jifen>$getjifen){
                     //积分不够
-                    echo $this->resultToJson(-1,'下单失败，积分不够','');
+                    echo $this->resultToJson(0,'下单失败，积分不够','');
                     die();
                 }else{
                     //抵扣积分
@@ -4694,10 +4693,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-                   'auf' => 'audio/L16;rate=16000',
-                   'aue' => 'raw',
-                   'voice_name' => 'xiaoyan',
-                   'speed' => '0'
+            'auf' => 'audio/L16;rate=16000',
+            'aue' => 'raw',
+            'voice_name' => 'xiaoyan',
+            'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6546,8 +6545,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                               "page"=>"mask/pages/Liar/loginindex",
-                               "width" => 400);
+                    "page"=>"mask/pages/Liar/loginindex",
+                    "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8420,10 +8419,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-                   'auf' => 'audio/L16;rate=16000',
-                   'aue' => 'raw',
-                   'voice_name' => 'xiaoyan',
-                   'speed' => '0'
+            'auf' => 'audio/L16;rate=16000',
+            'aue' => 'raw',
+            'voice_name' => 'xiaoyan',
+            'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
