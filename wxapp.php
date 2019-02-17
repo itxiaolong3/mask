@@ -553,11 +553,11 @@ class maskModuleWxapp extends WeModuleWxapp {
         //判断提交订单是否合法，免费领取订单每个用户365天一次机会
         foreach ($goodinfo as $k=>$v){
             if ($v['id']==26){
-                //免费领取订单
                 if ($v['num']>1){
                     echo  $this->resultToJson(0,'最多领一盒','');
                     die();
                 }
+                //免费领取订单
                 $ishava=pdo_fetch("select o.time from ims_mask_order_goods g LEFT JOIN ims_mask_order  o ON g.order_id=o.id where g.dishes_id=26 and o.user_id={$uid} ORDER BY o.time desc LIMIT 1");
                 if ($ishava['time']){
                     //有数据
@@ -960,11 +960,11 @@ class maskModuleWxapp extends WeModuleWxapp {
             }else{
                 //是否注册
                 $isp=pdo_get('mask_user',array('user_tel'=>$phone,'uniacid'=>$_W['uniacid']));
-                if ($isp){
+                if (!$isp){
                     echo $this->resultToJson(0,'没注册','');
-                }else{
-                    echo $this->resultToJson(0,'用户登录失败','');
+                    die();
                 }
+                echo $this->resultToJson(0,'账号密码不对','');
             }
         }else{
             echo $this->resultToJson(0,'手机号不可为空，登录失败','');
@@ -1513,6 +1513,23 @@ class maskModuleWxapp extends WeModuleWxapp {
         $list=pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype=7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
         echo $this->resultToJson(1,'提现记录',$list);
     }
+    //判断是否可以提现
+    public function doPageChecktixian(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $weekday=date('w',time());
+        if ($weekday==1){
+            //判断今日是否已经提现过
+            $istixian=pdo_fetch("SELECT * FROM ".tablename('mask_record')." WHERE ruid ={$uid} and rtype=7 and  DATE_FORMAT(raddtime, '%Y%m%d') = DATE_FORMAT(now(), '%Y%m%d')");
+            if ($istixian){
+                echo $this->resultToJson(0,'一天只可提一次',false);
+            }else{
+                echo $this->resultToJson(1,'可提现',true);
+            }
+        }else{
+            echo $this->resultToJson(0,'提现日为每周一',false);
+        }
+    }
     //提现
     public function doPageWithdrawal() {
         global $_W, $_GPC;
@@ -1522,7 +1539,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $paypsw=$_GPC['paypsw'];
         $data['rtype'] = 7;
         $data['rstate'] = 1; //支出
-        $data['rmoney'] = $money;
+        $data['rmoney'] = number_format($money*0.99,2);
         $data['rcomment'] = '申请提现'.$money.'元';
         $data['rordernumber'] = date('YmdHis',time()).rand(1111,9999);
         $data['ruid'] = $uid; //用户id
@@ -1534,13 +1551,15 @@ class maskModuleWxapp extends WeModuleWxapp {
         if ($money>$userinfo['wallet']){
             //提现金额大于余额
             echo $this->resultToJson(0,'提现金额超出余额'.'');
-        }else if($money<0){
-            echo $this->resultToJson(0,'提现金额必须大于0'.'');
+        }else if($money<100){
+            echo $this->resultToJson(0,'提现金额必须大于100'.'');
         }else if($paypsw!=$userinfo['paypsw']){
-            echo $this->resultToJson(0,'支付密码不对'.'');
+            echo $this->resultToJson(0,'支付密码错误'.'');
         }else{
             $res = pdo_insert('mask_record', $data);
-            if ($res){
+            //更新用户余额
+            $updatawallet=pdo_update('mask_user', array('wallet -=' => $money), array('id' => $uid));
+            if ($res&&$updatawallet){
                 echo $this->resultToJson(1,'提现申请成功'.'');
             }else{
                 echo $this->resultToJson(0,'提现申请失败'.'');
@@ -1783,16 +1802,16 @@ class maskModuleWxapp extends WeModuleWxapp {
                     if ($feelgood){
                         //领取免费面膜需要发给红包
                         if ($pid){
-                            $hbdata['rtype']=1;
+                            $hbdata['rtype']=8;
                             $hbdata['rstate']=0;
-                            $hbdata['rmoney']=150;//直推奖励
                             $hbdata['ruid']=$pid;
                             $hbdata['rbuyername']=$nickname;
                             $hbdata['rordernumber']=$order['order_num']; //银卡
                             $card=pdo_get('mask_bankcard', array('uid'=>$pid));
                             $hbdata['rcardid']=$card['id'];
                             //随机红包
-                            $hbmoney=rand (0.88,1);
+                            $hbmoney=number_format($this->randFloat(0.1,0.5),1);
+                            $hbdata['rmoney']=$hbmoney;//红包奖励
                             $hbdata['rcomment']=$nickname."扫码随机红包奖励：".$hbmoney."元";
                             $hbdata['raddtime']=date('Y-m-d H:i:s',time());
                             pdo_insert('mask_record',$hbdata);
@@ -1960,6 +1979,10 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(-1,'没支付密码',false);
         }
 
+    }
+    //随机生成0.08-1
+    function randFloat($min, $max){
+        return $min + mt_rand()/mt_getrandmax() * ($max-$min);
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid

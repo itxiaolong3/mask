@@ -78,6 +78,10 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
     }
     $nickname=$show_str;
     //////////////////////////////
+    /// 随机生成数
+    function randFloat($min, $max){
+        return $min + mt_rand()/mt_getrandmax() * ($max-$min);
+    }
     //新增交易记录，佣金分配
     //订单类型
     //$type=$order['type'];
@@ -88,16 +92,16 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
     if ($feelgood){
         //领取免费面膜需要发给红包
         if ($pid){
-            $hbdata['rtype']=1;
+            $hbdata['rtype']=8;
             $hbdata['rstate']=0;
-            $hbdata['rmoney']=150;//直推奖励
             $hbdata['ruid']=$pid;
             $hbdata['rbuyername']=$nickname;
             $hbdata['rordernumber']=$order['order_num']; //银卡
             $card=pdo_get('mask_bankcard', array('uid'=>$pid));
             $hbdata['rcardid']=$card['id'];
             //随机红包
-            $hbmoney=rand (0.88,1);
+            $hbmoney=number_format(randFloat(0.88,1),2);
+            $hbdata['rmoney']=$hbmoney;//红包奖励
             $hbdata['rcomment']=$nickname."扫码随机红包奖励：".$hbmoney."元";
             $hbdata['raddtime']=date('Y-m-d H:i:s',time());
             pdo_insert('mask_record',$hbdata);
