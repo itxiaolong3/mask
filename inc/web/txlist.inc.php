@@ -3,10 +3,10 @@ global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
 $operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
 $type=empty($_GPC['type']) ? 'wait' :$_GPC['type'];
-$state=empty($_GPC['state']) ? '1' :$_GPC['state'];
+$state=empty($_GPC['state']) ? '0' :$_GPC['state'];
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
-$where=' WHERE  a.uniacid=:uniacid';
+$where=' WHERE  b.uniacid=:uniacid';
 $data[':uniacid']=$_W['uniacid'];
 if(isset($_GPC['keywords'])){
     $op=$_GPC['keywords'];
@@ -15,10 +15,10 @@ if(isset($_GPC['keywords'])){
     $type='all';
 }
 if($type!='all'){   
- $where.= " and a.state=$state"; 
+ $where.= " and a.rsettlement=$state";
 }
-  $sql="SELECT a.*,b.name,b.user_id,c.name as sk_name FROM ".tablename('mask_withdrawal') .  " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id left join " . tablename("mask_user") . " c on c.id=b.user_id ". $where." ORDER BY a.time DESC";
-  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_withdrawal') .  " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id".$where." ORDER BY a.time DESC",$data);
+  $sql="SELECT a.*,b.* FROM ".tablename('mask_record') .  " a"  . " left join " . tablename("mask_bankcard") . " b on a.rcardid=b.id ". $where." and a.rtype=7 and a.risrefu=0   ORDER BY a.raddtime DESC";
+  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_record') .  " a"  . " left join " . tablename("mask_bankcard") . " b on a.rcardid=b.id".$where." a.rtype=7 and a.risrefu=0 ORDER BY a.raddtime DESC",$data);
 
 $list=pdo_fetchall($sql,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
@@ -28,7 +28,7 @@ $pager = pagination($total, $pageindex, $pagesize);
 
 if($operation=='adopt'){//审核通过
     $id=$_GPC['id'];
-    $res=pdo_update('mask_withdrawal',array('state'=>2,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
+    $res=pdo_update('mask_record',array('rsettlement'=>1,'rshtime'=>date('Y-m-d H:i:s')),array('rid'=>$id));
     if($res){
         message('审核成功',$this->createWebUrl('txlist',array()),'success');
     }else{
@@ -144,9 +144,19 @@ function arraytoxml($data){
 
 if($operation=='reject'){
      $id=$_GPC['id'];
-    $res=pdo_update('mask_withdrawal',array('state'=>3,'sh_time'=>date('Y-m-d H:i:s')),array('id'=>$id));
+    $res=pdo_update('mask_record',array('rsettlement'=>0,'risrefu'=>1,'rshtime'=>date('Y-m-d H:i:s')),array('rid'=>$id));
+    //恢复金额
+    $rsqmoney=$_GPC['rsqmoney'];
+    $ruid=$_GPC['ruid'];
      if($res){
-        message('拒绝成功',$this->createWebUrl('txlist',array()),'success');
+         //更新用户余额
+         $walletrs=pdo_update('mask_user', array('wallet +=' => $rsqmoney), array('id' => $ruid));
+         if ($walletrs){
+             message('拒绝成功',$this->createWebUrl('txlist',array()),'success');
+         }else{
+             message('拒绝失败','','error');
+         }
+
     }else{
         message('拒绝失败','','error');
     }

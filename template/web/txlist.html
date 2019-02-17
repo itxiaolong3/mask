@@ -29,11 +29,11 @@
   <span class="ygxian"></span>
   <div class="ygdangq">当前位置:</div>
 
-  <li   {if $type=='wait'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>wait,'state'=>1));}">待提现</a></li>
+  <li   {if $type=='wait'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>wait,'state'=>0));}">待提现</a></li>
 
-  <li   {if $type=='now'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>now,'state'=>2));}">提现通过</a></li>
+  <li   {if $type=='now'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>now,'state'=>1));}">提现通过</a></li>
 
-  <li   {if $type=='delivery'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>delivery,'state'=>3));}">提现拒绝</a></li>
+  <!--<li   {if $type=='delivery'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>delivery,'state'=>3));}">提现拒绝</a></li>-->
   <li  {if $type=='all'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>all));}">全部</a></li>
 
 </ul>
@@ -89,81 +89,54 @@
 
                     <tr class="yg5_tr1">
 
-                        <td class="store_td1">门店名称</td>
+                        <td class="store_td1">用户昵称</td>
                         <td>提现金额</td>
                         <!-- <td>实际金额</td>  -->
                         <td>提现方式</td>
                         <td>收款人</td>
                         <td>提现时间</td>
+                        <td>审核时间</td>
                         <td>提现状态</td>
                         <td>操作</td>
                     </tr>
                     {loop $list $key $item}
                     <tr class="yg5_tr2">
-                      <td class="store_td1">{$item['name']}</td>
-                      <td>{$item['tx_cost']}</td>
-                      <!-- <td>{$item['sj_cost']}</td> -->
-                      {if $item['type']==1}
-                      <td>
-                         微信
-                     </td>
-                     {elseif $item['type']==2}
+                      <td class="store_td1">{$item['rbuyername']}</td>
+                      <td>{$item['rmoney']}</td>
                      <td>
                          银联
                      </td>
-                   
-                     {/if}
-                     <td>{$item['sk_name']}</td>
-                     <td>{$item['time']}</td>
-
-
-                     {if $item['state']==1}
+                     <td>{$item['name']}</td>
+                     <td>{$item['raddtime']}</td>
+                     {if $item['rsettlement']==0}
+                        <td>待审</td>
                      <td >
-                        <span class="label storered">待审核</span>
-                    </td >
-                    {elseif $item['state']==2}
+                         <span class="label storered">待审核</span>
+                         {if $item['risrefu']==1}
+                         <span class="label storeblue">拒绝过</span>
+                         {/if}
+                     </td >
+                    {elseif $item['rsettlement']==1}
+                        <td>{$item['rshtime']}</td>
                     <td >
                         <span class="label storeblue">已提现</span>
                     </td>
-                    {elseif $item['state']==3}
-                    <td >
-                       <span class="label yghuise">已拒绝</span>
-                   </td>
-
                    {/if}  
                    <td>
-        <!--               {if $item['state']==1&&$item['type']==2}
-                        <a href="javascript:;" class="storespan btn btn-xs" data-toggle="modal" data-target="#myModal{$item['id']}">
-                          <span class="fa fa-pencil-square-o" style="margin-right: 0"></span>
-                          <span class="bianji">查看
-                              <span class="arrowdown"></span>
-                          </span>                            
-                      </a>
-                      {/if} -->
                        <a href="javascript:;" class="storespan btn btn-xs" data-toggle="modal" data-target="#myModal{$item['id']}">
                           <span class="fa fa-pencil-square-o" style="margin-right: 0"></span>
                           <span class="bianji">查看
                               <span class="arrowdown"></span>
                           </span>                            
                       </a>
-                      {if $item['state']==1}
-                 
-                      <!--<a class="btn btn-info btn-xs" href="{php echo $this->createWebUrl('txlist',array('id'=>$item['id'],'op'=>'adopt2'))}" >微信打款</a>-->
-                
-                      <a class="btn ygyouhui2 btn-xs" href="{php echo $this->createWebUrl('txlist',array('id'=>$item['id'],'op'=>'adopt'))}" >线下打款</a>
-                      <a class="btn ygshouqian2 btn-xs" href="{php echo $this->createWebUrl('txlist', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
-                      {/if}
-                   <!--    <a href="{php echo $this->createWebUrl('txlist', array('id' => $item['id'],'op'=>'delete'))}" class="storespan btn btn-xs" onclick="return confirm('确认删除吗？');return false;">
-                          <span class="fa fa-trash-o"></span>
-                          <span class="bianji">删除
-                              <span class="arrowdown"></span>
-                          </span>
-                      </a> -->
-                      <!-- <a class="btn btn-danger btn-xs" href="{php echo $this->createWebUrl('txlist', array('id' => $item['id'],'op'=>'delete'))}" onclick="return confirm('确认删除吗？');return false;" title="删除">删</a> -->
+                       {if $item['rsettlement']==0}
+                      <a class="btn ygyouhui2 btn-xs" data-toggle="modal" data-target="#myModal1{$item['id']}">线下打款</a>
+                       {if $item['risrefu']==0}
+                       <a class="btn ygshouqian2 btn-xs"  title="拒绝" data-toggle="modal" data-target="#myModal2{$item['id']}">拒绝</a>
+                       {/if}
 
-                  </td>
-
-              </td>
+                       {/if}
+                   </td>
 
           </tr>
              <!-- 修改信息弹框（Modal） -->
@@ -182,19 +155,19 @@
         <div class="modal-body">
           <div class="qs_box col-md-12 pa_0">
             <label for="" class="col-md-3">联系方式 :</label>
-            <input type="text" value="{$item['tel']}" name="tel" class="col-md-6 con">
+            <input type="text" value="{$item['phone']}" name="phone" class="col-md-6 con">
           </div>
           <div class="qs_box col-md-12 pa_0">
             <label for="" class="col-md-3">银行卡号 :</label>
-            <input type="text" value="{$item['yhk_num']}" name="yhk_num" class="col-md-6 con">
+            <input type="text" value="{$item['cardnumber']}" name="cardnumber" class="col-md-6 con">
           </div>
             <div class="qs_box col-md-12 pa_0">
                 <label for=""  class="col-md-3">开户行:</label>
-                <input type="text" value="{$item['yh_info']}" name="yh_info" class="col-md-6 con">
+                <input type="text" value="{$item['openbranch']}" name="openbranch" class="col-md-6 con">
             </div>
           <div class="qs_box col-md-12 pa_0">
             <label for=""  class="col-md-3">所属支行:</label>
-            <input type="text" value="{$item['yh_info']}" name="yh_info" class="col-md-6 con">
+            <input type="text" value="{$item['branch']}" name="branch" class="col-md-6 con">
           </div>
          
         </div>
@@ -212,8 +185,40 @@
     </div>
   </div>
 </div>
-
-
+                    <div class="modal fade" id="myModal1{$item['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel1" style="font-size: 20px;">审核提示</h4>
+                                </div>
+                                <div class="modal-body" style="font-size: 20px">
+                                    是否确认已打款？确认后表示提现审核通过。
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    <a href="{php echo $this->createWebUrl('txlist',array('id'=>$item['rid'],'op'=>'adopt'))}" type="button" class="btn btn-info" >已打款</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="myModal2{$item['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel2" style="font-size: 20px;">拒绝提示</h4>
+                                </div>
+                                <div class="modal-body" style="font-size: 20px">
+                                    是否拒绝提现？拒绝后将删除记录，并金额恢复
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    <a href="{php echo $this->createWebUrl('txlist', array('id' => $item['rid'],'rsqmoney'=>$item['rsqmoney'],'ruid'=>$item['ruid'],'op'=>'reject'))}" type="button" class="btn btn-info" >拒绝提现</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
           {/loop}
           {if empty($list)}
           <tr class="yg5_tr2">

@@ -1292,7 +1292,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //队员信息
     public function doPageteaminfodetail(){
         global $_W, $_GPC;
-        $xiaofei=pdo_fetch("SELECT sum(money) as con FROM ".tablename('mask_order')." WHERE  user_id ={$_GPC['uid']} and state>1 and isafter=0");
+        $xiaofei=pdo_fetch("SELECT sum(money) as con FROM ".tablename('mask_order')." WHERE  user_id ={$_GPC['uid']} and state in (2,3,4) and isafter=0");
         $redata['consumption']=number_format($xiaofei['con'],2);
         $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
         $redata['userinfo']=$userinfo;
@@ -1540,6 +1540,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['rtype'] = 7;
         $data['rstate'] = 1; //支出
         $data['rmoney'] = number_format($money*0.99,2);
+        $data['rsqmoney'] = $money;
         $data['rcomment'] = '申请提现'.$money.'元';
         $data['rordernumber'] = date('YmdHis',time()).rand(1111,9999);
         $data['ruid'] = $uid; //用户id
@@ -1555,6 +1556,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(0,'提现金额必须大于100'.'');
         }else if($paypsw!=$userinfo['paypsw']){
             echo $this->resultToJson(0,'支付密码错误'.'');
+        }else if(empty($cid)){
+            echo $this->resultToJson(0,'请绑定银行卡'.'');
         }else{
             $res = pdo_insert('mask_record', $data);
             //更新用户余额
