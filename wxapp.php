@@ -1170,8 +1170,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $redata['userinfo']=$userinfo;
         //当月结算统计
-        $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
-        $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$_GPC['uid']} and rsettlement=1 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
+        $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
+        $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$_GPC['uid']} and rsettlement=1 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
         $redata['nosettlement']=$nodeal['con'];
         $redata['settlement']=$deal['con'];
         echo $this->resultToJson(1,'我的分销数据',$redata);
@@ -1311,10 +1311,10 @@ class maskModuleWxapp extends WeModuleWxapp {
             $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
             $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
         }else{
-            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']}  and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']}  and  rtype <> 7 and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
         }
         $redata['alltotal']=$allrecord['con'];
         $redata['nodealtotal']=$nodeal['con'];
