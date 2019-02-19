@@ -87,17 +87,33 @@
                 <table class="yg5_tabel col-md-12" id="test_table">
                     <tr class="yg5_tr1">
                         <th class="store_td1 col-md-1" >id</th>
+                        <th class="col-md-1">头像</th>
                         <th class="col-md-1">昵称</th>
-                        <th class="col-md-1">openid</th>
+                        <th class="col-md-1">身份</th>
                         <th class="col-md-2">手机号</th>
 
                     </tr>
                       {loop $list  $row}
                     <tr class="yg5_tr2">
-                        <td >{$row['u_id']}</td>
-                        <td>{$row['username']}</td>
-                        <td>{$row['openid']}</td>
-                        <td>{$row['phone']}</td>
+                        <td >{$row['id']}</td>
+                        <td ><img src="{$row['headerimg']}" width="60" height="60"></td>
+                        <td>{$row['nickname']}</td>
+                        <td>
+                            {if $row['level']==0}
+                            <span>普通会员</span>
+                            {elseif $row['level']==1}
+                            合伙人
+                            {elseif $row['level']==2}
+                            银卡合伙人
+                            {elseif $row['level']==3}
+                            金卡合伙人
+                            {elseif $row['level']==4}
+                            市代合伙人
+                            {elseif $row['level']==5}
+                            省代合伙人
+                            {/if}
+                        </td>
+                        <td>{$row['user_tel']}</td>
                     </tr>
 
                     {/loop}

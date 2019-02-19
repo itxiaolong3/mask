@@ -120,7 +120,7 @@
             <input type="hidden" name="m" value="mask" />
             <input type="hidden" name="do" value="order" />
             <div class="input-group" style="width: 300px;">
-                <input type="text" name="keywords" class="form-control" placeholder="请输入姓名/订单编号">
+                <input type="text" name="keywords" class="form-control" placeholder="请输入姓名/订单编号/昵称/用户ID">
                 <span class="input-group-btn">
                     <input type="submit" class="btn btn-default" name="submit" value="查找"/>
                 </span>
@@ -239,7 +239,7 @@
                         <div class="col-md-12 orderback2">
                             <div class="ordername">
                                 <!--<div class="left ordername1">{$item['order']['name']} &nbsp;&nbsp;<span class="orfont4">#{$item['order']['md_name']}{if $item['order']['order_type']==3}({if $item['order']['is_dd']==1}已到店{else}未到店{/if}){/if}</span></div>-->
-                                <div class="left ordername1">{$item['order']['name']} &nbsp;&nbsp;</div>
+                                <div class="left ordername1">{$item['order']['name']} &nbsp;&nbsp;ID({$item['order']['uid']})&nbsp;&nbsp;&nbsp;&nbsp;昵称：{$item['order']['nickname']}</div>
                                 <a href="{php echo $this->createWebUrl('orderinfo',array('id'=>$item['order']['id']));}"><div class="right btn btn-sm btn-default" style="border:none;">查看详情</div></a>
                             </div>
                             <div class="">

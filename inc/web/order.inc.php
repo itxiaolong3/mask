@@ -9,7 +9,7 @@ $type2=isset($_GPC['type2'])?$_GPC['type2']:'today';
 $where=" where a.uniacid=:uniacid ";
 $data[':uniacid']=$_W['uniacid'];
 if(isset($_GPC['keywords'])){
-    $where.=" and (a.name LIKE  concat('%', :name,'%') || a.order_num LIKE  concat('%', :name,'%'))";
+    $where.=" and (a.name LIKE  concat('%', :name,'%') || a.order_num LIKE  concat('%', :name,'%') || b.nickname LIKE  concat('%', :name,'%') || b.id LIKE  concat('%', :name,'%'))";
     $data[':name']=$_GPC['keywords'];
     $type='all';
     $type2='';
@@ -61,8 +61,9 @@ if($_GPC['time']){
     }
 }
 //$sql="SELECT a.*,b.name as md_name,c.poundage as md_poundage,d.poundage,d.ps_mode,b.ps_poundage FROM ".tablename('mask_order'). " a"  . " left join " . tablename("mask_store") . " b on a.store_id=b.id " . " left join " . tablename("mask_storetype") . " c on b.md_type=c.id ". " left join " . tablename("mask_storeset") . " d on b.id=d.store_id ".$where." ORDER BY a.id DESC";
-$sql="SELECT a.* FROM ".tablename('mask_order'). " a" .$where." ORDER BY a.id DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_order'). " a" .$where." ORDER BY a.id DESC",$data);
+//$sql="SELECT a.* FROM ".tablename('mask_order'). " a" .$where." ORDER BY a.id DESC";
+$sql="SELECT a.*,b.id as uid,b.nickname FROM ".tablename('mask_order'). " a" . " left join " . tablename("mask_user") . " b on a.user_id=b.id "  .$where." ORDER BY a.id DESC";
+$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_order'). " a". " left join " . tablename("mask_user") . " b on a.user_id=b.id "  .$where." ORDER BY a.id DESC",$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list=pdo_fetchall($select_sql,$data);
 $res2=pdo_getall('mask_order_goods');

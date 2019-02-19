@@ -100,9 +100,9 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $card=pdo_get('mask_bankcard', array('uid'=>$pid));
             $hbdata['rcardid']=$card['id'];
             //随机红包
-            $hbmoney=number_format(randFloat(0.88,1),2);
+            $hbmoney=number_format(randFloat(0.1,0.5),2);
             $hbdata['rmoney']=$hbmoney;//红包奖励
-            $hbdata['rcomment']=$nickname."扫码随机红包奖励：".$hbmoney."元";
+            $hbdata['rcomment']=$nickname."推广红包区域奖励(".$hbmoney.")元";
             $hbdata['raddtime']=date('Y-m-d H:i:s',time());
             pdo_insert('mask_record',$hbdata);
         }
@@ -130,7 +130,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $dldata['rordernumber']=$order['order_num']; //银卡
             $card=pdo_get('mask_bankcard', array('uid'=>$pid));
             $dldata['rcardid']=$card['id'];
-            $dldata['rcomment']="直推(".$nickname.")奖励：150元";
+            $dldata['rcomment']="合伙人奖励(150元)";
             $dldata['raddtime']=date('Y-m-d H:i:s',time());
             //银卡记录
             $ykdata['rtype']=1;
@@ -141,7 +141,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $ykdata['rordernumber']=$order['order_num'];
             $card=pdo_get('mask_bankcard', array('uid'=>$pid));//银卡
             $ykdata['rcardid']=$card['id'];
-            $ykdata['rcomment']="直推(".$nickname.")银卡奖励：30元";
+            $ykdata['rcomment']="银卡销售额奖励(30元)";
             $ykdata['raddtime']=date('Y-m-d H:i:s',time());
             //金卡记录
             $jkdata['rtype']=1;
@@ -152,7 +152,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $jkdata['rordernumber']=$order['order_num'];
             $card=pdo_get('mask_bankcard', array('uid'=>$pid)); //银卡
             $jkdata['rcardid']=$card['id'];
-            $jkdata['rcomment']="直推(".$nickname.")金卡奖励：40元";
+            $jkdata['rcomment']="金卡招商奖励(40元)";
             $jkdata['raddtime']=date('Y-m-d H:i:s',time());
             //市代记录
             $sddata['rtype']=1;
@@ -163,7 +163,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $sddata['rordernumber']=$order['order_num'];
             $card=pdo_get('mask_bankcard', array('uid'=>$pid)); //银卡
             $sddata['rcardid']=$card['id'];
-            $sddata['rcomment']="直推(".$nickname.")市代奖励：8元";
+            $sddata['rcomment']="市代区域奖励(8元)";
             $sddata['raddtime']=date('Y-m-d H:i:s',time());
             //省代记录
             $shendaidata['rtype']=1;
@@ -174,7 +174,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $shendaidata['rordernumber']=$order['order_num'];
             $card=pdo_get('mask_bankcard', array('uid'=>$pid)); //银卡
             $shendaidata['rcardid']=$card['id'];
-            $shendaidata['rcomment']="直推(".$nickname.")省代奖励：4元";
+            $shendaidata['rcomment']="省代区域奖励(4元)";
             $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
 
             switch ($onelevel){
@@ -244,7 +244,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                 $jtdata['rordernumber']=$order['order_num'];
                 $card=pdo_get('mask_bankcard', array('uid'=>$twopid));
                 $jtdata['rcardid']=$card['id'];
-                $jtdata['rcomment']="间推(".$nickname.")奖励：48元";
+                $jtdata['rcomment']="二级合伙人奖励(48元)";
                 $jtdata['raddtime']=date('Y-m-d H:i:s',time());
                 $jup=pdo_insert('mask_record',$jtdata);
                 if ($jup){

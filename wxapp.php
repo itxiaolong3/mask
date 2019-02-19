@@ -80,6 +80,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         if ($getopenid){
             $sdata['nickname']=$_GPC['nickname'];
             $sdata['headerimg']=$_GPC['headerimg'];
+            if (empty($_GPC['nickname'])||empty($_GPC['headerimg'])){
+                echo $this->resultToJson(0,'昵称或者头像为空',$_GPC['nickname'].'头像='.$_GPC['headerimg']);
+                die();
+            }
             $sdata['uniacid']=$_W['uniacid'];
             $sdata['openid']=$getopenid;
             $sdata['dq_time']=date('Y-m-d H:i:s',time());
@@ -525,7 +529,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         //先判断用户是否登录
         $islogin=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
         if (!$islogin){
-            echo $this->resultToJson(0,'请登录！','');
+            echo $this->resultToJson(-1,'请登录！','');
             die();
         }
         $addid=$_GPC['aid'];//地址id
@@ -568,7 +572,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                     $Days = round(($d1-$d2)/3600/24);
                     if ($Days<360){
                         //不可以购买
-                        echo $this->resultToJson(-1,'下单失败，365天只能买一次'.$v['num'],'');
+                        echo $this->resultToJson(0,'365天只能买一次,请看待支付订单是否已存在该订单','');
                         die();
                     }
                 }
@@ -586,14 +590,16 @@ class maskModuleWxapp extends WeModuleWxapp {
                 $getjifen=$getjifenf['getscore']-$payjifenf['payscore'];
                 if ($jifen>$getjifen){
                     //积分不够
-                    echo $this->resultToJson(0,'下单失败，积分不够','');
+                    echo $this->resultToJson(0,'积分不够,请看待支付订单是否已存在该订单','');
                     die();
                 }else{
                     //抵扣积分
                     $data2['beforescore']=$getjifen;
                     $data2['afterscore']=$getjifen-$jifen;
+                    $data2['score']=$jifen;
                     $data2['note']='消费积分';
                     $data2['type']=1;
+                    $data2['user_id']=$uid;
                     $data2['cerated_time']=date('Y-m-d H:i:s');
                     $data2['uniacid']=$_W['uniacid'];//小程序id
                     pdo_insert('mask_integral',$data2);//添加积分明细
@@ -608,19 +614,19 @@ class maskModuleWxapp extends WeModuleWxapp {
         if($res){
             foreach ($goodinfo as $k=>$v){
                 $onegood=pdo_get('mask_goodmy',array('gID'=>$v['id']));
-                $data2['name']=$onegood['Title'];//商品名称
-                $data2['number']=$v['num'];//商品数量
-                $data2['integral']=$v['integral'];//商品积分
-                $data2['TotalQty']=$v['TotalQty'];//商品销量
-                $data2['money']=$v['price'];//商品单价
-                $data2['img']=$onegood['Itemcover'];//商品图片
-                //$data2['spec']=$v['msg'];//商品规格
-                $data2['dishes_id']=$v['id'];//商品id
+                $data3['name']=$onegood['Title'];//商品名称
+                $data3['number']=$v['num'];//商品数量
+                $data3['integral']=$v['integral'];//商品积分
+                $data3['TotalQty']=$v['TotalQty'];//商品销量
+                $data3['money']=$v['price'];//商品单价
+                $data3['img']=$onegood['Itemcover'];//商品图片
+                //$data3['spec']=$v['msg'];//商品规格
+                $data3['dishes_id']=$v['id'];//商品id
                 // $data2['fid']=$v['fid'];//发货地id
-                $data2['uniacid']=$_W['uniacid'];//小程序id
-                $data2['order_id']=$order_id;
-                //$data2['Code']=date('Ymd',time()).'-'.$this->randNum(8);
-                $res2=pdo_insert('mask_order_goods',$data2);
+                $data3['uniacid']=$_W['uniacid'];//小程序id
+                $data3['order_id']=$order_id;
+                //$data3['Code']=date('Ymd',time()).'-'.$this->randNum(8);
+                $res2=pdo_insert('mask_order_goods',$data3);
                 array_push($chidid,pdo_insertid());
             }
             if($res2){
@@ -631,11 +637,11 @@ class maskModuleWxapp extends WeModuleWxapp {
                 }
                 echo $this->resultToJson(1,'提交订单成功',$order_id);
             }else{
-                echo $this->resultToJson(0,'提交订单失败','');
+                echo $this->resultToJson(0,'提交订单失败1=',$data3);
             }
 
         }else{
-            echo $this->resultToJson(0,'提交订单失败','');
+            echo $this->resultToJson(0,'提交订单失败2','');
         }
 
     }
@@ -768,7 +774,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         if($res2['url_name']){
             $res2['url_name']=$res2['url_name'];
         }else{
-            $res2['url_name']='紫色魁影';
+            $res2['url_name']='紫色魅影';
         }
         //支付需要传入的参数 openid 订单id 支付金额
         $appid=$res2['appid'];
@@ -947,10 +953,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data=array();
         if(!empty($uid)){
             $res=pdo_get('mask_user',array('id'=>$uid,'uniacid'=>$_W['uniacid']));
-            if ($phone==$res['user_tel']){
-                echo $this->resultToJson(1,'检验登录成功','');
+            if ($res['user_tel']){
+                echo $this->resultToJson(1,'检验注册成功','');
             }else{
-                echo $this->resultToJson(0,'检验登录失败','');
+                echo $this->resultToJson(0,'检验注册失败','');
             }
         }else if (!empty($phone)){
             $res=pdo_get('mask_user',array('user_tel'=>$phone,'psw'=>$psw,'uniacid'=>$_W['uniacid']));
@@ -1172,8 +1178,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         //当月结算统计
         $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
         $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$_GPC['uid']} and rsettlement=1 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
-        $redata['nosettlement']=$nodeal['con'];
-        $redata['settlement']=$deal['con'];
+        $redata['nosettlement']=number_format($nodeal['con'],2);
+        $redata['settlement']=number_format($deal['con'],2);
         echo $this->resultToJson(1,'我的分销数据',$redata);
     }
     //团队详细
@@ -1316,9 +1322,9 @@ class maskModuleWxapp extends WeModuleWxapp {
             $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
             $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
         }
-        $redata['alltotal']=$allrecord['con'];
-        $redata['nodealtotal']=$nodeal['con'];
-        $redata['dealtotal']=$deal['con'];
+        $redata['alltotal']=number_format($allrecord['con'],2);
+        $redata['nodealtotal']=number_format($nodeal['con'],2);
+        $redata['dealtotal']=number_format($deal['con'],2);
         $redata['list']=$list;
         echo $this->resultToJson(1,'收益页数据',$redata);
 
@@ -1496,9 +1502,9 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $type=$_GPC['type'];//2表示全部
         if ($type<2){
-            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rstate'=>$type),array('rid','rcomment','raddtime','rmoney','rstate'));
+            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rstate'=>$type,'rsettlement'=>1),array('rid','rcomment','raddtime','rmoney','rstate'));
         }else{
-            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid']),array('rid','rcomment','raddtime','rmoney','rstate'));
+            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rsettlement'=>1),array('rid','rcomment','raddtime','rmoney','rstate'));
         }
         if ($recoord){
             echo $this->resultToJson(1,'消费记录数据',$recoord);
@@ -1579,8 +1585,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=0");
         $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$_GPC['uid']} and type=1");
         $jifen=$getjifenf['getscore']-$payjifenf['payscore'];
-        $datas['wallet']=$wallet;
-        $datas['totalmoney']=$money;
+        //$datas['wallet']=$wallet;
+        $datas['wallet']=0;
+        //$datas['totalmoney']=$money;
+        $datas['totalmoney']=0;
         $datas['shengjifeng']=$jifen;
         echo $this->resultToJson(1,'会员卡信息',$datas);
     }
@@ -1815,7 +1823,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             //随机红包
                             $hbmoney=number_format($this->randFloat(0.1,0.5),1);
                             $hbdata['rmoney']=$hbmoney;//红包奖励
-                            $hbdata['rcomment']=$nickname."扫码随机红包奖励：".$hbmoney."元";
+                            $hbdata['rcomment']=$nickname."推广红包区域奖励(".$hbmoney.")元";
                             $hbdata['raddtime']=date('Y-m-d H:i:s',time());
                             pdo_insert('mask_record',$hbdata);
                         }
@@ -1838,7 +1846,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $dldata['rordernumber']=$order['order_num']; //银卡
                             $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid']));
                             $dldata['rcardid']=$card['id'];
-                            $dldata['rcomment']="直推(".$nickname.")奖励：150元";
+                            $dldata['rcomment']="合伙人奖励(150元)";
                             $dldata['raddtime']=date('Y-m-d H:i:s',time());
                             //银卡记录
                             $ykdata['rtype']=1;
@@ -1849,7 +1857,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $ykdata['rordernumber']=$order['order_num'];
                             $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid']));//银卡
                             $ykdata['rcardid']=$card['id'];
-                            $ykdata['rcomment']="直推(".$nickname.")银卡奖励：30元";
+                            $ykdata['rcomment']="银卡销售额奖励(30元)";
                             $ykdata['raddtime']=date('Y-m-d H:i:s',time());
                             //金卡记录
                             $jkdata['rtype']=1;
@@ -1860,7 +1868,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $jkdata['rordernumber']=$order['order_num'];
                             $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
                             $jkdata['rcardid']=$card['id'];
-                            $jkdata['rcomment']="直推(".$nickname.")金卡奖励：40元";
+                            $jkdata['rcomment']="金卡招商奖励(40元)";
                             $jkdata['raddtime']=date('Y-m-d H:i:s',time());
                             //市代记录
                             $sddata['rtype']=1;
@@ -1871,7 +1879,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $sddata['rordernumber']=$order['order_num'];
                             $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
                             $sddata['rcardid']=$card['id'];
-                            $sddata['rcomment']="直推(".$nickname.")市代奖励：4元";
+                            $sddata['rcomment']="市代区域奖励(8元)";
                             $sddata['raddtime']=date('Y-m-d H:i:s',time());
                             //省代记录
                             $shendaidata['rtype']=1;
@@ -1882,7 +1890,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $shendaidata['rordernumber']=$order['order_num'];
                             $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
                             $shendaidata['rcardid']=$card['id'];
-                            $shendaidata['rcomment']="直推(".$nickname.")奖励：8元";
+                            $shendaidata['rcomment']="省代区域奖励(4元)";
                             $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
 
                             switch ($onelevel){
@@ -1952,7 +1960,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                                 $jtdata['rordernumber']=$order['order_num'];
                                 $card=pdo_get('mask_bankcard', array('uid'=>$twopid,'uniacid'=>$_W['uniacid']));
                                 $jtdata['rcardid']=$card['id'];
-                                $jtdata['rcomment']="间推(".$nickname.")奖励：48元";
+                                $jtdata['rcomment']="二级合伙人奖励(48元)";
                                 $jtdata['raddtime']=date('Y-m-d H:i:s',time());
                                 $jup=pdo_insert('mask_record',$jtdata);
                                 if ($jup){
@@ -4719,10 +4727,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6571,8 +6579,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                    "page"=>"mask/pages/Liar/loginindex",
-                    "width" => 400);
+                               "page"=>"mask/pages/Liar/loginindex",
+                               "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8445,10 +8453,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
