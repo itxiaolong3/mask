@@ -89,6 +89,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $sdata['dq_time']=date('Y-m-d H:i:s',time());
             $getuserinfo=pdo_get('mask_user',array('openid'=>$getopenid));
             if ($getuserinfo){
+                pdo_update('mask_user',array('dq_time'=>date('Y-m-d H:i:s',time()),'headerimg'=>$_GPC['headerimg'],'nickname'=>$_GPC['nickname']),array('openid'=>$getopenid));
                 echo $this->resultToJson(1,'保存openid成功',$getuserinfo);
             }else{
                 $insres=pdo_insert('mask_user',$sdata);
