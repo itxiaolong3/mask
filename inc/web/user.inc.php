@@ -19,14 +19,24 @@ if($_GPC['keywords']){
 	$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") .
         " WHERE  nickname LIKE :name || user_tel LIKE :name and uniacid=:uniacid ",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
 	$pager = pagination($total, $pageindex, $pagesize);
-	if($_GPC['id']){
-		$res4=pdo_delete("mask_user",array('u_id'=>$_GPC['id']));
-		if($res4){
-		 message('删除成功！', $this->createWebUrl('user'), 'success');
-		}else{
-			  message('删除失败！','','error');
-		}
-	}
+//	if($_GPC['id']){
+//		$res4=pdo_delete("mask_user",array('u_id'=>$_GPC['id']));
+//		if($res4){
+//		 message('删除成功！', $this->createWebUrl('user'), 'success');
+//		}else{
+//			  message('删除失败！','','error');
+//		}
+//	}
+if($_GPC['op']=='changelevel'){
+    $getlevel=$_GPC['level'];
+    //更改订单操作
+    $rst=pdo_update('mask_user',array('level'=>$getlevel),array('id'=>$_GPC['id']));
+    if ($rst){
+        echo json_encode(array('code'=>1));
+    }else{
+        echo json_encode(array('code'=>0));
+    }
+}
 if(checksubmit('submit2')){
       $res=pdo_update('mask_user',array('wallet +='=>$_GPC['reply']),array('id'=>$_GPC['id2']));
       if($res){

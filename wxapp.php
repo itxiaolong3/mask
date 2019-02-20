@@ -46,7 +46,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         //$dldata['rcardid']=$card['id'];
         $dldata['rcomment']="直推(A未知)奖励：150元";
         $dldata['raddtime']=date('Y-m-d H:i:s',time());
-
+        $re=pdo_getall('mask_areaagent');
+        var_dump($re);
         //echo $this->doPageGoodsCode(6);
     }
     //获取openid并保存用户信息
@@ -80,13 +81,13 @@ class maskModuleWxapp extends WeModuleWxapp {
         if ($getopenid){
             $sdata['nickname']=$_GPC['nickname'];
             $sdata['headerimg']=$_GPC['headerimg'];
+            $sdata['uniacid']=$_W['uniacid'];
+            $sdata['openid']=$getopenid;
+            $sdata['dq_time']=date('Y-m-d H:i:s',time());
             if (empty($_GPC['nickname'])||empty($_GPC['headerimg'])){
                 echo $this->resultToJson(0,'昵称或者头像为空',$_GPC['nickname'].'头像='.$_GPC['headerimg']);
                 die();
             }
-            $sdata['uniacid']=$_W['uniacid'];
-            $sdata['openid']=$getopenid;
-            $sdata['dq_time']=date('Y-m-d H:i:s',time());
             $getuserinfo=pdo_get('mask_user',array('openid'=>$getopenid));
             if ($getuserinfo){
                 pdo_update('mask_user',array('dq_time'=>date('Y-m-d H:i:s',time()),'headerimg'=>$_GPC['headerimg'],'nickname'=>$_GPC['nickname']),array('openid'=>$getopenid));
@@ -955,9 +956,9 @@ class maskModuleWxapp extends WeModuleWxapp {
         if(!empty($uid)){
             $res=pdo_get('mask_user',array('id'=>$uid,'uniacid'=>$_W['uniacid']));
             if ($res['user_tel']){
-                echo $this->resultToJson(1,'检验注册成功','');
+                echo $this->resultToJson(1,'检验登录成功','');
             }else{
-                echo $this->resultToJson(0,'检验注册失败','');
+                echo $this->resultToJson(0,'检验登录失败','');
             }
         }else if (!empty($phone)){
             $res=pdo_get('mask_user',array('user_tel'=>$phone,'psw'=>$psw,'uniacid'=>$_W['uniacid']));
@@ -985,6 +986,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $getuid=$_GPC['uid'];
         if (!$getuid){
             echo $this->resultToJson(0,'请退出重新授权操作','');
+            die();
         }
         $getpid=$_GPC['pid'];
         $getcode=$_GPC['code'];
@@ -1534,7 +1536,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                 echo $this->resultToJson(1,'可提现',true);
             }
         }else{
-            echo $this->resultToJson(0,'提现日为每周一',false);
+            echo $this->resultToJson(0,'尚未满足提现条件或不在提现时间段',false);
         }
     }
     //提现
@@ -1915,40 +1917,27 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     //更新余额
                                     //pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
                                     break;
-                                case 4:
-                                    //市代
-                                    //先判断是否本市的
-                                    $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
-                                    $addressarr=explode('-',$cityaddress);
-                                    $orderaddressarr=explode('-',$order['address']);
-                                    pdo_insert('mask_record',$dldata);
-                                    pdo_insert('mask_record',$ykdata);
-                                    pdo_insert('mask_record',$jkdata);
-                                    if ($addressarr[1]==$orderaddressarr[1]){
-                                        pdo_insert('mask_record',$sddata);
-                                        //更新余额
-                                        //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
-                                    }
-                                    break;
-                                case 5:
-                                    //省代
-                                    pdo_insert('mask_record',$dldata);
-                                    pdo_insert('mask_record',$ykdata);
-                                    pdo_insert('mask_record',$jkdata);
-                                    //先判断是否省代的
-                                    $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
-                                    $addressarr=explode('-',$cityaddress);
-                                    $orderaddressarr=explode('-',$order['address']);
-                                    pdo_insert('mask_record',$dldata);
-                                    pdo_insert('mask_record',$ykdata);
-                                    pdo_insert('mask_record',$jkdata);
-                                    if ($addressarr[0]==$orderaddressarr[0]){
-                                        pdo_insert('mask_record',$sddata);
-                                        pdo_insert('mask_record',$shendaidata);
-                                        //更新余额
-                                        //pdo_update('mask_user', array('wallet +=' => 232), array('id' => $pid));
-                                    }
-                                    break;
+
+                            }
+                            //市代
+                            $cityaddress=pdo_getall('mask_areaagent',array('state'=>1));
+                            $orderaddressarr=explode('-',$order['address']);
+                            foreach ($cityaddress as $k=>$v){
+                                $addressarr=explode('-',$v['address']);
+                                if ($addressarr[1]==$orderaddressarr[1]){
+                                    pdo_insert('mask_record',$sddata);
+                                    //更新余额
+                                    //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                                }
+                            }
+                            //省代
+                            foreach ($cityaddress as $k=>$v){
+                                $addressarr=explode('-',$v['address']);
+                                if ($addressarr[0]==$orderaddressarr[0]){
+                                    pdo_insert('mask_record',$shendaidata);
+                                    //更新余额
+                                    //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                                }
                             }
                             //间推等级
                             $twopid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);

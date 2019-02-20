@@ -52,7 +52,7 @@
 <div class="main ygmain">
     <div class="panel panel-default">
         <div class="panel-body">
-            <a class="btn btn-sm label-orderinfo" href="{php echo $this->createWebUrl('order');}"><i class="fa fa-refresh"></i>返回订单管理</a>
+            <a class="btn btn-sm label-orderinfo" href="javascript:history.back(-1)"><i class="fa fa-refresh"></i>返回订单管理</a>
             <div class="right">
                     {if $item['state']==2}
                   <a href="{php echo $this->createWebUrl('order',array('op'=>'jd','id'=>$item['id']));}"><button class="btn btn-sm btn-warning">确认发货</button></a>
@@ -306,17 +306,17 @@
                         {elseif $item['state']==4}
                         <span  style="color:green" >已完成</span>
                         {elseif $item['state']==5}
-                        <span  style="color:gray" >已评价</span>
+                        <span  style="color:gray" >已取消</span>
                         {elseif $item['state']==6}
-                        <span  style="color:green" >已取消</span>
+                        <span  style="color:green" >待退款</span>
                         {elseif $item['state']==7}
-                        <span  style="color:orange" >已拒绝</span>
+                        <span  style="color:orange" >已退款</span>
                         {elseif $item['state']==8}
-                        <span  style="color:green" >退款中</span>
-                        {elseif $item['state']==9}
-                        <span  style="color:red" >退款成功</span>
-                          {elseif $item['state']==10}
-                        <span  style="color:red" >退款拒绝</span>
+                        <span  style="color:green" >退款拒绝</span>
+                        <!--{elseif $item['state']==9}-->
+                        <!--<span  style="color:red" >退款成功</span>-->
+                          <!--{elseif $item['state']==10}-->
+                        <!--<span  style="color:red" >退款拒绝</span>-->
                         {/if}</div>
                         </div>
                      <!--    <div class="col-md-12 beizhu">【备注】</div> -->

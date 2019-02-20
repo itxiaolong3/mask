@@ -91,7 +91,7 @@
                         <th class="col-md-1">昵称</th>
                         <th class="col-md-1">身份</th>
                         <th class="col-md-2">手机号</th>
-
+                        <td  class="col-md-2">操作</td>
                     </tr>
                       {loop $list  $row}
                     <tr class="yg5_tr2">
@@ -114,8 +114,34 @@
                             {/if}
                         </td>
                         <td>{$row['user_tel']}</td>
+                        <td><a class="btn ygyouhui2 btn-xs"  value="编 辑"  data-toggle="modal" data-target="#myModal{$row['id']}">设置身份</a></td>
                     </tr>
-
+                    <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel" style="font-size: 20px;">设置等级</h4>
+                                </div>
+                                <div class="modal-body" style="font-size: 20px">
+                                    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+                                        <div class="form-group">
+                                            <label class="col-xs-8 col-sm-3  control-label">输入对应等级</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" name="level" id="level{$row['id']}" class="form-control" value="{$row['level']}" />
+                                            </div>
+                                            <label class="control-label">0-普通用户 | 1-合伙人 | 2-银卡合伙人 | 3-金卡合伙人 | 4-市代合伙人  5-省代合伙人</label>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    <a href="javascript:void(0);" onclick="changlevel({$row['id']});" type="button"  class="btn btn-info" >确定</a>
+                                    <!--<a href="{php echo $this->createWebUrl('onetype', array('op' => 'delete', 'id' => $row['ID']))}" id="postfee" type="button" class="btn btn-info" >确定</a>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     {/loop}
                       {if empty($list)}
                     <tr class="yg5_tr2">
@@ -138,6 +164,35 @@
 
 <!-- {template 'common/footer'} -->
 <script type="text/javascript">
+    var postpath = "{$_W['siteroot']}/web/index.php?c=site&i={$_W['uniacid']}&a=entry&do=user&m=mask&op=changelevel";
+    function changlevel(id) {
+        $('.btn-info').removeAttr("onclick")
+        //var data = $('form').serializeArray();
+        level=$("#level"+id).val();
+        console.log(level,'修改的等级');
+        //开始提交数据进行保存
+        $.ajax({
+            type:"post",
+            url:postpath,
+            data:{
+                level:level,
+                op:'changelevel',
+                id:id
+            },
+            success:function(e){
+                //var res = JSON.parse(e)
+                //console.log(res.data.code,'执行成功')
+                window.location.reload()
+
+            },
+            error:function(e){
+                console.log('执行失败')
+            },
+            complete:function(e){
+                console.log('每一步都执行')
+            }
+        })
+    }
     $(function(){
         // $("#frame-12").addClass("in");
         // $("#frame-12").show();

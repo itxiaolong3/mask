@@ -96,7 +96,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $hbdata['rstate']=0;
             $hbdata['ruid']=$pid;
             $hbdata['rbuyername']=$nickname;
-            $hbdata['rordernumber']=$order['order_num']; //银卡
+            $hbdata['rordernumber']=$order['order_num'];
             $card=pdo_get('mask_bankcard', array('uid'=>$pid));
             $hbdata['rcardid']=$card['id'];
             //随机红包
@@ -198,40 +198,26 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     //更新余额
                     //pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
                     break;
-                case 4:
-                    //市代
-                    //先判断是否本市的
-                    $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
-                    $addressarr=explode('-',$cityaddress);
-                    $orderaddressarr=explode('-',$order['address']);
-                    pdo_insert('mask_record',$dldata);
-                    pdo_insert('mask_record',$ykdata);
-                    pdo_insert('mask_record',$jkdata);
-                    if ($addressarr[1]==$orderaddressarr[1]){
-                        pdo_insert('mask_record',$sddata);
-                        //更新余额
-                        //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
-                    }
-                    break;
-                case 5:
-                    //省代
-                    pdo_insert('mask_record',$dldata);
-                    pdo_insert('mask_record',$ykdata);
-                    pdo_insert('mask_record',$jkdata);
-                    //先判断是否省代的
-                    $cityaddress=pdo_getcolumn('mask_areaagent', array('uid' => $pid), 'address',1);
-                    $addressarr=explode('-',$cityaddress);
-                    $orderaddressarr=explode('-',$order['address']);
-                    pdo_insert('mask_record',$dldata);
-                    pdo_insert('mask_record',$ykdata);
-                    pdo_insert('mask_record',$jkdata);
-                    if ($addressarr[0]==$orderaddressarr[0]){
-                        pdo_insert('mask_record',$sddata);
-                        pdo_insert('mask_record',$shendaidata);
-                        //更新余额
-                        //pdo_update('mask_user', array('wallet +=' => 232), array('id' => $pid));
-                    }
-                    break;
+            }
+            //市代
+            $cityaddress=pdo_getall('mask_areaagent',array('state'=>1));
+            $orderaddressarr=explode('-',$order['address']);
+            foreach ($cityaddress as $k=>$v){
+                $addressarr=explode('-',$v['address']);
+                if ($addressarr[1]==$orderaddressarr[1]){
+                    pdo_insert('mask_record',$sddata);
+                    //更新余额
+                    //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                }
+            }
+            //省代
+            foreach ($cityaddress as $k=>$v){
+                $addressarr=explode('-',$v['address']);
+                if ($addressarr[0]==$orderaddressarr[0]){
+                    pdo_insert('mask_record',$shendaidata);
+                    //更新余额
+                    //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                }
             }
             //间推等级
             $twopid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);

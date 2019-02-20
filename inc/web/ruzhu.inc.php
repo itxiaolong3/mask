@@ -8,11 +8,11 @@ $where=' WHERE  uniacid=:uniacid';
 $data[':uniacid']=$_W['uniacid'];
 if($_GPC['keywords']){
     $op=$_GPC['keywords'];
-    $where.=" and (store_name LIKE  concat('%', :name,'%') || user_name LIKE  concat('%', :name,'%'))";    
+    $where.=" and (name LIKE  concat('%', :name,'%') || phone LIKE  concat('%', :name,'%'))";
     $data[':name']=$op;
 } 
-  $sql="SELECT * FROM ".tablename('wpdc_ruzhu') .  "  ". $where." ORDER BY id DESC";
-  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('wpdc_ruzhu') .  "".$where." ORDER BY id DESC",$data);
+  $sql="SELECT * FROM ".tablename('mask_areaagent') .  "  ". $where." ORDER BY id DESC";
+  $total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_areaagent') .  "".$where." ORDER BY id DESC",$data);
 
 $list=pdo_fetchall( $sql,$data);
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
@@ -22,7 +22,7 @@ $pager = pagination($total, $pageindex, $pagesize);
 $operation=$_GPC['op'];
 if($operation=='adopt'){//审核通过
     $id=$_GPC['id'];
-    $res=pdo_update('wpdc_ruzhu',array('state'=>2),array('id'=>$id));  
+    $res=pdo_update('mask_areaagent',array('state'=>1),array('id'=>$id));
     if($res){
         message('审核成功',$this->createWebUrl('ruzhu',array()),'success');
     }else{
@@ -31,7 +31,7 @@ if($operation=='adopt'){//审核通过
 }
 if($operation=='reject'){
      $id=$_GPC['id'];
-    $res=pdo_update('wpdc_ruzhu',array('state'=>3),array('id'=>$id));
+    $res=pdo_update('mask_areaagent',array('state'=>2),array('id'=>$id));
      if($res){
         message('拒绝成功',$this->createWebUrl('ruzhu',array()),'success');
     }else{
@@ -40,7 +40,7 @@ if($operation=='reject'){
 }
 if($operation=='delete'){
      $id=$_GPC['id'];
-     $res=pdo_delete('wpdc_ruzhu',array('id'=>$id));
+     $res=pdo_delete('mask_areaagent',array('id'=>$id));
      if($res){
         message('删除成功',$this->createWebUrl('ruzhu',array()),'success');
     }else{

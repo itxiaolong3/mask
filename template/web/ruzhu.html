@@ -71,32 +71,32 @@
                     <tr class="yg5_tr1">
                         <td class="store_td1">姓名</td>
                         <td>手机号</td>
-                        <td>常住地址</td>
-                        <td>描述</td>
+                        <td>地址</td>
+                        <td>备注</td>
                         <td>申请时间</td>
                         <td>审核状态</td>
                         <td>操作</td>
                     </tr>
                     {loop $list $key $item}
                     <tr class="yg5_tr2">
-                      <td class="store_td1">{$item['store_name']}</td>
-                      <td class="store_td1"><img class="store_list_img" src="{media  $item['img']}" alt=""/>    </td>
-                       
+                      <td class="store_td1">{$item['name']}</td>
+                      <!--<td class="store_td1"><img class="store_list_img" src="{media  $item['img']}" alt=""/>    </td>-->
+                        <td>{$item['phone']}</td>
                       <td>{$item['address']}</td>
-                      <td>{$item['user_name']}</td>
-                       <td>{$item['tel']}</td>
-                     <td>{php echo date("Y-m-d H:i:s",$item['time'])}</td>
+                      <td>{$item['comment']}</td>
+
+                     <td>{$item['addtime']}</td>
 
 
-                     {if $item['state']==1}
+                     {if $item['state']==0}
                      <td >
                         <span class="label storered">待审核</span>
                     </td >
-                    {elseif $item['state']==2}
+                    {elseif $item['state']==1}
                     <td >
                         <span class="label storeblue">已通过</span>
                     </td>
-                    {elseif $item['state']==3}
+                    {elseif $item['state']==2}
                     <td >
                        <span class="label storegrey">已拒绝</span>
                    </td>
@@ -104,17 +104,21 @@
                    {/if}  
                    <td>
 
-                      {if $item['state']==1}
+                      {if $item['state']==0}
                       <a class="btn ygyouhui2 btn-xs" href="{php echo $this->createWebUrl('ruzhu',array('id'=>$item['id'],'op'=>'adopt'))}" >通过</a>
-                      <a class="btn storegrey2 btn-xs" href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
+                       <a class="btn storegrey2 btn-xs" href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
+                       {elseif $item['state']==1}
+                       <a class="btn storegrey2 btn-xs" href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
+                       {elseif $item['state']==2}
+                       <a class="btn ygyouhui2 btn-xs" href="{php echo $this->createWebUrl('ruzhu',array('id'=>$item['id'],'op'=>'adopt'))}" >通过</a>
                       {/if}
                       <!--<a class="btn ygshouqian btn-xs" href="{php echo $this->createWebUrl('ruzhuinfo',array('id'=>$item['id']))}" >详情</a>-->
-                      <a href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'delete'))}" class="storespan btn btn-xs" onclick="return confirm('确认删除吗？');return false;" title="删除">
-                          <span class="fa fa-trash-o"></span>
-                          <span class="bianji">删除
-                              <span class="arrowdown"></span>
-                          </span>
-                      </a>
+                      <!--<a href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'delete'))}" class="storespan btn btn-xs" onclick="return confirm('确认删除吗？');return false;" title="删除">-->
+                          <!--<span class="fa fa-trash-o"></span>-->
+                          <!--<span class="bianji">删除-->
+                              <!--<span class="arrowdown"></span>-->
+                          <!--</span>-->
+                      <!--</a>-->
                       
                       <!-- <a class="btn btn-danger btn-xs" href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'delete'))}" onclick="return confirm('确认删除吗？');return false;" title="删除">删</a> -->
 
