@@ -109,7 +109,7 @@
     <!--<li {if $type=='zt'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type'=>zt));}">自提订单</a></li>-->
     <li {if $type=='wait'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type'=>wait));}">待支付</a></li>
     <!--     <li {if $type=='dd'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type'=>dd));}">预约到店</a></li> -->
-    <li {if $type=='cancel'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type'=>cancel));}">取消/拒绝/退款</a></li>
+    <li {if $type=='cancel'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type'=>cancel));}">售后订单</a></li>
     <li {if $type=='all'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type'=>all));}">全部订单</a></li>
 </ul>
 <div class="row ygrow">
@@ -168,7 +168,7 @@
             <div class="panel panel-default">
                 <div class="panel-body" style="padding: 0px 15px;">
                     <div class="row" style="position: relative;">
-                        {if $item['order']['state']==1 || $item['order']['state']==6}
+                        {if $item['order']['state']==1}
                         <div class="ortypeimg">
                             <img src="../addons/mask/template/images/daizhifu.png">
                         </div>
@@ -207,31 +207,21 @@
                                 {elseif $item['order']['state']==2}
                                 <div class="left orderconfirm2">待接单</div>
                                 <a href="javascript:void(0);"><div class="left orderconfirm" data-toggle="modal" data-target="#myModal{$item['order']['id']}">确认发货</div></a>
-                                <!--<a href="{php echo $this->createWebUrl('order',array('op'=>'jd','id'=>$item['order']['id']));}"><div class="left orderconfirm">确认发货</div></a>-->
-                                <!--<a href="{php echo $this->createWebUrl('order',array('op'=>'jjjd','id'=>$item['order']['id']));}"><div class="left orderconfirm">拒接接单</div></a>-->
                                 {elseif $item['order']['state']==3}
                                 <div class="left orderconfirm2">待收货</div>
-                                <!--<div class="left orderconfirm2 ps_info" id="order_info" value="{$item['order']['id']}">-->
-                                <!--<text class="dis_info" value="{$item['order']['ps_mode']}">配送详情</text>-->
-                                <!--</div>-->
-                                <a href="{php echo $this->createWebUrl('order',array('op'=>'wc','id'=>$item['order']['id']));}"><div class="left orderconfirm">点击完成</div></a>
-                                <!--<a href="{php echo $this->createWebUrl('order',array('op'=>'cancel','id'=>$item['order']['id']));}"><div class="left orderconfirm">取消订单</div></a>-->
 
-                                {elseif $item['order']['state']==4}
+                                <a href="{php echo $this->createWebUrl('order',array('op'=>'wc','id'=>$item['order']['id']));}"><div class="left orderconfirm">点击完成</div></a>
+                               {elseif $item['order']['state']==4}
                                 <div class="left label label-xs orderconhui">已完成</div>
                                 {elseif $item['order']['state']==5}
                                 <div class="left orderconfirm2">已评价</div>
                                 {elseif $item['order']['state']==6}
-                                <div class="left orderconfirm2">已取消</div>
-                                {elseif $item['order']['state']==7}
-                                <div class="left orderconfirm2">已拒接</div>
-                                {elseif $item['order']['state']==8}
                                 <div class="left orderconfirm2">待退款</div>
                                 <a href="{php echo $this->createWebUrl('order',array('op'=>'refund','id'=>$item['order']['id']));}"><div class="left orderconfirm">通过退款</div></a>
                                 <a href="{php echo $this->createWebUrl('order',array('op'=>'reject','id'=>$item['order']['id']));}"><div class="left orderconfirm">拒绝退款</div></a>
-                                {elseif $item['order']['state']==9}
+                                {elseif $item['order']['state']==7}
                                 <div class="left orderconfirm2">退款成功</div>
-                                {elseif $item['order']['state']==10}
+                                {elseif $item['order']['state']==8}
                                 <div class="left orderconfirm2">退款拒绝</div>
                                 {/if}
                             </div>

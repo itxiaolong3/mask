@@ -27,7 +27,7 @@ if($_GPC['time']){
         $where.=" and a.state=2";
     }
     if($type=='cancel'){//取消
-        $where.=" and a.state in (5,6,7,8,9,10)";
+        $where.=" and a.state in (6,7,8)";
     }
     if($type=='complete'){//已完成
         $where.=" and a.state=4";
@@ -99,7 +99,7 @@ if($_GPC['op']=='cancel'){
     $rst=pdo_get('mask_order',array('id'=>$_GPC['id']));
     $set=pdo_get('mask_storeset',array('store_id'=>$rst['store_id']),'ps_mode');
     $sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),'ps_name');
-    $ps_name=empty($sys['ps_name'])?'天天拼团':$sys['ps_name'];
+    $ps_name=empty($sys['ps_name'])?'紫色魅影':$sys['ps_name'];
     if($res){
         if($set['ps_mode']=='快服务配送'){
             $result=$this->qxkfw($_GPC['id']);
@@ -132,7 +132,7 @@ if($_GPC['op']=='jd'){
     $store=pdo_fetch($sql);
     $orderInfo=pdo_get('mask_order',array('id'=>$_GPC['id']),'order_type');
     $sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),'ps_name');
-    $ps_name=empty($sys['ps_name'])?'天天拼团':$sys['ps_name'];
+    $ps_name=empty($sys['ps_name'])?'紫色魅影':$sys['ps_name'];
     $res=pdo_update('mask_order',$data2,array('id'=>$_GPC['id']));
     ///////////////模板消息///////////////////
     function getaccess_token($_W,$_GPC){
@@ -168,7 +168,7 @@ if($_GPC['op']=='jd'){
                "color": "#173177"
              },
              "keyword2": {
-               "value":"天天拼团",
+               "value":"紫色魅影",
                "color": "#173177"
              },
              "keyword3": {
@@ -527,119 +527,127 @@ if($_GPC['op']=='wc'){
     }
 }
 if($_GPC['op']=='refund'){
-    $type=pdo_get('mask_order',array('id'=>$_GPC['id']));
-    $store=pdo_get('mask_storeset',array('store_id'=>$type['store_id']),'ps_mode');
-    $sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),'ps_name');
-    $ps_name=empty($sys['ps_name'])?'超级跑腿':$sys['ps_name'];
-    if($type['pay_type']==1){//微信退款
-        $result=$this->wxrefund($_GPC['id']);
-    }
-    if($type['pay_type']==2){//余额退款
-        $rst=pdo_get('mask_qbmx',array('user_id'=>$type['user_id'],'order_id'=>$type['id']));
-        if(!$rst){
-            $tk['money'] = $type['money'];
-            $tk['order_id'] = $type['id'];
-            $tk['user_id'] = $type['user_id'];
-            $tk['type'] = 1;
-            $tk['note'] = '订单退款';
-            $tk['time'] = date('Y-m-d H:i:s');
-            $tkres = pdo_insert('mask_qbmx', $tk);
-            pdo_update('mask_user', array('wallet +=' => $type['money']), array('id' => $type['user_id']));
-        }
-    }
-    if ($result['result_code'] == 'SUCCESS' || $tkres) {//退款成功
-        //更改订单操作
-        pdo_update('mask_order',array('state'=>9),array('id'=>$_GPC['id']));
-        if($store['ps_mode']=='快服务配送'){
-            $result=$this->qxkfw($_GPC['id']);
-        }
-        if($store['ps_mode']==$ps_name){
-            $this->qxpt($_GPC['id']);
-        }
-        $this->invalidcommission($_GPC['id']);
-
-        pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
-        ///////////////模板消息退款///////////////////
-        function getaccess_token($_W){
-            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
-            $appid=$res['appid'];
-            $secret=$res['appsecret'];
-            $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,$url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
-            $data = curl_exec($ch);
-            curl_close($ch);
-            $data = json_decode($data,true);
-            return $data['access_token'];
-        }
-        //设置与发送模板信息
-        function set_msg($_W){
-            $access_token = getaccess_token($_W);
-            $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
-            $res2=pdo_get('mask_order',array('id'=>$_GET['id']));
-            if($res2['pay_type']==1){
-                $note='微信钱包';
-            }elseif($res2['pay_type']==2){
-                $note='余额钱包';
-            }
-            $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
-            $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
-            $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
-            $formwork ='{
-           "touser": "'.$user["openid"].'",
-           "template_id": "'.$res["tk_tid"].'",
-           "page": "mask/pages/Liar/loginindex",
-           "form_id":"'.$form['form_id'].'",
-           "data": {
-             "keyword1": {
-               "value": "'.$res2['order_num'].'",
-               "color": "#173177"
-             },
-             "keyword2": {
-               "value":"'.$store['name'].'",
-               "color": "#173177"
-             },
-             "keyword3": {
-
-               "value": "'.$res2['money'].'",
-               "color": "#173177"
-             },
-             "keyword4": {
-               "value":  "'.$note.'",
-               "color": "#173177"
-             },
-             "keyword5": {
-               "value": "'.date("Y-m-d H:i:s").'",
-               "color": "#173177"
-             }
-           }
-         }';
-            // $formwork=$data;
-            $url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=".$access_token."";
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,$url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
-            curl_setopt($ch, CURLOPT_POST,1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS,$formwork);
-            $data = curl_exec($ch);
-            curl_close($ch);
-            // return $data;
-            pdo_delete('mask_formid',array('id'=>$form['id']));
-        }
-        echo set_msg($_W);
-        ///////////////模板消息///////////////////
-        message('退款成功',$this->createWebUrl('order',array()),'success');
+    //更改订单操作
+    $rst=pdo_update('mask_order',array('state'=>7),array('id'=>$_GPC['id']));
+    if($rst){
+        $this->updcommission($_GPC['id']);
+        message('操作成功',$this->createWebUrl('order',array()),'success');
     }else{
-        message($result['err_code_des'],'','error');
+        message('操作失败！','','error');
     }
+//    $type=pdo_get('mask_order',array('id'=>$_GPC['id']));
+//    $store=pdo_get('mask_storeset',array('store_id'=>$type['store_id']),'ps_mode');
+//    $sys=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']),'ps_name');
+//    $ps_name=empty($sys['ps_name'])?'超级跑腿':$sys['ps_name'];
+//    if($type['pay_type']==1){//微信退款
+//        $result=$this->wxrefund($_GPC['id']);
+//    }
+//    if($type['pay_type']==2){//余额退款
+//        $rst=pdo_get('mask_qbmx',array('user_id'=>$type['user_id'],'order_id'=>$type['id']));
+//        if(!$rst){
+//            $tk['money'] = $type['money'];
+//            $tk['order_id'] = $type['id'];
+//            $tk['user_id'] = $type['user_id'];
+//            $tk['type'] = 1;
+//            $tk['note'] = '订单退款';
+//            $tk['time'] = date('Y-m-d H:i:s');
+//            $tkres = pdo_insert('mask_qbmx', $tk);
+//            pdo_update('mask_user', array('wallet +=' => $type['money']), array('id' => $type['user_id']));
+//        }
+//    }
+//    if ($result['result_code'] == 'SUCCESS' || $tkres) {//退款成功
+//        //更改订单操作
+//        pdo_update('mask_order',array('state'=>9),array('id'=>$_GPC['id']));
+//        if($store['ps_mode']=='快服务配送'){
+//            $result=$this->qxkfw($_GPC['id']);
+//        }
+//        if($store['ps_mode']==$ps_name){
+//            $this->qxpt($_GPC['id']);
+//        }
+//        $this->invalidcommission($_GPC['id']);
+//
+//        pdo_delete('mask_formid',array('time <='=>time()-60*60*24*7));
+//        ///////////////模板消息退款///////////////////
+//        function getaccess_token($_W){
+//            $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+//            $appid=$res['appid'];
+//            $secret=$res['appsecret'];
+//            $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appid."&secret=".$secret."";
+//            $ch = curl_init();
+//            curl_setopt($ch, CURLOPT_URL,$url);
+//            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+//            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+//            $data = curl_exec($ch);
+//            curl_close($ch);
+//            $data = json_decode($data,true);
+//            return $data['access_token'];
+//        }
+//        //设置与发送模板信息
+//        function set_msg($_W){
+//            $access_token = getaccess_token($_W);
+//            $res=pdo_get('mask_message',array('uniacid'=>$_W['uniacid']));
+//            $res2=pdo_get('mask_order',array('id'=>$_GET['id']));
+//            if($res2['pay_type']==1){
+//                $note='微信钱包';
+//            }elseif($res2['pay_type']==2){
+//                $note='余额钱包';
+//            }
+//            $user=pdo_get('mask_user',array('id'=>$res2['user_id']));
+//            $store=pdo_get('mask_store',array('id'=>$res2['store_id']));
+//            $form=pdo_get('mask_formid',array('user_id'=>$res2['user_id'],'time >='=>time()-60*60*24*7));
+//            $formwork ='{
+//           "touser": "'.$user["openid"].'",
+//           "template_id": "'.$res["tk_tid"].'",
+//           "page": "mask/pages/Liar/loginindex",
+//           "form_id":"'.$form['form_id'].'",
+//           "data": {
+//             "keyword1": {
+//               "value": "'.$res2['order_num'].'",
+//               "color": "#173177"
+//             },
+//             "keyword2": {
+//               "value":"'.$store['name'].'",
+//               "color": "#173177"
+//             },
+//             "keyword3": {
+//
+//               "value": "'.$res2['money'].'",
+//               "color": "#173177"
+//             },
+//             "keyword4": {
+//               "value":  "'.$note.'",
+//               "color": "#173177"
+//             },
+//             "keyword5": {
+//               "value": "'.date("Y-m-d H:i:s").'",
+//               "color": "#173177"
+//             }
+//           }
+//         }';
+//            // $formwork=$data;
+//            $url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=".$access_token."";
+//            $ch = curl_init();
+//            curl_setopt($ch, CURLOPT_URL,$url);
+//            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+//            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+//            curl_setopt($ch, CURLOPT_POST,1);
+//            curl_setopt($ch, CURLOPT_POSTFIELDS,$formwork);
+//            $data = curl_exec($ch);
+//            curl_close($ch);
+//            // return $data;
+//            pdo_delete('mask_formid',array('id'=>$form['id']));
+//        }
+//        echo set_msg($_W);
+//        ///////////////模板消息///////////////////
+//        message('退款成功',$this->createWebUrl('order',array()),'success');
+//    }else{
+//        message($result['err_code_des'],'','error');
+//    }
 
 }
 if($_GPC['op']=='reject'){
     //更改订单操作
-    $rst=pdo_update('mask_order',array('state'=>10),array('id'=>$_GPC['id']));
+    $rst=pdo_update('mask_order',array('state'=>8),array('id'=>$_GPC['id']));
     if($rst){
         $this->updcommission($_GPC['id']);
         message('操作成功',$this->createWebUrl('order',array()),'success');

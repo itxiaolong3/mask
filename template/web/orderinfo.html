@@ -58,8 +58,8 @@
                   <a href="{php echo $this->createWebUrl('order',array('op'=>'jd','id'=>$item['id']));}"><button class="btn btn-sm btn-warning">确认发货</button></a>
                   {/if}
                    {if $item['state']==8}
-                  <a href="{php echo $this->createWebUrl('order',array('op'=>'tg','id'=>$item['id']));}"><button class="btn btn-sm btn-info">通过退款</button></a>
-                  <a href="{php echo $this->createWebUrl('order',array('op'=>'jj','id'=>$item['id']));}"><button class="btn btn-sm btn-warning">拒绝退款</button></a>
+                  <a href="{php echo $this->createWebUrl('order',array('op'=>'refund','id'=>$item['id']));}"><button class="btn btn-sm btn-info">通过退款</button></a>
+                  <!--<a href="{php echo $this->createWebUrl('order',array('op'=>'jj','id'=>$item['id']));}"><button class="btn btn-sm btn-warning">拒绝退款</button></a>-->
                   {/if}
        <!--  <input type="submit" class="btn btn-xm btn-danger" name="" value="确认付款">
         <input type="submit" class="btn btn-xm btn-success" name="" value="完成订单">
