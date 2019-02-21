@@ -105,12 +105,12 @@
                    <td>
 
                       {if $item['state']==0}
-                      <a class="btn ygyouhui2 btn-xs" href="{php echo $this->createWebUrl('ruzhu',array('id'=>$item['id'],'op'=>'adopt'))}" >通过</a>
+                      <a class="btn ygyouhui2 btn-xs"  data-toggle="modal" data-target="#myModal{$item['id']}">通过</a>
                        <a class="btn storegrey2 btn-xs" href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
                        {elseif $item['state']==1}
                        <a class="btn storegrey2 btn-xs" href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
                        {elseif $item['state']==2}
-                       <a class="btn ygyouhui2 btn-xs" href="{php echo $this->createWebUrl('ruzhu',array('id'=>$item['id'],'op'=>'adopt'))}" >通过</a>
+                       <a class="btn ygyouhui2 btn-xs"  data-toggle="modal" data-target="#myModal{$item['id']}" >通过</a>
                       {/if}
                       <!--<a class="btn ygshouqian btn-xs" href="{php echo $this->createWebUrl('ruzhuinfo',array('id'=>$item['id']))}" >详情</a>-->
                       <!--<a href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'delete'))}" class="storespan btn btn-xs" onclick="return confirm('确认删除吗？');return false;" title="删除">-->
@@ -127,7 +127,37 @@
               </td>
 
           </tr>
-
+                    <div class="modal fade" id="myModal{$item['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel" style="font-size: 20px;">选择类型</h4>
+                                </div>
+                                <div class="modal-body" style="font-size: 20px">
+                                    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+                                        <div class="form-group">
+                                            <label class="col-xs-8 col-sm-3  control-label">选择申请类型</label>
+                                            <div class="col-sm-9">
+                                                <!--<input type="text" name="level" id="level{$row['id']}" class="form-control" value="{$row['level']}" />-->
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <select class="col-sm-5" id="level{$item['id']}" name="item" autocomplete="off">
+                                                    <option value="1"  selected >市代合伙人</option>
+                                                    <option value="2">省代合伙人</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    <a href="javascript:void(0);" onclick="changlevel({$item['id']});" type="button"  class="btn btn-info" >确定</a>
+                                    <!--<a href="{php echo $this->createWebUrl('onetype', array('op' => 'delete', 'id' => $row['ID']))}" id="postfee" type="button" class="btn btn-info" >确定</a>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
           {/loop}
           {if empty($list)}
           <tr class="yg5_tr2">
@@ -155,6 +185,35 @@
 
 </div>
 <script type="text/javascript">
+    var postpath = "{$_W['siteroot']}/web/index.php?c=site&i={$_W['uniacid']}&a=entry&do=ruzhu&m=mask&op=adopt";
+    function changlevel(id) {
+        $('.btn-info').removeAttr("onclick")
+        //var data = $('form').serializeArray();
+        level=$("#level"+id).val();
+        console.log(level,'修改的等级');
+        //开始提交数据进行保存
+        $.ajax({
+            type:"post",
+            url:postpath,
+            data:{
+                type:level,
+                op:'adopt',
+                id:id
+            },
+            success:function(e){
+                //var res = JSON.parse(e)
+                //console.log(res.data.code,'执行成功')
+                window.location.reload()
+
+            },
+            error:function(e){
+                console.log('执行失败')
+            },
+            complete:function(e){
+                console.log('每一步都执行')
+            }
+        })
+    }
     $(function(){
         // $("#frame-5").addClass("in");
         $("#frame-5").show();

@@ -22,8 +22,17 @@ $pager = pagination($total, $pageindex, $pagesize);
 $operation=$_GPC['op'];
 if($operation=='adopt'){//审核通过
     $id=$_GPC['id'];
+    $types=$_GPC['type'];
     $res=pdo_update('mask_areaagent',array('state'=>1),array('id'=>$id));
+    $uid=pdo_getcolumn('mask_areaagent', array('id' => $id), 'uid',1);
+    if ($types==1){//市代
+        $updatalevel=pdo_update('mask_user',array('level'=>4),array('id'=>$uid));
+    }else if ($types==2){//省代
+        $updatalevel=pdo_update('mask_user',array('level'=>5),array('id'=>$uid));
+    }
+
     if($res){
+        //更新身份
         message('审核成功',$this->createWebUrl('ruzhu',array()),'success');
     }else{
         message('审核失败','','error');
@@ -32,7 +41,9 @@ if($operation=='adopt'){//审核通过
 if($operation=='reject'){
      $id=$_GPC['id'];
     $res=pdo_update('mask_areaagent',array('state'=>2),array('id'=>$id));
+    $uid=pdo_getcolumn('mask_areaagent', array('id' => $id), 'uid',1);
      if($res){
+         $updatalevel=pdo_update('mask_user',array('level'=>3),array('id'=>$uid));
         message('拒绝成功',$this->createWebUrl('ruzhu',array()),'success');
     }else{
         message('拒绝失败','','error');
