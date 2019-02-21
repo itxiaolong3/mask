@@ -507,12 +507,17 @@ if($_GPC['op']=='jjjd'){
 }
 
 
-
-
-
-
-
-
+if($_GPC['op']=='editinfo'){
+    $ediedata['name']=$_GPC['name'];
+    $ediedata['address']=$_GPC['address'];
+    $ediedata['tel']=$_GPC['tel'];
+    $res=pdo_update('mask_order',$ediedata,array('id'=>$_GPC['id']));
+    if ($res){
+        echo json_encode(array('code'=>1));
+    }else{
+        echo json_encode(array('code'=>0));
+    }
+}
 if($_GPC['op']=='wc'){
     $data2['state']=4;
     $data2['complete_time']=date("Y-m-d H:i:s");
@@ -655,7 +660,64 @@ if($_GPC['op']=='reject'){
         message('操作失败！','','error');
     }
 }
+//批量发货
+if(checksubmit('submit2')){
+    $url=$_W['attachurl'];
+    $filename = $_FILES['file_stu']['name'];
+    $tmp_name = $_FILES['file_stu']['tmp_name'];
+    $filePath = IA_ROOT . '/addons/pintuan/excel/';
+    include 'phpexcelreader/reader.php';
+    $data = new Spreadsheet_Excel_Reader();
+    $data->setOutputEncoding('utf-8');
 
+    //注意设置时区
+    $time = date("y-m-d-H-i-s"); //取当前上传的时间
+    $extend = strrchr ($filename, '.');
+    //上传后的文件名
+    $name = $time . $extend;
+    $uploadfile = $filePath . $name; //上传后的文件名地址
+    //@move_uploaded_file($tmp_name, $uploadfile);
+    if (copy($tmp_name, $uploadfile)) {
+        if (!file_exists($filePath)) {
+            echo '文件路径不存在.';
+            return;
+        }
+        if (!is_readable($uploadfile)) {
+            echo("文件为只读,请修改文件相关权限.");
+            return;
+        }
+        if(!in_array($extend, array('.xls')))
+            //检查文件类型
+        {
+            message('文件类型不符',$this->createWebUrl('order',array()),'error');
+            exit;
+        }
+
+        $data->read($uploadfile);
+        $num=count($data->sheets[0]['cells']);
+        error_reporting(E_ALL ^ E_NOTICE);
+        $count = 0;
+        for ($i = 2; $i <=  $num; $i++) { //$=2 第二行开始
+            $row = $data->sheets[0]['cells'][$i];
+            //message($data->sheets[0]['cells'][$i][1]);
+            //开始处理数据库
+            $ordernum= $row[1];
+            $insert['postfeename'] = $row[2];
+            $insert['postfeenum'] = $row[3];
+            $insert['state'] = 3;
+            $insert['jd_time'] = date('Y-m-d H:i:s');;
+            pdo_update('mask_order',$insert,array('order_num'=>$ordernum));
+        }
+    }
+    //unlink($uploadfile); //删除文件
+    if ($count == 0) {
+        message('导入失败',$this->createWebUrl('order',array()),'error');
+
+    } else {
+        message('导入成功',$this->createWebUrl('order',array()),'success');
+    }
+
+}
 if(checksubmit('export_submit', true)) {
     $time=date("Y-m-d");
     $time="'%$time%'";
