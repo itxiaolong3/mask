@@ -530,8 +530,19 @@ class maskModuleWxapp extends WeModuleWxapp {
         $uid=$_GPC['uid'];
         //先判断用户是否登录
         $islogin=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
+        $psw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'psw',1);
+        //是否有推荐人
+        $isok=pdo_get('mask_relation',array('uid'=>$uid));
+        if (!$psw){
+            echo $this->resultToJson(-1,'未登录密码，请点击忘记密码进行重设','');
+            die();
+        }
         if (!$islogin){
             echo $this->resultToJson(-1,'请登录！','');
+            die();
+        }
+        if (!$isok){
+            echo $this->resultToJson(-1,'无推荐人，无法下单','');
             die();
         }
         $addid=$_GPC['aid'];//地址id
@@ -1784,7 +1795,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                     $order=pdo_get('mask_order',array('id'=>$orderid));
                     //更新订单状态和子订单状态
                     pdo_update('mask_order_goods',array('state'=>2),array('order_id'=>$orderid));
-                    $payres=pdo_update('mask_order',array('state'=>2),array('id'=>$orderid));
+                    $payres=pdo_update('mask_order',array('state'=>2,'pay_type'=>1),array('id'=>$orderid));
                     //自己的信息
                     $nickname=pdo_getcolumn('mask_user', array('id' => $order['user_id']), 'nickname',1);
                     //////////////////限制字符串长度/////////////////////////////

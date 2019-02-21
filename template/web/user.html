@@ -67,7 +67,7 @@
                    <input type="hidden" name="m" value="mask" />
                    <input type="hidden" name="do" value="user" />
             <div class="input-group" style="width: 300px">
-                <input type="text" name="keywords" class="form-control" placeholder="请输入昵称/手机号">
+                <input type="text" name="keywords" class="form-control" placeholder="请输入用户ID/昵称/手机号">
                 <span class="input-group-btn">
                     <input type="submit" class="btn btn-default" name="submit" value="查找"/>
                 </span>
@@ -100,7 +100,7 @@
                         <td>{$row['nickname']}</td>
                         <td>
                             {if $row['level']==0}
-                            <span>普通会员</span>
+                            <span>普通用户</span>
                             {elseif $row['level']==1}
                             合伙人
                             {elseif $row['level']==2}
@@ -128,9 +128,17 @@
                                         <div class="form-group">
                                             <label class="col-xs-8 col-sm-3  control-label">输入对应等级</label>
                                             <div class="col-sm-9">
-                                                <input type="text" name="level" id="level{$row['id']}" class="form-control" value="{$row['level']}" />
+                                                <!--<input type="text" name="level" id="level{$row['id']}" class="form-control" value="{$row['level']}" />-->
                                             </div>
-                                            <label class="control-label">0-普通用户 | 1-合伙人 | 2-银卡合伙人 | 3-金卡合伙人 | 4-市代合伙人  5-省代合伙人</label>
+                                            <div class="col-sm-9">
+                                                <select class="col-sm-5" id="level{$row['id']}" name="item" autocomplete="off">
+                                                    <option value="0" {if $row['level']=='0'} selected {/if}>普通用户</option>
+                                                    <option value="1" {if $row['level']=='1'} selected {/if}>合伙人</option>
+                                                    <option value="2" {if $row['level']=='2'} selected {/if}>银卡合伙人</option>
+                                                    <option value="3" {if $row['level']=='3'} selected {/if}>金卡合伙人</option>
+                                                </select>
+                                            </div>
+                                            <span style="color: red;font-size: 15px;">*如需设置市代或者省代，请先设置成金卡，然后在小程序端进行申请。后台在区域商申请中给予通过</span>
                                         </div>
                                     </form>
                                 </div>
