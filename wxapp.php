@@ -999,7 +999,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         $getpsw=md5('itxiaolong'.$_GPC['psw']);
         $getuid=$_GPC['uid'];
         if (!$getuid){
-            echo $this->resultToJson(0,'请退出重新授权操作','');
+            echo $this->resultToJson(0,'请删除小程序重新授权操作','');
+            die();
         }
         $getpid=$_GPC['pid'];
         $getcode=$_GPC['code'];
