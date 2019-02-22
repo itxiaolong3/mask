@@ -175,7 +175,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     //去上级找金卡
                     $fpid=findpid($pid);
                     if ($fpid){
-                        findkinklevel($fpid,$ordernum,$nickname);
+                        findkinklevel($fpid,$order['order_num'],$nickname);
                     }
                     break;
                 case 3:
