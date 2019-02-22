@@ -69,6 +69,7 @@
                 <table class="yg5_tabel col-md-12">
 
                     <tr class="yg5_tr1">
+                        <td class="store_td1">用户ID</td>
                         <td class="store_td1">姓名</td>
                         <td>手机号</td>
                         <td>地址</td>
@@ -79,6 +80,7 @@
                     </tr>
                     {loop $list $key $item}
                     <tr class="yg5_tr2">
+                      <td class="store_td1">{$item['uid']}</td>
                       <td class="store_td1">{$item['name']}</td>
                       <!--<td class="store_td1"><img class="store_list_img" src="{media  $item['img']}" alt=""/>    </td>-->
                         <td>{$item['phone']}</td>
@@ -106,9 +108,9 @@
 
                       {if $item['state']==0}
                       <a class="btn ygyouhui2 btn-xs"  data-toggle="modal" data-target="#myModal{$item['id']}">通过</a>
-                       <a class="btn storegrey2 btn-xs" href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
+                       <a class="btn storegrey2 btn-xs" data-toggle="modal" data-target="#myModal2{$item['id']}" title="拒绝">拒绝</a>
                        {elseif $item['state']==1}
-                       <a class="btn storegrey2 btn-xs" href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'reject'))}" title="拒绝">拒绝</a>
+                       <a class="btn storegrey2 btn-xs" data-toggle="modal" data-target="#myModal2{$item['id']}" title="拒绝">拒绝</a>
                        {elseif $item['state']==2}
                        <a class="btn ygyouhui2 btn-xs"  data-toggle="modal" data-target="#myModal{$item['id']}" >通过</a>
                       {/if}
@@ -153,6 +155,24 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                                     <a href="javascript:void(0);" onclick="changlevel({$item['id']});" type="button"  class="btn btn-info" >确定</a>
+                                    <!--<a href="{php echo $this->createWebUrl('onetype', array('op' => 'delete', 'id' => $row['ID']))}" id="postfee" type="button" class="btn btn-info" >确定</a>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="myModal2{$item['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel2" style="font-size: 20px;">温馨提示</h4>
+                                </div>
+                                <div class="modal-body" style="font-size: 20px">
+                                    <label class="col-xs-12  control-label">拒绝后改用户将恢复为金卡合伙人！，是否继续？</label>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    <a href="{php echo $this->createWebUrl('ruzhu', array('id' => $item['id'],'op'=>'reject'))}"  class="btn btn-info" >确定</a>
                                     <!--<a href="{php echo $this->createWebUrl('onetype', array('op' => 'delete', 'id' => $row['ID']))}" id="postfee" type="button" class="btn btn-info" >确定</a>-->
                                 </div>
                             </div>

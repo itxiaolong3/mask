@@ -665,7 +665,7 @@ if(checksubmit('submit2')){
     $url=$_W['attachurl'];
     $filename = $_FILES['file_stu']['name'];
     $tmp_name = $_FILES['file_stu']['tmp_name'];
-    $filePath = IA_ROOT . '/addons/pintuan/excel/';
+    $filePath = IA_ROOT . '/addons/mask/excel/';
     include 'phpexcelreader/reader.php';
     $data = new Spreadsheet_Excel_Reader();
     $data->setOutputEncoding('utf-8');
@@ -701,12 +701,13 @@ if(checksubmit('submit2')){
             $row = $data->sheets[0]['cells'][$i];
             //message($data->sheets[0]['cells'][$i][1]);
             //开始处理数据库
-            $ordernum= $row[1];
-            $insert['postfeename'] = $row[2];
-            $insert['postfeenum'] = $row[3];
+            $ordernum= trim($row[1]);
+            $insert['postfeename'] = trim($row[2]);
+            $insert['postfeenum'] = trim($row[3]);
             $insert['state'] = 3;
             $insert['jd_time'] = date('Y-m-d H:i:s');;
-            pdo_update('mask_order',$insert,array('order_num'=>$ordernum));
+            $res=pdo_update('mask_order',$insert,array('order_num'=>$ordernum));
+            $count = $count + $res;
         }
     }
     //unlink($uploadfile); //删除文件

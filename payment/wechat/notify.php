@@ -198,6 +198,65 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     //更新余额
                     //pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
                     break;
+                default:
+                    //寻找推荐人上级是否是金银卡
+                    $ppid=findpid($pid);
+                    if ($ppid){
+                        findlevel($ppid,$order['order_num']);
+                    }
+            }
+            function findpid($uid){
+                $ppid=pdo_getcolumn('mask_relation', array('uid' => $uid), 'pid',1);
+                if ($ppid){
+                    return $ppid;
+                }else{
+                    return '';
+                }
+            }
+            function findlevel($uid,$ordernum){
+                $nicknames=pdo_getcolumn('mask_user', array('id' => $uid), 'nickname',1);
+                //间推中的银卡记录
+                $ykdata['rtype']=1;
+                $ykdata['rstate']=0;
+                $ykdata['rmoney']=30;//直推奖励
+                $ykdata['ruid']=$uid;
+                $ykdata['rbuyername']=$nicknames;
+                $ykdata['rordernumber']=$ordernum;
+                $card=pdo_get('mask_bankcard', array('uid'=>$uid));
+                $ykdata['rcardid']=$card['id'];
+                $ykdata['rcomment']="银卡销售额奖励(30元)";
+                $ykdata['raddtime']=date('Y-m-d H:i:s',time());
+                //间推中的金卡记录
+                $jkdata['rtype']=1;
+                $jkdata['rstate']=0;
+                $jkdata['rmoney']=40;//直推奖励
+                $jkdata['ruid']=$uid;
+                $jkdata['rbuyername']=$nicknames;
+                $jkdata['rordernumber']=$ordernum;
+                $card=pdo_get('mask_bankcard', array('uid'=>$uid));
+                $jkdata['rcardid']=$card['id'];
+                $jkdata['rcomment']="金卡招商奖励(40元)";
+                $jkdata['raddtime']=date('Y-m-d H:i:s',time());
+
+                $ppinfo=pdo_get('mask_user', array('id'=>$uid));
+                $ponelevel=$ppinfo['level'];
+                if ($ponelevel==2){
+                    //银卡
+                    pdo_insert('mask_record',$ykdata);
+                    $fpid=findpid($uid);
+                    if ($fpid){
+                        findlevel($fpid,$ordernum);
+                    }
+                }else if($ponelevel==3){
+                    //金卡
+                    pdo_insert('mask_record',$ykdata);
+                    pdo_insert('mask_record',$jkdata);
+                }else{
+                    $fpid=findpid($uid);
+                    if ($fpid){
+                        findlevel($fpid,$ordernum);
+                    }
+                }
             }
             //市代
             $cityaddress=pdo_getall('mask_areaagent',array('state'=>1));
