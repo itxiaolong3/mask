@@ -154,32 +154,15 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $jkdata['rcardid']=$card['id'];
             $jkdata['rcomment']="金卡招商奖励(40元)";
             $jkdata['raddtime']=date('Y-m-d H:i:s',time());
-            //市代记录
-            $sddata['rtype']=1;
-            $sddata['rstate']=0;
-            $sddata['rmoney']=8;//直推奖励
-            $sddata['ruid']=$pid;
-            $sddata['rbuyername']=$nickname;
-            $sddata['rordernumber']=$order['order_num'];
-            $card=pdo_get('mask_bankcard', array('uid'=>$pid)); //银卡
-            $sddata['rcardid']=$card['id'];
-            $sddata['rcomment']="市代区域奖励(8元)";
-            $sddata['raddtime']=date('Y-m-d H:i:s',time());
-            //省代记录
-            $shendaidata['rtype']=1;
-            $shendaidata['rstate']=0;
-            $shendaidata['rmoney']=4;//直推奖励
-            $shendaidata['ruid']=$pid;
-            $shendaidata['rbuyername']=$nickname;
-            $shendaidata['rordernumber']=$order['order_num'];
-            $card=pdo_get('mask_bankcard', array('uid'=>$pid)); //银卡
-            $shendaidata['rcardid']=$card['id'];
-            $shendaidata['rcomment']="省代区域奖励(4元)";
-            $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
 
             switch ($onelevel){
                 case 1:
                     pdo_insert('mask_record',$dldata);
+                    //上级只是代理还需要继续找银卡金卡
+                    $ppid=findpid($pid);
+                    if ($ppid){
+                        findlevel($ppid,$order['order_num'],$nickname);
+                    }
                     //更新余额
                     //pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
                     break;
@@ -189,6 +172,11 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     //更新余额
                     //pdo_update('mask_user', array('wallet +=' => 180), array('id' => $pid));
                     //银卡
+                    //去上级找金卡
+                    $fpid=findpid($pid);
+                    if ($fpid){
+                        findkinklevel($fpid,$ordernum,$nickname);
+                    }
                     break;
                 case 3:
                     //金卡
@@ -202,9 +190,26 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     //寻找推荐人上级是否是金银卡
                     $ppid=findpid($pid);
                     if ($ppid){
-                        findlevel($ppid,$order['order_num']);
+                        findlevel($ppid,$order['order_num'],$nickname);
                     }
             }
+            //市代记录
+            $sddata['rtype']=1;
+            $sddata['rstate']=0;
+            $sddata['rmoney']=8;//直推奖励
+            $sddata['rbuyername']=$nickname;
+            $sddata['rordernumber']=$order['order_num'];
+            $sddata['rcomment']="市代区域奖励(8元)";
+            $sddata['raddtime']=date('Y-m-d H:i:s',time());
+            //省代记录
+            $shendaidata['rtype']=1;
+            $shendaidata['rstate']=0;
+            $shendaidata['rmoney']=4;//直推奖励
+            $shendaidata['rbuyername']=$nickname;
+            $shendaidata['rordernumber']=$order['order_num'];
+            $shendaidata['rcomment']="省代区域奖励(4元)";
+            $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
+            //获取上级
             function findpid($uid){
                 $ppid=pdo_getcolumn('mask_relation', array('uid' => $uid), 'pid',1);
                 if ($ppid){
@@ -213,14 +218,14 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     return '';
                 }
             }
-            function findlevel($uid,$ordernum){
-                $nicknames=pdo_getcolumn('mask_user', array('id' => $uid), 'nickname',1);
+            //金银卡都找
+            function findlevel($uid,$ordernum,$nickname){
                 //间推中的银卡记录
                 $ykdata['rtype']=1;
                 $ykdata['rstate']=0;
                 $ykdata['rmoney']=30;//直推奖励
                 $ykdata['ruid']=$uid;
-                $ykdata['rbuyername']=$nicknames;
+                $ykdata['rbuyername']=$nickname;
                 $ykdata['rordernumber']=$ordernum;
                 $card=pdo_get('mask_bankcard', array('uid'=>$uid));
                 $ykdata['rcardid']=$card['id'];
@@ -231,7 +236,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                 $jkdata['rstate']=0;
                 $jkdata['rmoney']=40;//直推奖励
                 $jkdata['ruid']=$uid;
-                $jkdata['rbuyername']=$nicknames;
+                $jkdata['rbuyername']=$nickname;
                 $jkdata['rordernumber']=$ordernum;
                 $card=pdo_get('mask_bankcard', array('uid'=>$uid));
                 $jkdata['rcardid']=$card['id'];
@@ -245,7 +250,8 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     pdo_insert('mask_record',$ykdata);
                     $fpid=findpid($uid);
                     if ($fpid){
-                        findlevel($fpid,$ordernum);
+                        //银卡找到，就往上只找金卡了
+                        findkinklevel($fpid,$ordernum,$nickname);
                     }
                 }else if($ponelevel==3){
                     //金卡
@@ -254,7 +260,33 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                 }else{
                     $fpid=findpid($uid);
                     if ($fpid){
-                        findlevel($fpid,$ordernum);
+                        findlevel($fpid,$ordernum,$nickname);
+                    }
+                }
+            }
+            //只找金卡
+            function findkinklevel($uid,$ordernum,$nickname){
+                //间推中的金卡记录
+                $jkdata['rtype']=1;
+                $jkdata['rstate']=0;
+                $jkdata['rmoney']=40;//直推奖励
+                $jkdata['ruid']=$uid;
+                $jkdata['rbuyername']=$nickname;
+                $jkdata['rordernumber']=$ordernum;
+                $card=pdo_get('mask_bankcard', array('uid'=>$uid));
+                $jkdata['rcardid']=$card['id'];
+                $jkdata['rcomment']="金卡招商奖励(40元)";
+                $jkdata['raddtime']=date('Y-m-d H:i:s',time());
+
+                $ppinfo=pdo_get('mask_user', array('id'=>$uid));
+                $ponelevel=$ppinfo['level'];
+                if($ponelevel==3){
+                    //金卡
+                    pdo_insert('mask_record',$jkdata);
+                }else{
+                    $fpid=findpid($uid);
+                    if ($fpid){
+                        findkinklevel($fpid,$ordernum,$nickname);
                     }
                 }
             }
@@ -264,6 +296,9 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             foreach ($cityaddress as $k=>$v){
                 $addressarr=explode('-',$v['address']);
                 if ($addressarr[1]==$orderaddressarr[1]){
+                    $sddata['ruid']=$v['uid'];
+                    $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
+                    $sddata['rcardid']=$card['id'];
                     pdo_insert('mask_record',$sddata);
                     //更新余额
                     //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
@@ -273,6 +308,9 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             foreach ($cityaddress as $k=>$v){
                 $addressarr=explode('-',$v['address']);
                 if ($addressarr[0]==$orderaddressarr[0]){
+                    $shendaidata['ruid']=$v['uid'];
+                    $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
+                    $shendaidata['rcardid']=$card['id'];
                     pdo_insert('mask_record',$shendaidata);
                     //更新余额
                     //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));

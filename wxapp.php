@@ -47,8 +47,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         $dldata['rcomment']="直推(A未知)奖励：150元";
         $dldata['raddtime']=date('Y-m-d H:i:s',time());
         $daytimes=5*86400;
-        $orders = pdo_fetchall('select user_id,jd_time,state,id,order_num from ' . tablename('mask_order') . ' where  uniacid=' . $_W['uniacid'] . ' and state=3 and UNIX_TIMESTAMP(jd_time) + ' . $daytimes . ' <=unix_timestamp() ');
-        echo json_encode($orders);
+        $info=pdo_getall('mask_order',array('user_id'=>'100319','state >='=>'6'),array('id','order_num','money','state'), '', 'id DESC');
+        echo json_encode($info);
         //echo $this->doPageGoodsCode(6);
     }
     //获取openid并保存用户信息
@@ -678,7 +678,11 @@ class maskModuleWxapp extends WeModuleWxapp {
             // $list = pdo_fetchall($sql,$data);
             $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state !='=>5), array('id','order_num','money','state'), '', 'id DESC');
         }else{
-            $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state'=>$statuid),array('id','order_num','money','state'), '', 'id DESC');
+            if ($statuid==6){
+                $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state >= '=>'6'),array('id','order_num','money','state'), '', 'id DESC');
+            }else{
+                $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state'=>$statuid),array('id','order_num','money','state'), '', 'id DESC');
+            }
         }
         if (empty($getorder)){
             //没有订单
@@ -727,8 +731,10 @@ class maskModuleWxapp extends WeModuleWxapp {
             //修改交易记录状态
             pdo_update('mask_record',array('rsettlement'=>1),array('rordernumber'=>$_GPC['ordernumber']));
             //更新用户余额
-            $uidandrmoney=pdo_get('mask_record',array('rordernumber'=>$_GPC['ordernumber']));
-            pdo_update('mask_user', array('wallet +=' => $uidandrmoney['rmoney']), array('id' => $uidandrmoney['ruid']));
+            $uidandrmoney=pdo_getall('mask_record',array('rordernumber'=>$_GPC['ordernumber']));
+            foreach ($uidandrmoney as $k=>$v){
+                pdo_update('mask_user', array('wallet +=' => $v['rmoney']), array('id' => $v['ruid']));
+            }
             echo $this->resultToJson(1,'签收成功','');
         }else{
             echo $this->resultToJson(1,'签收失败','');
@@ -999,7 +1005,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $getpsw=md5('itxiaolong'.$_GPC['psw']);
         $getuid=$_GPC['uid'];
         if (!$getuid){
-            echo $this->resultToJson(0,'请删除小程序重新授权操作','');
+            echo $this->resultToJson(0,'请退出重新授权操作','');
             die();
         }
         $getpid=$_GPC['pid'];
@@ -1153,7 +1159,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //海报数据
     public function doPageQrcodeinfo(){
         global $_GPC, $_W;
-        $info=pdo_get('mask_user',array('id'=>$_GPC['uid']),array('nickname','id','headerimg','img','level'));
+        $info=pdo_get('mask_user',array('id'=>$_GPC['uid']),array('nickname','id','headerimg','img','level','quyuid'));
         if ($info){
             echo $this->resultToJson(1,'海报数据成功',$info);
         }else{
@@ -1181,7 +1187,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $redata['teamcount']=array_sum($twocount)+count($onecount);
         //个人信息
-        $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level'));
+        $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level','quyuid'));
         $pid=pdo_getcolumn('mask_relation', array('uid' => $_GPC['uid']), 'pid',1);
         if ($pid){
             //有推荐人
@@ -1214,7 +1220,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $datas[':name']="%$op%";
 
         }
-        $sql = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
+        $sql = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.quyuid,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
             " left join " . tablename("mask_user") . " b on b.id=a.uid  ".$where." and a.pid=:p_id order by b.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $datas[':p_id']=$_GPC['uid'];
@@ -1225,7 +1231,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $res2 = array();
         for ($i = 0;$i < count($res);$i++) {
-            $sql2 = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
+            $sql2 = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.quyuid,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
                 " left join " . tablename("mask_user") . " b on b.id=a.uid   WHERE a.pid=:p_id order by b.id DESC";
             $res3 = pdo_fetchall($sql2, array(':p_id' => $res[$i]['uid']));
             $res2[] = $res3;
@@ -1509,7 +1515,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
         $this->collectGood();
-        $info=pdo_get('mask_user',array('id'=>$uid),array('id','wallet','level'));
+        $info=pdo_get('mask_user',array('id'=>$uid),array('id','wallet','level','quyuid'));
         if ($info){
             echo $this->resultToJson(1,'余额和身份',$info);
         }else{
@@ -1697,7 +1703,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //特权中的个人信息
     public function doPageVipindexInfo(){
         global $_W, $_GPC;
-        $info = pdo_get('mask_user', array('id' => $_GPC['uid']), array('nickname', 'headerimg','level'));
+        $info = pdo_get('mask_user', array('id' => $_GPC['uid']), array('nickname', 'headerimg','level','quyuid'));
         echo $this->resultToJson(1,'特权页信息',$info);
     }
     //我的会员卡页面
@@ -4749,10 +4755,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6601,8 +6607,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                    "page"=>"mask/pages/Liar/loginindex",
-                    "width" => 400);
+                               "page"=>"mask/pages/Liar/loginindex",
+                               "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8475,10 +8481,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));

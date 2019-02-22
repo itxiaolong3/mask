@@ -26,9 +26,9 @@ if($operation=='adopt'){//审核通过
     $res=pdo_update('mask_areaagent',array('state'=>1),array('id'=>$id));
     $uid=pdo_getcolumn('mask_areaagent', array('id' => $id), 'uid',1);
     if ($types==1){//市代
-        $updatalevel=pdo_update('mask_user',array('level'=>4),array('id'=>$uid));
+        $updatalevel=pdo_update('mask_user',array('quyuid'=>4),array('id'=>$uid));
     }else if ($types==2){//省代
-        $updatalevel=pdo_update('mask_user',array('level'=>5),array('id'=>$uid));
+        $updatalevel=pdo_update('mask_user',array('quyuid'=>5),array('id'=>$uid));
     }
 
     if($res){
@@ -43,7 +43,7 @@ if($operation=='reject'){
     $res=pdo_update('mask_areaagent',array('state'=>2),array('id'=>$id));
     $uid=pdo_getcolumn('mask_areaagent', array('id' => $id), 'uid',1);
      if($res){
-         $updatalevel=pdo_update('mask_user',array('level'=>3),array('id'=>$uid));
+         $updatalevel=pdo_update('mask_user',array('quyuid'=>0,'level'=>3),array('id'=>$uid));
         message('拒绝成功',$this->createWebUrl('ruzhu',array()),'success');
     }else{
         message('拒绝失败','','error');
