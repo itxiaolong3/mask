@@ -47,8 +47,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         $dldata['rcomment']="直推(A未知)奖励：150元";
         $dldata['raddtime']=date('Y-m-d H:i:s',time());
         $daytimes=5*86400;
-        $orders = pdo_fetchall('select user_id,jd_time,state,id,order_num from ' . tablename('mask_order') . ' where  uniacid=' . $_W['uniacid'] . ' and state=3 and UNIX_TIMESTAMP(jd_time) + ' . $daytimes . ' <=unix_timestamp() ');
-        echo json_encode($orders);
+        $info=pdo_getall('mask_order',array('user_id'=>'100319','state >='=>'6'),array('id','order_num','money','state'), '', 'id DESC');
+        echo json_encode($info);
         //echo $this->doPageGoodsCode(6);
     }
     //获取openid并保存用户信息
@@ -678,7 +678,11 @@ class maskModuleWxapp extends WeModuleWxapp {
             // $list = pdo_fetchall($sql,$data);
             $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state !='=>5), array('id','order_num','money','state'), '', 'id DESC');
         }else{
-            $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state'=>$statuid),array('id','order_num','money','state'), '', 'id DESC');
+            if ($statuid==6){
+                $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state >= '=>'6'),array('id','order_num','money','state'), '', 'id DESC');
+            }else{
+                $getorder=pdo_getall('mask_order',array('user_id'=>$uid,'state'=>$statuid),array('id','order_num','money','state'), '', 'id DESC');
+            }
         }
         if (empty($getorder)){
             //没有订单
@@ -727,8 +731,10 @@ class maskModuleWxapp extends WeModuleWxapp {
             //修改交易记录状态
             pdo_update('mask_record',array('rsettlement'=>1),array('rordernumber'=>$_GPC['ordernumber']));
             //更新用户余额
-            $uidandrmoney=pdo_get('mask_record',array('rordernumber'=>$_GPC['ordernumber']));
-            pdo_update('mask_user', array('wallet +=' => $uidandrmoney['rmoney']), array('id' => $uidandrmoney['ruid']));
+            $uidandrmoney=pdo_getall('mask_record',array('rordernumber'=>$_GPC['ordernumber']));
+            foreach ($uidandrmoney as $k=>$v){
+                pdo_update('mask_user', array('wallet +=' => $v['rmoney']), array('id' => $v['ruid']));
+            }
             echo $this->resultToJson(1,'签收成功','');
         }else{
             echo $this->resultToJson(1,'签收失败','');
@@ -1155,7 +1161,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //海报数据
     public function doPageQrcodeinfo(){
         global $_GPC, $_W;
-        $info=pdo_get('mask_user',array('id'=>$_GPC['uid']),array('nickname','id','headerimg','img','level'));
+        $info=pdo_get('mask_user',array('id'=>$_GPC['uid']),array('nickname','id','headerimg','img','level','quyuid'));
         if ($info){
             echo $this->resultToJson(1,'海报数据成功',$info);
         }else{
@@ -1183,7 +1189,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $redata['teamcount']=array_sum($twocount)+count($onecount);
         //个人信息
-        $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level'));
+        $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level','quyuid'));
         $pid=pdo_getcolumn('mask_relation', array('uid' => $_GPC['uid']), 'pid',1);
         if ($pid){
             //有推荐人
@@ -1216,7 +1222,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $datas[':name']="%$op%";
 
         }
-        $sql = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
+        $sql = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.quyuid,b.headerimg,b.id as uuid from " . tablename("mask_relation") . " a" .
             " left join " . tablename("mask_user") . " b on b.id=a.uid  ".$where." and a.pid=:p_id order by b.id DESC";
         $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
         $datas[':p_id']=$_GPC['uid'];
@@ -1227,7 +1233,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $res2 = array();
         for ($i = 0;$i < count($res);$i++) {
-            $sql2 = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
+            $sql2 = "select a.* ,b.nickname,b.user_name,b.sex,b.wechat,b.qq,b.birthday,b.address,b.level,b.quyuid,b.headerimg,b.id as uuid  from " . tablename("mask_relation") . " a" .
                 " left join " . tablename("mask_user") . " b on b.id=a.uid   WHERE a.pid=:p_id order by b.id DESC";
             $res3 = pdo_fetchall($sql2, array(':p_id' => $res[$i]['uid']));
             $res2[] = $res3;
@@ -1511,7 +1517,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
         $this->collectGood();
-        $info=pdo_get('mask_user',array('id'=>$uid),array('id','wallet','level'));
+        $info=pdo_get('mask_user',array('id'=>$uid),array('id','wallet','level','quyuid'));
         if ($info){
             echo $this->resultToJson(1,'余额和身份',$info);
         }else{
@@ -1699,7 +1705,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //特权中的个人信息
     public function doPageVipindexInfo(){
         global $_W, $_GPC;
-        $info = pdo_get('mask_user', array('id' => $_GPC['uid']), array('nickname', 'headerimg','level'));
+        $info = pdo_get('mask_user', array('id' => $_GPC['uid']), array('nickname', 'headerimg','level','quyuid'));
         echo $this->resultToJson(1,'特权页信息',$info);
     }
     //我的会员卡页面
@@ -1856,7 +1862,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                         pdo_update('mask_user',array('level'=>1),array('id'=>$order['user_id']));
                         if ($pid){
                             //直推等级
-                            $puserinfo=pdo_get('mask_user', array('id'=>$pid,'uniacid'=>$_W['uniacid']));
+                            $puserinfo=pdo_get('mask_user', array('id'=>$pid));
                             $onelevel=$puserinfo['level'];
                             //代理记录
                             $dldata['rtype']=1;
@@ -1865,7 +1871,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $dldata['ruid']=$pid;
                             $dldata['rbuyername']=$nickname;
                             $dldata['rordernumber']=$order['order_num']; //银卡
-                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid']));
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid));
                             $dldata['rcardid']=$card['id'];
                             $dldata['rcomment']="合伙人奖励(150元)";
                             $dldata['raddtime']=date('Y-m-d H:i:s',time());
@@ -1876,7 +1882,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $ykdata['ruid']=$pid;
                             $ykdata['rbuyername']=$nickname;
                             $ykdata['rordernumber']=$order['order_num'];
-                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid']));//银卡
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid));//银卡
                             $ykdata['rcardid']=$card['id'];
                             $ykdata['rcomment']="银卡销售额奖励(30元)";
                             $ykdata['raddtime']=date('Y-m-d H:i:s',time());
@@ -1887,36 +1893,19 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $jkdata['ruid']=$pid;
                             $jkdata['rbuyername']=$nickname;
                             $jkdata['rordernumber']=$order['order_num'];
-                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
+                            $card=pdo_get('mask_bankcard', array('uid'=>$pid)); //银卡
                             $jkdata['rcardid']=$card['id'];
                             $jkdata['rcomment']="金卡招商奖励(40元)";
                             $jkdata['raddtime']=date('Y-m-d H:i:s',time());
-                            //市代记录
-                            $sddata['rtype']=1;
-                            $sddata['rstate']=0;
-                            $sddata['rmoney']=8;//直推奖励
-                            $sddata['ruid']=$pid;
-                            $sddata['rbuyername']=$nickname;
-                            $sddata['rordernumber']=$order['order_num'];
-                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
-                            $sddata['rcardid']=$card['id'];
-                            $sddata['rcomment']="市代区域奖励(8元)";
-                            $sddata['raddtime']=date('Y-m-d H:i:s',time());
-                            //省代记录
-                            $shendaidata['rtype']=1;
-                            $shendaidata['rstate']=0;
-                            $shendaidata['rmoney']=4;//直推奖励
-                            $shendaidata['ruid']=$pid;
-                            $shendaidata['rbuyername']=$nickname;
-                            $shendaidata['rordernumber']=$order['order_num'];
-                            $card=pdo_get('mask_bankcard', array('uid'=>$pid,'uniacid'=>$_W['uniacid'])); //银卡
-                            $shendaidata['rcardid']=$card['id'];
-                            $shendaidata['rcomment']="省代区域奖励(4元)";
-                            $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
 
                             switch ($onelevel){
                                 case 1:
                                     pdo_insert('mask_record',$dldata);
+                                    //上级只是代理还需要继续找银卡金卡
+                                    $ppid=findpid($pid);
+                                    if ($ppid){
+                                        findlevel($ppid,$order['order_num'],$nickname);
+                                    }
                                     //更新余额
                                     //pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
                                     break;
@@ -1926,6 +1915,11 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     //更新余额
                                     //pdo_update('mask_user', array('wallet +=' => 180), array('id' => $pid));
                                     //银卡
+                                    //去上级找金卡
+                                    $fpid=findpid($pid);
+                                    if ($fpid){
+                                        findkinklevel($fpid,$order['order_num'],$nickname);
+                                    }
                                     break;
                                 case 3:
                                     //金卡
@@ -1935,7 +1929,109 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     //更新余额
                                     //pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
                                     break;
+                                default:
+                                    //寻找推荐人上级是否是金银卡
+                                    $ppid=findpid($pid);
+                                    if ($ppid){
+                                        findlevel($ppid,$order['order_num'],$nickname);
+                                    }
+                            }
+                            //市代记录
+                            $sddata['rtype']=1;
+                            $sddata['rstate']=0;
+                            $sddata['rmoney']=8;//直推奖励
+                            $sddata['rbuyername']=$nickname;
+                            $sddata['rordernumber']=$order['order_num'];
+                            $sddata['rcomment']="市代区域奖励(8元)";
+                            $sddata['raddtime']=date('Y-m-d H:i:s',time());
+                            //省代记录
+                            $shendaidata['rtype']=1;
+                            $shendaidata['rstate']=0;
+                            $shendaidata['rmoney']=4;//直推奖励
+                            $shendaidata['rbuyername']=$nickname;
+                            $shendaidata['rordernumber']=$order['order_num'];
+                            $shendaidata['rcomment']="省代区域奖励(4元)";
+                            $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
+                            //获取上级
+                            function findpid($uid){
+                                $ppid=pdo_getcolumn('mask_relation', array('uid' => $uid), 'pid',1);
+                                if ($ppid){
+                                    return $ppid;
+                                }else{
+                                    return '';
+                                }
+                            }
+                            //金银卡都找
+                            function findlevel($uid,$ordernum,$nickname){
+                                //间推中的银卡记录
+                                $ykdata['rtype']=1;
+                                $ykdata['rstate']=0;
+                                $ykdata['rmoney']=30;//直推奖励
+                                $ykdata['ruid']=$uid;
+                                $ykdata['rbuyername']=$nickname;
+                                $ykdata['rordernumber']=$ordernum;
+                                $card=pdo_get('mask_bankcard', array('uid'=>$uid));
+                                $ykdata['rcardid']=$card['id'];
+                                $ykdata['rcomment']="银卡销售额奖励(30元)";
+                                $ykdata['raddtime']=date('Y-m-d H:i:s',time());
+                                //间推中的金卡记录
+                                $jkdata['rtype']=1;
+                                $jkdata['rstate']=0;
+                                $jkdata['rmoney']=40;//直推奖励
+                                $jkdata['ruid']=$uid;
+                                $jkdata['rbuyername']=$nickname;
+                                $jkdata['rordernumber']=$ordernum;
+                                $card=pdo_get('mask_bankcard', array('uid'=>$uid));
+                                $jkdata['rcardid']=$card['id'];
+                                $jkdata['rcomment']="金卡招商奖励(40元)";
+                                $jkdata['raddtime']=date('Y-m-d H:i:s',time());
 
+                                $ppinfo=pdo_get('mask_user', array('id'=>$uid));
+                                $ponelevel=$ppinfo['level'];
+                                if ($ponelevel==2){
+                                    //银卡
+                                    pdo_insert('mask_record',$ykdata);
+                                    $fpid=findpid($uid);
+                                    if ($fpid){
+                                        //银卡找到，就往上只找金卡了
+                                        findkinklevel($fpid,$ordernum,$nickname);
+                                    }
+                                }else if($ponelevel==3){
+                                    //金卡
+                                    pdo_insert('mask_record',$ykdata);
+                                    pdo_insert('mask_record',$jkdata);
+                                }else{
+                                    $fpid=findpid($uid);
+                                    if ($fpid){
+                                        findlevel($fpid,$ordernum,$nickname);
+                                    }
+                                }
+                            }
+                            //只找金卡
+                            function findkinklevel($uid,$ordernum,$nickname){
+                                //间推中的金卡记录
+                                $jkdata['rtype']=1;
+                                $jkdata['rstate']=0;
+                                $jkdata['rmoney']=40;//直推奖励
+                                $jkdata['ruid']=$uid;
+                                $jkdata['rbuyername']=$nickname;
+                                $jkdata['rordernumber']=$ordernum;
+                                $card=pdo_get('mask_bankcard', array('uid'=>$uid));
+                                $jkdata['rcardid']=$card['id'];
+                                $jkdata['rcomment']="金卡招商奖励(40元)";
+                                $jkdata['raddtime']=date('Y-m-d H:i:s',time());
+
+                                $ppinfo=pdo_get('mask_user', array('id'=>$uid));
+                                $ponelevel=$ppinfo['level'];
+                                if($ponelevel==3){
+                                    //金卡
+                                    pdo_insert('mask_record',$jkdata);
+                                }else{
+                                    $fpid=findpid($uid);
+                                    if ($fpid){
+                                        findkinklevel($fpid,$ordernum,$nickname);
+                                    }
+                                }
                             }
                             //市代
                             $cityaddress=pdo_getall('mask_areaagent',array('state'=>1));
@@ -1943,6 +2039,9 @@ class maskModuleWxapp extends WeModuleWxapp {
                             foreach ($cityaddress as $k=>$v){
                                 $addressarr=explode('-',$v['address']);
                                 if ($addressarr[1]==$orderaddressarr[1]){
+                                    $sddata['ruid']=$v['uid'];
+                                    $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
+                                    $sddata['rcardid']=$card['id'];
                                     pdo_insert('mask_record',$sddata);
                                     //更新余额
                                     //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
@@ -1952,6 +2051,9 @@ class maskModuleWxapp extends WeModuleWxapp {
                             foreach ($cityaddress as $k=>$v){
                                 $addressarr=explode('-',$v['address']);
                                 if ($addressarr[0]==$orderaddressarr[0]){
+                                    $shendaidata['ruid']=$v['uid'];
+                                    $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
+                                    $shendaidata['rcardid']=$card['id'];
                                     pdo_insert('mask_record',$shendaidata);
                                     //更新余额
                                     //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
@@ -1966,7 +2068,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                                 $jtdata['ruid']=$twopid;
                                 $jtdata['rbuyername']=$nickname;
                                 $jtdata['rordernumber']=$order['order_num'];
-                                $card=pdo_get('mask_bankcard', array('uid'=>$twopid,'uniacid'=>$_W['uniacid']));
+                                $card=pdo_get('mask_bankcard', array('uid'=>$twopid));
                                 $jtdata['rcardid']=$card['id'];
                                 $jtdata['rcomment']="二级合伙人奖励(48元)";
                                 $jtdata['raddtime']=date('Y-m-d H:i:s',time());
@@ -1975,7 +2077,6 @@ class maskModuleWxapp extends WeModuleWxapp {
                                     //更新余额
                                     //pdo_update('mask_user', array('wallet +=' => 48), array('id' => $pid));
                                 }
-
                             }
 
                         }
@@ -4751,10 +4852,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6603,8 +6704,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                    "page"=>"mask/pages/Liar/loginindex",
-                    "width" => 400);
+                               "page"=>"mask/pages/Liar/loginindex",
+                               "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8477,10 +8578,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
