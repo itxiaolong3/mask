@@ -747,8 +747,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         $oid=$_GPC['oid'];
         $zfbnum=$_GPC['zfbnum'];//支付宝
         $zfbname=$_GPC['zfbname'];//姓名
-        //查看当时退款订单时的订单状态
-        $state=pdo_getcolumn('mask_order', array('id' => $oid), 'state',1);
         switch ($types){
             case 1:
                 if(empty($zfbname)||empty($zfbnum)){
@@ -2038,25 +2036,27 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $orderaddressarr=explode('-',$order['address']);
                             foreach ($cityaddress as $k=>$v){
                                 $addressarr=explode('-',$v['address']);
-                                if ($addressarr[1]==$orderaddressarr[1]){
-                                    $sddata['ruid']=$v['uid'];
-                                    $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
-                                    $sddata['rcardid']=$card['id'];
-                                    pdo_insert('mask_record',$sddata);
-                                    //更新余额
-                                    //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
-                                }
-                            }
-                            //省代
-                            foreach ($cityaddress as $k=>$v){
-                                $addressarr=explode('-',$v['address']);
-                                if ($addressarr[0]==$orderaddressarr[0]){
-                                    $shendaidata['ruid']=$v['uid'];
-                                    $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
-                                    $shendaidata['rcardid']=$card['id'];
-                                    pdo_insert('mask_record',$shendaidata);
-                                    //更新余额
-                                    //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                                //先查询该区域商是省代还是市代
+                                //省代
+                                if ($v['leveltype']==2){
+                                    if ($addressarr[0]==$orderaddressarr[0]){
+                                        $shendaidata['ruid']=$v['uid'];
+                                        $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
+                                        $shendaidata['rcardid']=$card['id'];
+                                        pdo_insert('mask_record',$shendaidata);
+                                        //更新余额
+                                        //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                                    }
+                                }else if($v['leveltype']==1){
+                                    //市代
+                                    if ($addressarr[1]==$orderaddressarr[1]){
+                                        $sddata['ruid']=$v['uid'];
+                                        $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
+                                        $sddata['rcardid']=$card['id'];
+                                        pdo_insert('mask_record',$sddata);
+                                        //更新余额
+                                        //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                                    }
                                 }
                             }
                             //间推等级
@@ -4852,10 +4852,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-                   'auf' => 'audio/L16;rate=16000',
-                   'aue' => 'raw',
-                   'voice_name' => 'xiaoyan',
-                   'speed' => '0'
+            'auf' => 'audio/L16;rate=16000',
+            'aue' => 'raw',
+            'voice_name' => 'xiaoyan',
+            'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6704,8 +6704,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                               "page"=>"mask/pages/Liar/loginindex",
-                               "width" => 400);
+                    "page"=>"mask/pages/Liar/loginindex",
+                    "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8578,10 +8578,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-                   'auf' => 'audio/L16;rate=16000',
-                   'aue' => 'raw',
-                   'voice_name' => 'xiaoyan',
-                   'speed' => '0'
+            'auf' => 'audio/L16;rate=16000',
+            'aue' => 'raw',
+            'voice_name' => 'xiaoyan',
+            'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));

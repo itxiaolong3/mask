@@ -73,7 +73,7 @@
                         <td class="store_td1">姓名</td>
                         <td>手机号</td>
                         <td>地址</td>
-                        <!--<td>当前身份</td>-->
+                        <td>当前身份</td>
                         <td>备注</td>
                         <td>申请时间</td>
                         <td>审核状态</td>
@@ -86,15 +86,15 @@
                       <!--<td class="store_td1"><img class="store_list_img" src="{media  $item['img']}" alt=""/>    </td>-->
                         <td>{$item['phone']}</td>
                       <td>{$item['address']}</td>
-                      <!--<td>-->
-                          <!--{if $item['quyuid']==0}-->
-                            <!--非区域商-->
-                          <!--{elseif $item['quyuid']==4}-->
-                          <!--市代合伙人-->
-                          <!--{elseif $item['quyuid']==5}-->
-                          <!--省代合伙人-->
-                          <!--{/if}-->
-                      <!--</td>-->
+                      <td>
+                          {if $item['leveltype']==0}
+                            非区域商
+                          {elseif $item['leveltype']==1}
+                          市代合伙人
+                          {elseif $item['leveltype']==2}
+                          省代合伙人
+                          {/if}
+                      </td>
                       <td>{$item['comment']}</td>
                      <td>{$item['addtime']}</td>
                      {if $item['state']==0}

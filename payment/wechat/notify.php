@@ -290,25 +290,29 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     }
                 }
             }
-            //市代
+
             $cityaddress=pdo_getall('mask_areaagent',array('state'=>1));
             $orderaddressarr=explode('-',$order['address']);
             foreach ($cityaddress as $k=>$v){
                 $addressarr=explode('-',$v['address']);
-                if ($addressarr[1]==$orderaddressarr[1]){
-                    $sddata['ruid']=$v['uid'];
-                    $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
-                    $sddata['rcardid']=$card['id'];
-                    pdo_insert('mask_record',$sddata);
-                    //更新余额
-                    //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
-                }else{
-                    //省代
+                //先查询该区域商是省代还是市代
+                //省代
+                if ($v['leveltype']==2){
                     if ($addressarr[0]==$orderaddressarr[0]){
                         $shendaidata['ruid']=$v['uid'];
                         $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
                         $shendaidata['rcardid']=$card['id'];
                         pdo_insert('mask_record',$shendaidata);
+                        //更新余额
+                        //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
+                    }
+                }else if($v['leveltype']==1){
+                    //市代
+                    if ($addressarr[1]==$orderaddressarr[1]){
+                        $sddata['ruid']=$v['uid'];
+                        $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
+                        $sddata['rcardid']=$card['id'];
+                        pdo_insert('mask_record',$sddata);
                         //更新余额
                         //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
                     }

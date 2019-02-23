@@ -23,11 +23,12 @@ $operation=$_GPC['op'];
 if($operation=='adopt'){//审核通过
     $id=$_GPC['id'];
     $types=$_GPC['type'];
-    $res=pdo_update('mask_areaagent',array('state'=>1),array('id'=>$id));
     $uid=pdo_getcolumn('mask_areaagent', array('id' => $id), 'uid',1);
     if ($types==1){//市代
+        $res=pdo_update('mask_areaagent',array('state'=>1,'leveltype'=>1),array('id'=>$id));
         $updatalevel=pdo_update('mask_user',array('quyuid'=>4),array('id'=>$uid));
     }else if ($types==2){//省代
+        $res=pdo_update('mask_areaagent',array('state'=>1,'leveltype'=>2),array('id'=>$id));
         $updatalevel=pdo_update('mask_user',array('quyuid'=>5),array('id'=>$uid));
     }
 
