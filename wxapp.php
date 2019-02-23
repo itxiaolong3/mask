@@ -529,6 +529,9 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageAddMyOrder(){
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
+        if ($uid!=100003&&$uid!=100012&&$uid!=100097){
+            echo $this->resultToJson(0,'系统繁忙，下午再试','');die();
+        }
         //先判断用户是否登录
         $islogin=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
         $psw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'psw',1);

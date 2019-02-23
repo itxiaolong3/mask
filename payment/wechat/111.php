@@ -129,11 +129,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                 $jtdata['rcardid']=$card['id'];
                 $jtdata['rcomment']="二级合伙人奖励(48元)";
                 $jtdata['raddtime']=date('Y-m-d H:i:s',time());
-                $isava=pdo_get('mask_record', array('ruid'=>$twopid,'rordernumber'=>$order['order_num'],'rmoney'=>48));
-                if (empty($isava)){
-                    pdo_insert('mask_record',$jtdata);
-                }
-
+                pdo_insert('mask_record',$jtdata);
             }
             //市代记录
             $sddata['rtype']=1;
@@ -163,10 +159,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                         $shendaidata['ruid']=$v['uid'];
                         $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
                         $shendaidata['rcardid']=$card['id'];
-                        $isava=pdo_get('mask_record', array('ruid'=>$v['uid'],'rordernumber'=>$order['order_num'],'rmoney'=>4));
-                        if (empty($isava)){
-                            pdo_insert('mask_record',$shendaidata);
-                        }
+                        pdo_insert('mask_record',$shendaidata);
                         //更新余额
                         //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
                     }
@@ -176,10 +169,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                         $sddata['ruid']=$v['uid'];
                         $card=pdo_get('mask_bankcard', array('uid'=>$v['uid'])); //银卡
                         $sddata['rcardid']=$card['id'];
-                        $isava=pdo_get('mask_record', array('ruid'=>$v['uid'],'rordernumber'=>$order['order_num'],'rmoney'=>8));
-                        if (empty($isava)){
-                            pdo_insert('mask_record',$sddata);
-                        }
+                        pdo_insert('mask_record',$sddata);
                         //更新余额
                         //pdo_update('mask_user', array('wallet +=' => 228), array('id' => $pid));
                     }
@@ -227,60 +217,53 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                 case 1:
                     $onelevelfilename=$_W['attachurl'].'onelevelfilename.txt';
                     $onelevelfilename1=$_W['attachurl'].'onmore.txt';
-                    $isava=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$order['order_num'],'rmoney'=>150));
-                    if (empty($isava)){
-                        pdo_insert('mask_record',$dldata);
-                    }
+                    pdo_insert('mask_record',$dldata);
                     //上级只是代理还需要继续找银卡金卡
                     $ppid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
                     if ($ppid){
                         file_put_contents($onelevelfilename,"直推人的上级id=".$ppid,FILE_APPEND);
                         findlevel($ppid,$order['order_num'],$nickname);
+                    }else{
+                        file_put_contents($onelevelfilename1,"直推人的上级没有id",FILE_APPEND);
+                        //echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        // die();
                     }
                     //更新余额
                     //pdo_update('mask_user', array('wallet +=' => 150), array('id' => $pid));
                     break;
                 case 2:
-                    $isava=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$order['order_num'],'rmoney'=>150));
-                    if (empty($isava)){
-                        pdo_insert('mask_record',$dldata);
-                    }
-                    $isava2=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$order['order_num'],'rmoney'=>30));
-                    if (empty($isava2)){
-                        pdo_insert('mask_record',$ykdata);
-                    }
+                    pdo_insert('mask_record',$dldata);
+                    pdo_insert('mask_record',$ykdata);
                     //银卡
                     //去上级找金卡
                     $fpid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
                     if ($fpid){
                         findkinklevel($fpid,$order['order_num'],$nickname);
-                       // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
                     }else{
-                       // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-                       // die();
+                        // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        // die();
                     }
                     break;
                 case 3:
                     //金卡
-                    $isava=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$order['order_num'],'rmoney'=>150));
-                    if (empty($isava)){
-                        pdo_insert('mask_record',$dldata);
-                    }
-                    $isava2=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$order['order_num'],'rmoney'=>30));
-                    if (empty($isava2)){
-                        pdo_insert('mask_record',$ykdata);
-                    }
-                    $isava3=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$order['order_num'],'rmoney'=>40));
-                    if (empty($isava3)){
-                        pdo_insert('mask_record',$jkdata);
-                    }
+                    pdo_insert('mask_record',$dldata);
+                    pdo_insert('mask_record',$ykdata);
+                    pdo_insert('mask_record',$jkdata);
+                    //echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                    // die();
+                    //更新余额
+                    //pdo_update('mask_user', array('wallet +=' => 220), array('id' => $pid));
                     break;
                 default:
                     //寻找推荐人上级是否是金银卡
                     $ppid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
                     if ($ppid){
                         findlevel($ppid,$order['order_num'],$nickname);
-                       // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                    }else{
+                        //echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        // die();
                     }
             }
 
@@ -340,10 +323,7 @@ function findlevel($uid,$ordernum,$nickname){
     $ponelevel=$ppinfo['level'];
     if ($ponelevel==2){
         //银卡
-        $isava4=pdo_get('mask_record', array('ruid'=>$uid,'rordernumber'=>$ordernum,'rmoney'=>30));
-        if (empty($isava4)){
-            pdo_insert('mask_record',$ykdata);
-        }
+        pdo_insert('mask_record',$ykdata);
         $fpid=pdo_getcolumn('mask_relation', array('uid' => $uid), 'pid',1);
         if ($fpid){
             //银卡找到，就往上只找金卡了
@@ -351,14 +331,8 @@ function findlevel($uid,$ordernum,$nickname){
         }
     }else if($ponelevel==3){
         //金卡
-        $isava5=pdo_get('mask_record', array('ruid'=>$uid,'rordernumber'=>$ordernum,'rmoney'=>30));
-        if (empty($isava5)){
-            pdo_insert('mask_record',$ykdata);
-        }
-        $isava6=pdo_get('mask_record', array('ruid'=>$uid,'rordernumber'=>$ordernum,'rmoney'=>40));
-        if (empty($isava6)){
-            pdo_insert('mask_record',$jkdata);
-        }
+        pdo_insert('mask_record',$ykdata);
+        pdo_insert('mask_record',$jkdata);
         //echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
     }else{
         $fpid=pdo_getcolumn('mask_relation', array('uid' => $uid), 'pid',1);
@@ -386,10 +360,7 @@ function findkinklevel($uid,$ordernum,$nickname){
     $ponelevel=$ppinfo['level'];
     if($ponelevel==3){
         //金卡
-        $isava7=pdo_get('mask_record', array('ruid'=>$uid,'rordernumber'=>$ordernum,'rmoney'=>40));
-        if (empty($isava7)){
-            pdo_insert('mask_record',$jkdata);
-        }
+        pdo_insert('mask_record',$jkdata);
     }else{
         $fpid=pdo_getcolumn('mask_relation', array('uid' => $uid), 'pid',1);
         if ($fpid){

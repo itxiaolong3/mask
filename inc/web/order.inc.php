@@ -536,6 +536,7 @@ if($_GPC['op']=='refund'){
     $rst=pdo_update('mask_order',array('state'=>7),array('id'=>$_GPC['id']));
     if($rst){
         //删除收益记录
+
         //恢复身份
 
         message('操作成功',$this->createWebUrl('order',array()),'success');

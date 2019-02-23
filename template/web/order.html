@@ -220,13 +220,13 @@
                                 <!--<a href="{php echo $this->createWebUrl('order',array('op'=>'dy','order_id'=>$item['order']['id']));}"><span class="btn btn-xs orderbtn">打印小票</span></a>-->
                             </div>
                             <div class="right">
-                                {if $item['order']['afterselltype']==1}
-                                <div class="left orderconfirm2"><label style="color: red">退货退款</label></div>
-                                {elseif $item['order']['afterselltype']==2}
-                                <div class="left orderconfirm2"><label style="color: red">仅退款</label></div>
-                                {elseif $item['order']['afterselltype']==3}
-                                <div class="left orderconfirm2"><label style="color: red">仅换货</label></div>
-                                {/if}
+                                <!--{if $item['order']['afterselltype']==1}-->
+                                <!--<div class="left orderconfirm2"><label style="color: white">退货退款</label></div>-->
+                                <!--{elseif $item['order']['afterselltype']==2}-->
+                                <!--<div class="left orderconfirm2"><label style="color: white">仅退款</label></div>-->
+                                <!--{elseif $item['order']['afterselltype']==3}-->
+                                <!--<div class="left orderconfirm2"><label style="color: white">仅换货</label></div>-->
+                                <!--{/if}-->
                                 {if $item['order']['state']==1}
                                 <div class="left orderconfirm2">待支付</div>
                                 {elseif $item['order']['state']==2}
