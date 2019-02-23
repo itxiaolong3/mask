@@ -36,20 +36,65 @@ class maskModuleWxapp extends WeModuleWxapp {
     //测试接口
     public function doPagetest(){
         global $_W, $_GPC;
+        $pid=100003;
+        $nickname='陈芳';
+        $ordernum=201902221306244202;
+
         $dldata['rtype']=1;
         $dldata['rstate']=0;
-        $dldata['rmoney']=150;//直推奖励
-        $dldata['ruid']=100003;
-        $dldata['rbuyername']='A未知';
-        $dldata['rordernumber']='201902151644268522';
-        //$card=pdo_get('mask_bankcard', array('uid'=>$pid));//银卡
-        //$dldata['rcardid']=$card['id'];
-        $dldata['rcomment']="直推(A未知)奖励：150元";
+        $dldata['rmoney']=48;//直推奖励
+        $dldata['ruid']=$pid;
+        $dldata['rbuyername']=$nickname;
+        $dldata['rordernumber']=$ordernum;
+        $card=pdo_get('mask_bankcard', array('uid'=>$pid));
+        $dldata['rcardid']=$card['id'];
+        $dldata['rcomment']="二级合伙人奖励(48元)";
         $dldata['raddtime']=date('Y-m-d H:i:s',time());
-        $daytimes=5*86400;
-        $info=pdo_getall('mask_order',array('user_id'=>'100319','state >='=>'6'),array('id','order_num','money','state'), '', 'id DESC');
-        echo json_encode($info);
-        //echo $this->doPageGoodsCode(6);
+
+        $isava=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$ordernum,'rmoney'=>48));
+
+//        if (empty($isava)){
+//            $res=pdo_insert('mask_record',$dldata);
+//        }else{
+//            $res=0;
+//        }
+
+        $ykdata['rtype']=1;
+        $ykdata['rstate']=0;
+        $ykdata['rmoney']=30;//直推奖励
+        $ykdata['ruid']=100003;
+        $ykdata['rbuyername']=$nickname;
+        $ykdata['rordernumber']=$ordernum;
+        $card=pdo_get('mask_bankcard', array('uid'=>100003));//银卡
+        $ykdata['rcardid']=$card['id'];
+        $ykdata['rcomment']="银卡销售额奖励(30元)";
+        $ykdata['raddtime']=date('Y-m-d H:i:s',time());
+
+
+        $isava2=pdo_get('mask_record', array('ruid'=>100003,'rordernumber'=>$ordernum,'rmoney'=>30));
+        if (empty($isava2)){
+            $res=pdo_insert('mask_record',$ykdata);
+        }else{
+            $res=0;
+        }
+        $shendaidata['rtype']=1;
+        $shendaidata['rstate']=0;
+        $shendaidata['rmoney']=4;//直推奖励
+        $shendaidata['rbuyername']=$nickname;
+        $shendaidata['rordernumber']=$ordernum;
+        $shendaidata['ruid']=100067;
+        $card=pdo_get('mask_bankcard', array('uid'=>100067)); //银卡
+        $shendaidata['rcardid']=$card['id'];
+        $shendaidata['rcomment']="省代区域奖励(4元)";
+        $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
+
+        $isava=pdo_get('mask_record', array('ruid'=>100067,'rordernumber'=>$ordernum,'rmoney'=>4));
+//        if (empty($isava)){
+//            $res=pdo_insert('mask_record',$shendaidata);
+//        }else{
+//            $res=0;
+//        }
+        echo $res;
     }
     //获取openid并保存用户信息
     public function doPageOpenid(){
