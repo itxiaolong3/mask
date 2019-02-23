@@ -535,7 +535,9 @@ if($_GPC['op']=='refund'){
     //更改订单操作
     $rst=pdo_update('mask_order',array('state'=>7),array('id'=>$_GPC['id']));
     if($rst){
-        $this->updcommission($_GPC['id']);
+        //删除收益记录
+        //恢复身份
+
         message('操作成功',$this->createWebUrl('order',array()),'success');
     }else{
         message('操作失败！','','error');

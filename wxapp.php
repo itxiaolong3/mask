@@ -741,6 +741,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         $oid=$_GPC['oid'];
         $zfbnum=$_GPC['zfbnum'];//支付宝
         $zfbname=$_GPC['zfbname'];//姓名
+        //查看当时退款订单时的订单状态
+        $state=pdo_getcolumn('mask_order', array('id' => $oid), 'state',1);
         switch ($types){
             case 1:
                 if(empty($zfbname)||empty($zfbnum)){
@@ -999,7 +1001,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $getpsw=md5('itxiaolong'.$_GPC['psw']);
         $getuid=$_GPC['uid'];
         if (!$getuid){
-            echo $this->resultToJson(0,'请删除小程序重新授权操作','');
+            echo $this->resultToJson(0,'请退出重新授权操作','');
             die();
         }
         $getpid=$_GPC['pid'];

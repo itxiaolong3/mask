@@ -220,6 +220,13 @@
                                 <!--<a href="{php echo $this->createWebUrl('order',array('op'=>'dy','order_id'=>$item['order']['id']));}"><span class="btn btn-xs orderbtn">打印小票</span></a>-->
                             </div>
                             <div class="right">
+                                {if $item['order']['afterselltype']==1}
+                                <div class="left orderconfirm2"><label style="color: red">退货退款</label></div>
+                                {elseif $item['order']['afterselltype']==2}
+                                <div class="left orderconfirm2"><label style="color: red">仅退款</label></div>
+                                {elseif $item['order']['afterselltype']==3}
+                                <div class="left orderconfirm2"><label style="color: red">仅换货</label></div>
+                                {/if}
                                 {if $item['order']['state']==1}
                                 <div class="left orderconfirm2">待支付</div>
                                 {elseif $item['order']['state']==2}
@@ -235,12 +242,13 @@
                                 <div class="left orderconfirm2">已评价</div>
                                 {elseif $item['order']['state']==6}
                                 <div class="left orderconfirm2">待退款</div>
-                                <a href="{php echo $this->createWebUrl('order',array('op'=>'refund','id'=>$item['order']['id']));}"><div class="left orderconfirm">通过退款</div></a>
+                                <a data-toggle="modal" data-target="#myModal2{$item['order']['id']}"><div class="left orderconfirm">去退款</div></a>
                                 <a href="{php echo $this->createWebUrl('order',array('op'=>'reject','id'=>$item['order']['id']));}"><div class="left orderconfirm">拒绝退款</div></a>
                                 {elseif $item['order']['state']==7}
                                 <div class="left orderconfirm2">退款成功</div>
                                 {elseif $item['order']['state']==8}
                                 <div class="left orderconfirm2">退款拒绝</div>
+                                <a data-toggle="modal" data-target="#myModal2{$item['order']['id']}"><div class="left orderconfirm">去退款</div></a>
                                 {/if}
                             </div>
                         </div>
@@ -384,6 +392,39 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                             <a href="javascript:void(0);" onclick="editewuliu({$item['order']['id']});" type="button"  class="btn btn-info1" >确定</a>
+                            <!--<a href="{php echo $this->createWebUrl('onetype', array('op' => 'delete', 'id' => $row['ID']))}" id="postfee" type="button" class="btn btn-info" >确定</a>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--通过退款-->
+            <div class="modal fade" id="myModal2{$item['order']['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel2" style="font-size: 20px;">支付宝账号</h4>
+                        </div>
+                        <div class="modal-body" style="font-size: 20px">
+                            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label class="col-xs-8 col-sm-3  control-label">姓名</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" value="{$item['order']['zfbname']}" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-xs-8 col-sm-3  control-label">支付宝账号</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" value="{$item['order']['zfbnum']}" />
+                                    </div>
+                                </div>
+                            </form>
+                            <label style="color: red;">*如果退款失败，有请问用户的余额是否满足佣金反扣额度</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <a href="{php echo $this->createWebUrl('order',array('op'=>'refund','id'=>$item['order']['id']));}"  class="btn btn-info" >确定</a>
                             <!--<a href="{php echo $this->createWebUrl('onetype', array('op' => 'delete', 'id' => $row['ID']))}" id="postfee" type="button" class="btn btn-info" >确定</a>-->
                         </div>
                     </div>
