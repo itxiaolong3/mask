@@ -104,7 +104,11 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $hbdata['rmoney']=$hbmoney;//红包奖励
             $hbdata['rcomment']=$nickname."推广红包区域奖励(".$hbmoney.")元";
             $hbdata['raddtime']=date('Y-m-d H:i:s',time());
-            pdo_insert('mask_record',$hbdata);
+            $isava=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$order['order_num']));
+            if (empty($isava)){
+                pdo_insert('mask_record',$hbdata);
+            }
+
         }
     }
     $testsql=" select * from ".tablename('mask_order_goods')." where dishes_id=24  and order_id='{$order['id']}'";
@@ -254,10 +258,10 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     $fpid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
                     if ($fpid){
                         findkinklevel($fpid,$order['order_num'],$nickname);
-                       // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
                     }else{
-                       // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-                       // die();
+                        // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        // die();
                     }
                     break;
                 case 3:
@@ -280,7 +284,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
                     $ppid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
                     if ($ppid){
                         findlevel($ppid,$order['order_num'],$nickname);
-                       // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        // echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
                     }
             }
 
@@ -300,7 +304,12 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
         echo array2xml($result);
         exit;
     }
-
+    $result = array(
+        'return_code' => 'SUCCESS',
+        'return_msg' => 'OK'
+    );
+    echo array2xml($result);
+    exit;
     //修改库存量
 }else{
     //订单已经处理过了

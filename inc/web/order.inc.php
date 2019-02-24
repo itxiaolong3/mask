@@ -532,13 +532,33 @@ if($_GPC['op']=='wc'){
     }
 }
 if($_GPC['op']=='refund'){
+    //等级恢复条件
+    $orderinfo=pdo_get('mask_order', array('id' => $_GPC['id']), array('order_num','getgoodtype','user_id','money'));
+    $ordernumber=pdo_fetch("SELECT COUNT(*) as ordernumber FROM ".tablename('mask_order')." WHERE  user_id ={$orderinfo['user_id']} and state in (2,3,4,6,8) and isafter=0");
+    //符合金银卡条件
+    //直接销售额
+//    $xiaoshoutotal=pdo_fetch("select sum(money) as total from ". tablename("mask_order") . " o"
+//        . " left join " . tablename("mask_relation") . " r on o.user_id=r.uid"."WHERE r.uniacid={$_W['uniacid']} and r.pid={$orderinfo['user_id']} and o.state=4");
+//    $completenum=number_format($wm['total'],2);
     //更改订单操作
     $rst=pdo_update('mask_order',array('state'=>7),array('id'=>$_GPC['id']));
     if($rst){
-        //删除收益记录
+        //修改收益记录为支出
+        pdo_update('mask_record',array('rstate'=>1),array('rordernumber'=>$orderinfo['order_num']));
+        //判断是否是399订单
+        if ($orderinfo['money']>=399){
+            if ($ordernumber['ordernumber']<2){
+                //恢复身份
+                pdo_update('mask_user', array('level' => 0), array('id' => $orderinfo['user_id']));
+                //收货后才退款时需要如下判断，银卡条件是直接销售额，所以只有收货后销售额才变
+                //检查上级是否还符合金银卡条件
+//                $twonum = pdo_get('mask_system', array('uniacid' => $_W['uniacid']), array('zhituinum', 'yingkanum'));
+//                $zhituinum=$twonum['zhituinum'];//达成银卡所需的直推金额
+//                $yingkanum=$twonum['yingkanum'];//达成金卡所需的银卡数量
+//                $pid=pdo_getcolumn('mask_relation', array('uid' => $orderinfo['user_id']), 'pid',1);
 
-        //恢复身份
-
+            }
+        }
         message('操作成功',$this->createWebUrl('order',array()),'success');
     }else{
         message('操作失败！','','error');

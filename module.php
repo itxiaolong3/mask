@@ -9,10 +9,10 @@ class maskModule extends WeModule
     {   
         global $_GPC, $_W;
     	 if ($_W['role'] == 'operator') {
-	        $url = $this->createWebUrl('store');
+	        $url = $this->createWebUrl('peiz');
 	        Header("Location: " . $url);
     	}else{
-            $url = $this->createWebUrl('store');
+            $url = $this->createWebUrl('peiz');
 	    	//$url = $this->createWebUrl('gaikuangdata');
 	        Header("Location: " . $url);
     	}
