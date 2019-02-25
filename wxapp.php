@@ -1484,7 +1484,12 @@ class maskModuleWxapp extends WeModuleWxapp {
         $ishava=pdo_get('mask_areaagent',array('uid'=>$_GPC['uid']));
         if ($ishava){
             //已申请
-            echo $this->resultToJson(1,'已在申请',$ishava);
+            $res=pdo_update('mask_areaagent',$adddata,array('uid'=>$_GPC['uid']));
+            if ($res){
+                echo $this->resultToJson(1,'更新申请成功','');
+            }else{
+                echo $this->resultToJson(0,'更新申请失败','');
+            }
         }else{
             $res=pdo_insert('mask_areaagent',$adddata);
             if ($res){

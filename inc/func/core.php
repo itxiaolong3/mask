@@ -215,6 +215,13 @@ class Core extends WeModuleSite
 //                    4 => $this->createMainMenu('充值设置', $do, 'czsz', '')
     //            )
   //          );
+            $navemenu[14] = array(
+                'title' => '<a href="index.php?c=site&a=entry&op=display&do=myteam&m=mask" class="panel-title wytitle" id="yframe-14"><icon style="color:#8d8d8d;" class="fa fa-user"></icon>  团队管理</a>',
+                'items' => array(
+                    0 => $this->createMainMenu('一级会员 ', $do, 'oneteam', ''),
+                    1=> $this->createMainMenu('二级会员 ', $do, 'twoteam', ''),
+                )
+            );
             // $navemenu[15] = array(
             //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=analysis&m=mask" class="panel-title wytitle" id="yframe-15"><icon style="color:#8d8d8d;" class="fa fa-recycle"></icon>  经营分析</a>',
             //     'items' => array(
