@@ -534,26 +534,6 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(0,'修改失败','');
         }
     }
-    //设置默认地址
-    public function doPageSettingdefault(){
-        global $_W, $_GPC;
-        $id=$_GPC['aid'];
-        $uid=$_GPC['uid'];
-        $isdefault=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"is_default"=>1));
-        if ($isdefault){
-            pdo_update('mask_address',array('is_default'=>0),array('aid'=>$isdefault['aid']));
-            $data['is_default']=1;
-        }else{
-            $data['is_default']=1;
-        }
-        $res=pdo_update('mask_address',$data,array('aid'=>$id));
-        if($res){
-            echo $this->resultToJson(1,'设置默认成功','');
-        }else{
-            pdo_update('mask_address',array('is_default'=>1),array('aid'=>$isdefault['aid']));
-            echo $this->resultToJson(0,'设置默认失败','');
-        }
-    }
     //删除地址
     public function doPageDelAdd(){
         global $_W, $_GPC;
@@ -581,6 +561,26 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(1,'返回我的地址成功',$res);
         }else{
             echo $this->resultToJson(0,'你没有地址',$res);
+        }
+    }
+    //设置默认地址
+    public function doPageSettingdefault(){
+        global $_W, $_GPC;
+        $id=$_GPC['aid'];
+        $uid=$_GPC['uid'];
+        $isdefault=pdo_get("mask_address",array('uid'=>$uid,'uniacid'=>$_W['uniacid'],"is_default"=>1));
+        if ($isdefault){
+            pdo_update('mask_address',array('is_default'=>0),array('aid'=>$isdefault['aid']));
+            $data['is_default']=1;
+        }else{
+            $data['is_default']=1;
+        }
+        $res=pdo_update('mask_address',$data,array('aid'=>$id));
+        if($res){
+            echo $this->resultToJson(1,'设置默认成功','');
+        }else{
+            pdo_update('mask_address',array('is_default'=>1),array('aid'=>$isdefault['aid']));
+            echo $this->resultToJson(0,'设置默认失败','');
         }
     }
     //获取单一商品
@@ -1270,9 +1270,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         //当月结算统计
         $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
         $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$_GPC['uid']} and rsettlement=1 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
-
         //查询已退款的待结算记录
-        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0");
         $redata['nosettlement']=number_format($nodeal['con']-$tknodeal['cons'],2);
         $redata['settlement']=number_format($deal['con'],2);
         $this->collectGood();
@@ -1414,7 +1413,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
             foreach ($list as $k=>$v){
                 if ($v['rstate']){
-                    $list[$k]['rmoney']='(退款扣)'.$v['rmoney'];
+                    $list[$k]['rmoney']='(退)'.$v['rmoney'];
                 }
             }
         }else{
@@ -1424,11 +1423,10 @@ class maskModuleWxapp extends WeModuleWxapp {
             $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
             foreach ($list as $k=>$v){
                 if ($v['rstate']){
-                    $list[$k]['rmoney']='(退款扣)'.$v['rmoney'];
+                    $list[$k]['rmoney']='(退)'.$v['rmoney'];
                 }
             }
         }
-        //查询已退款的待结算记录
         $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
         $redata['alltotal']=number_format($allrecord['con']-$tknodeal['cons'],2);
         $redata['nodealtotal']=number_format($nodeal['con']-$tknodeal['cons'],2);
@@ -1611,11 +1609,16 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $type=$_GPC['type'];//2表示全部
         if ($type<2){
-            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rstate'=>$type,'rsettlement'=>1),array('rid','rcomment','raddtime','rmoney','rstate'));
+            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rstate'=>$type,'rsettlement'=>1),array('rid','rtype','rcomment','raddtime','rmoney','rstate','rsqmoney'));
         }else{
-            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rsettlement'=>1),array('rid','rcomment','raddtime','rmoney','rstate'));
+            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rsettlement'=>1),array('rid','rtype','rcomment','raddtime','rmoney','rstate','rsqmoney'));
         }
         if ($recoord){
+            foreach ($recoord as $k=>$v){
+                if ($v['rtype']==7){
+                    $recoord[$k]['rmoney']=$v['rsqmoney'];
+                }
+            }
             echo $this->resultToJson(1,'消费记录数据',$recoord);
         }else{
             echo $this->resultToJson(0,'无消费记录数据',$recoord);
@@ -1626,6 +1629,9 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $dates=$_GPC['dates'];
         $list=pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype=7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+        foreach ($list as $k=>$v){
+            $list[$k]['rmoney']='-'.$v['rsqmoney'];
+        }
         echo $this->resultToJson(1,'提现记录',$list);
     }
     //判断是否可以提现
@@ -1821,22 +1827,16 @@ class maskModuleWxapp extends WeModuleWxapp {
                 //升级银卡成功奖励300元到余额
                 $jldata['rtype']=1;
                 $jldata['rstate']=0;
-                $jldata['rmoney']=300;
+                $jldata['rmoney']=8;//直推奖励
                 $jldata['ruid']=$_GPC['uid'];
                 $jldata['rbuyername']=$userinfo['nickname'];
                 $jldata['rordernumber']=0;
-                $jldata['rsettlement']=1;
                 $card=pdo_get('mask_bankcard', array('uid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid'])); //银行卡
                 $jldata['rcardid']=$card['id'];
                 $jldata['rcomment']="银卡升级奖励：300元";
                 $jldata['raddtime']=date('Y-m-d H:i:s',time());
-                pdo_update('mask_user',array('level'=>3),array('id'=>$_GPC['uid']));
-//                $isava=pdo_get('mask_record', array('ruid'=>$_GPC['uid'],'rordernumber'=>0,'rmoney'=>300));
-//                if (empty($isava)){
-//                    pdo_insert('mask_record',$jldata);
-//                }
-//                //更新余额
-//                pdo_update('mask_user', array('wallet +=' => 300), array('id' => $_GPC['uid']));
+                //更新余额
+                //pdo_update('mask_user', array('wallet +=' => 30), array('id' => $_GPC['uid']));
             }
             if ($completeyinkanum>=$yingkanum){
                 //达成金卡升级条件
@@ -2140,7 +2140,6 @@ class maskModuleWxapp extends WeModuleWxapp {
             //修改交易记录状态1
             //$pid=pdo_getcolumn('mask_relation', array('uid' => $v['id']), 'pid',1);
             pdo_update('mask_record',array('rsettlement'=>1),array('rordernumber'=>$v['order_num']));
-            ////
             //更新用户余额
             $uidandrmoney=pdo_getall('mask_record',array('rordernumber'=>$v['order_num']));
             foreach ($uidandrmoney as $kk=>$vv){
@@ -4970,10 +4969,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-                   'auf' => 'audio/L16;rate=16000',
-                   'aue' => 'raw',
-                   'voice_name' => 'xiaoyan',
-                   'speed' => '0'
+            'auf' => 'audio/L16;rate=16000',
+            'aue' => 'raw',
+            'voice_name' => 'xiaoyan',
+            'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -6822,8 +6821,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                               "page"=>"mask/pages/Liar/loginindex",
-                               "width" => 400);
+                    "page"=>"mask/pages/Liar/loginindex",
+                    "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8696,10 +8695,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-                   'auf' => 'audio/L16;rate=16000',
-                   'aue' => 'raw',
-                   'voice_name' => 'xiaoyan',
-                   'speed' => '0'
+            'auf' => 'audio/L16;rate=16000',
+            'aue' => 'raw',
+            'voice_name' => 'xiaoyan',
+            'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
