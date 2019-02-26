@@ -4,8 +4,8 @@
 <style type="text/css">
     .yg5_key>div{float: left;line-height: 34px;}
     .store_td1{height: 45px;}
-    .store_list_img{width: 40px;height: 40px;}
-    .yg5_tabel{border-color: #e5e5e5;outline: 1px solid #e5e5e5;font-size: 12px;}
+    .store_list_img{width: 40px;height:40px;}
+    .yg5_tabel{border-color: #e5e5e5;outline: 1px solid #e5e5e5;text-align: center;}
     .yg5_tr2>td{padding: 10px 15px;border: 1px solid #e5e5e5;text-align: center;}
     .yg5_tr1>th{
         border: 1px solid #e5e5e5;
@@ -15,48 +15,13 @@
         text-align: center;
     }
     .yg5_btn{background-color: #EEEEEE;color: #333;border: 1px solid #E4E4E4;border-radius: 6px;width: 100px;height: 34px;}
-    .store_inp{margin-left: 5px;}
-    .ygshanchu{color: white;background-color: #44ABF7;}
-    .accout_inp{width: 100%;height: 35px;border: 1px solid #cccccc;font-size: 14px;color: #333;}
-    .navback{display: none;}
-    .yg_back{margin-left: 170px;}
-    .scour{
-      position: relative;
-      width: 100%;
-      display: block;
-    }
-    .scour:hover .scour_tip{
-      display: block;
-    }
-    .scour_tip{
-      display: none;
-      position: absolute;
-      left: 50%;
-      bottom: 27px;
-      background-color: #333;
-      color: white;
-      padding: 2px 7px;
-      border-radius: 2px;
-      font-size: 10px;
-      margin-left: -20px
-    }
-    .scour_tip:after{
-      content: "";
-      display:block;
-      width: 0;
-      height: 0;
-      border-bottom: 10px solid #333;
-      border-left: 10px solid transparent;
-      transform: rotate(45deg);
-      position: absolute;
-      left: 40%;
-      top: 78%;
-    }
+    .check_img{width: 45px;height: 45px;}
+    /*#frame-5{display: block;visibility: visible;}*/
 </style>
 <ul class="nav nav-tabs">
     <span class="ygxian"></span>
-    <div class="ygdangq">当前位置:</div>    
-    <li class="active"><a href="javascript:void(0);">用户列表</a></li>
+    <div class="ygdangq">当前用户:</div>
+    <li class="active"><a href="javascript:void(0);">一级团队列表</a></li>
 </ul>
 <div class="main">
     <div class="panel panel-default">
@@ -65,7 +30,7 @@
               <input type="hidden" name="c" value="site" />
                    <input type="hidden" name="a" value="entry" />
                    <input type="hidden" name="m" value="mask" />
-                   <input type="hidden" name="do" value="user" />
+                   <input type="hidden" name="do" value="allteam" />
             <div class="input-group" style="width: 300px">
                 <input type="text" name="keywords" class="form-control" placeholder="请输入用户ID/昵称/手机号">
                 <span class="input-group-btn">
@@ -116,6 +81,8 @@
                         <td>{$row['user_tel']}</td>
                         <td>
                             <a class="btn ygyouhui2 btn-xs"  value="编 辑"  data-toggle="modal" data-target="#myModal{$row['id']}">设置身份</a>
+                            <a class="btn ygyouhui2 btn-xs"  href="index.php?c=site&a=entry&op=display&do=oneteam&m=mask&uid={$row['id']}&types=up">上级</a>
+                            <a class="btn ygyouhui2 btn-xs"  href="index.php?c=site&a=entry&op=display&do=oneteam&m=mask&uid={$row['id']}&types=down">下级</a>
                         </td>
                     </tr>
                     <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -204,8 +171,8 @@
         })
     }
     $(function(){
-        // $("#frame-12").addClass("in");
-        // $("#frame-12").show();
-        $("#yframe-12").addClass("wyactive");
+         $("#frame-16").addClass("in");
+         $("#frame-16").show();
+        $("#yframe-16").addClass("wyactive");
     })
 </script>

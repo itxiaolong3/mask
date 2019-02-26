@@ -12,6 +12,8 @@ class Core extends WeModuleSite
         $navemenu = array();
         $cur_color = ' style="color:#d9534f;" ';
         $system=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+        $userid=$_GPC['uid'];
+        $types=$_GPC['types'];
         if ($_W['role'] == 'operator') {
             $navemenu[0] = array(
                 'title' => '<a href="javascript:void(0)" class="panel-title wytitle"><icon style="color:#8d8d8d;" class="fa fa-cog"></icon>  业务菜单</a>',
@@ -215,13 +217,15 @@ class Core extends WeModuleSite
 //                    4 => $this->createMainMenu('充值设置', $do, 'czsz', '')
     //            )
   //          );
-            $navemenu[14] = array(
-                'title' => '<a href="index.php?c=site&a=entry&op=display&do=myteam&m=mask" class="panel-title wytitle" id="yframe-14"><icon style="color:#8d8d8d;" class="fa fa-user"></icon>  团队管理</a>',
-                'items' => array(
-                    0 => $this->createMainMenu('一级会员 ', $do, 'oneteam', ''),
-                    1=> $this->createMainMenu('二级会员 ', $do, 'twoteam', ''),
-                )
-            );
+            //待打开
+//            $navemenu[16] = array(
+//                'title' => '<a href="index.php?c=site&a=entry&op=display&do=allteam&m=mask" class="panel-title wytitle" id="yframe-16"><icon style="color:#8d8d8d;" class="fa fa-user"></icon>  团队管理</a>',
+//                'items' => array(
+//                    0 => $this->createMainMenu('所有会员 ', $do, 'allteam', ''),
+//                    1 => $this->createMainMenumy('一级会员 ', $do, 'oneteam','','',$userid,$types),
+//                    2=> $this->createMainMenumy('二级会员 ', $do, 'twoteam','','',$userid,$types),
+//                )
+//            );
             // $navemenu[15] = array(
             //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=analysis&m=mask" class="panel-title wytitle" id="yframe-15"><icon style="color:#8d8d8d;" class="fa fa-recycle"></icon>  经营分析</a>',
             //     'items' => array(
@@ -752,7 +756,17 @@ class Core extends WeModuleSite
             )
         );
     }
+    function createMainMenumy($title, $do, $method, $icon = "fa-image", $color = '',$uid,$types)
+    {
+        $color = ' style="color:'.$color.';" ';
 
+        return array('title' => $title, 'url' => $do != $method ? $this->createWebUrl($method, array('op' => 'display','uid'=>$uid,'types'=>$types)) : '',
+                     'active' => $do == $method ? ' active' : '',
+                     'append' => array(
+                         'title' => '<i '.$color.' class="fa fa-angle-right"></i>',
+                     )
+        );
+    }
     /*  function createSubMenu($title, $do, $method, $icon = "fa-image", $color = '#d9534f', $storeid)
       {
           $color = ' style="color:'.$color.';" ';
