@@ -16,6 +16,11 @@ if($_GPC['keywords']){
 	$sql="select *  from " . tablename("mask_record") ." WHERE  ruid LIKE :name || rordernumber LIKE :name || rbuyername LIKE :name order by  raddtime desc";
 	$select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 	$list = pdo_fetchall($select_sql,array(':name'=>$where));
+	foreach ($list as $k=>$v){
+	    if ($v['rstate']){
+	        $list[$k]['rmoney']='-'.$v['rmoney'];
+        }
+    }
 	$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_record") ." WHERE  ruid LIKE :name || rordernumber LIKE :name || rbuyername LIKE :name ",array(':name'=>$where));
 	$pager = pagination($total, $pageindex, $pagesize);
 	if($_GPC['id']){
