@@ -8,25 +8,37 @@ if($_GPC['keywords']){
 }else{
     $where='%%';
 }
-
-/*	$sql="select *  from " . tablename("mask_user") ." WHERE  name LIKE :name  and uniacid=:uniacid";
-$list=pdo_fetchall($sql,array(':name'=>$where,'uniacid'=>$_W['uniacid']));*/
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
-$sql="select *  from " . tablename("mask_user") ." WHERE  level in (1,2,3,4,5) and (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid order by  level desc";
-$select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
-$list = pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':name'=>$where));
-$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") .
-    " WHERE level in (1,2,3,4,5) and  (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid ",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
-$pager = pagination($total, $pageindex, $pagesize);
-//	if($_GPC['id']){
-//		$res4=pdo_delete("mask_user",array('u_id'=>$_GPC['id']));
-//		if($res4){
-//		 message('删除成功！', $this->createWebUrl('user'), 'success');
-//		}else{
-//			  message('删除失败！','','error');
-//		}
-//	}
+if($_GPC['types']=='find'){
+    $list=pdo_getall('mask_user', array('id'=>$op,'uniacid'=>$_W['uniacid']));
+    $pager = pagination(1, $pageindex, $pagesize);
+}else if (empty($_GPC['keywords'])){
+    $oneteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+        " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and u.level in (1,2,3,4,5) and r.pid={$_GPC['uid']}" );
+    $twoteamarrforpage=array();
+    $twoteamarr=array();
+    foreach ($oneteam as $k=>$v){
+        $getteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']} and u.level in (1,2,3,4,5) and (u.nickname LIKE :name || u.user_tel LIKE :name || u.id LIKE :name)",array(':name'=>$where));
+        $getteamforpage=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']} and u.level in (1,2,3,4,5) and (u.nickname LIKE :name || u.user_tel LIKE :name || u.id LIKE :name)".
+            " LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize,array(':name'=>$where));
+        if ($getteamforpage){
+            foreach ($getteamforpage as $k=>$v){
+                array_push($twoteamarrforpage,$v);
+            }
+        }
+        if ($getteam){
+            foreach ($getteam as $k=>$v){
+                array_push($twoteamarr,$v);
+            }
+        }
+    }
+    $list=$twoteamarrforpage;
+    $pager = pagination(count($twoteamarr), $pageindex, $pagesize);
+}
+
 if($_GPC['op']=='changelevel'){
     $getlevel=$_GPC['level'];
     //更改订单操作

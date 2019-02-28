@@ -96,6 +96,71 @@ class maskModuleWxapp extends WeModuleWxapp {
 //        }
         echo $res;
     }
+    public function doPageTeamTest(){
+        global $_W, $_GPC;
+        $pageindex = max(1, intval($_GPC['page']));
+        $pagesize=10;
+        //一级团队人数
+        $count=pdo_get('mask_relation', array('pid'=>$_GPC['uid']), array('count(id) as count'));
+        //一级团队合伙人数量以及粉丝数量
+        $hcountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level>0";
+        $fscountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level=0";
+        $countdatas[':uniacid']=$_W['uniacid'];
+        $countdatas[':pid']=$_GPC['uid'];
+        $hehuocount=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$hcountwhere,$countdatas);
+        $fscount=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$fscountwhere,$countdatas);
+        $oneteamforpage=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$_GPC['uid']}"." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize);
+        $oneteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$_GPC['uid']}" );
+        $data['oneteam']=$oneteam;
+        $data['oneteamforpage']=$oneteamforpage;
+        $data['onecount']=$count['count'];
+        $data['onehhcount']=$hehuocount;
+        $data['onefscount']=$fscount;
+        //二级团队的计算
+        $twoteamarr=array();
+        $twoteamarrforpage=array();
+        $twohhteamarr=array();
+        $twofsteamarr=array();
+        foreach ($oneteam as $k=>$v){
+            $getteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+                " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']}");
+            $getteamforpage=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+                " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']}"." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize);
+            $gethhteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+                " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']} and u.level>0");
+            $getfsteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+                " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']} and u.level=0");
+            if ($getteam){
+                foreach ($getteam as $k=>$v){
+                    array_push($twoteamarr,$v);
+                }
+            }
+            if ($getteamforpage){
+                foreach ($getteamforpage as $k=>$v){
+                    array_push($twoteamarrforpage,$v);
+                }
+            }
+            if ($gethhteam){
+                foreach ($gethhteam as $k=>$v){
+                    array_push($twohhteamarr,$v);
+                }
+            }
+            if ($getfsteam){
+                foreach ($getfsteam as $k=>$v){
+                    array_push($twofsteamarr,$v);
+                }
+            }
+
+        }
+        $data['twoteam']=$twoteamarr;
+        $data['twoteamforpage']=$twoteamarrforpage;
+        $data['twocount']=count($twoteamarr);
+        $data['twohhcount']=count($twohhteamarr);
+        $data['twofscount']=count($twofsteamarr);
+        echo json_encode($data);
+    }
     //获取openid并保存用户信息
     public function doPageOpenid(){
         global $_W, $_GPC;
@@ -872,7 +937,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $openid=$_GPC['openid'];//oQKgL0ZKHwzAY-KhiyEEAsakW5Zg
         $mch_id=$res['mchid'];
         $key=$res['wxkey'];
-        $out_trade_no = $mch_id. time();
+        $out_trade_no = rand(111,999).date('YmdHis',time());//订单号
         $root=$_W['siteroot'];
         pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$_GPC['orderid']));
         $total_fee =$_GPC['money'];
@@ -1252,13 +1317,26 @@ class maskModuleWxapp extends WeModuleWxapp {
     //我的分销页面
     public function doPageGettream(){
         global $_W, $_GPC;
+        $twoteamarr=array();
         $onecount=pdo_getall('mask_relation', array('pid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
-        $twocount=array();
-        foreach ($onecount as $k=>$v){
-            $count=pdo_fetchcolumn("select count(*) as con from " . tablename("mask_relation") ." WHERE  uniacid=:uniacid  and pid =:pid",array(':uniacid'=>$_W['uniacid'],':pid'=>$v['uid']));
-            array_push($twocount,$count['con']);
+        $oneteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$_GPC['uid']}" );
+        foreach ($oneteam as $k=>$v){
+            $getteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+                " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']}");
+            if ($getteam){
+                foreach ($getteam as $k=>$v){
+                    array_push($twoteamarr,$v);
+                }
+            }
         }
-        $redata['teamcount']=array_sum($twocount)+count($onecount);
+        $redata['teamcount']=count($twoteamarr)+count($onecount);
+//        $twocount=array();
+//        foreach ($onecount as $k=>$v){
+//            $count=pdo_fetchcolumn("select count(*) as con from " . tablename("mask_relation") ." WHERE  uniacid=:uniacid  and pid =:pid",array(':uniacid'=>$_W['uniacid'],':pid'=>$v['uid']));
+//            array_push($twocount,$count['con']);
+//        }
+//        $redata['teamcount']=array_sum($twocount)+count($onecount);
         //个人信息
         $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level','quyuid'));
         $pid=pdo_getcolumn('mask_relation', array('uid' => $_GPC['uid']), 'pid',1);
@@ -1860,6 +1938,13 @@ class maskModuleWxapp extends WeModuleWxapp {
         $info=pdo_get('mask_help', array('uniacid' => $_W['uniacid'],'question'=>'用户协议'));
         $contents=htmlspecialchars_decode($info['answer']);
         echo $this->resultToJson(1,'用户协议',$contents);
+    }
+    //提现协议
+    public function doPageTxXieyi(){
+        global $_W, $_GPC;
+        $info=pdo_get('mask_help', array('uniacid' => $_W['uniacid'],'question'=>'提现协议'));
+        $contents=htmlspecialchars_decode($info['answer']);
+        echo $this->resultToJson(1,'提现协议',$contents);
     }
     //区域商页面
     public function doPageAreaIndexinfo(){
