@@ -872,7 +872,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $openid=$_GPC['openid'];//oQKgL0ZKHwzAY-KhiyEEAsakW5Zg
         $mch_id=$res['mchid'];
         $key=$res['wxkey'];
-        $out_trade_no = $mch_id. time();
+        $out_trade_no = rand(111,999).date('YmdHis',time());//订单号
         $root=$_W['siteroot'];
         pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$_GPC['orderid']));
         $total_fee =$_GPC['money'];
