@@ -1077,6 +1077,10 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(0,'请退出重新授权操作','');
             die();
         }
+        if (!$getphone){
+            echo $this->resultToJson(0,'手机号为空！','');
+            die();
+        }
         $getpid=$_GPC['pid'];
         $getcode=$_GPC['code'];
         $res=pdo_get('mask_user',array('user_tel'=>$getphone,'uniacid'=>$_W['uniacid']));
