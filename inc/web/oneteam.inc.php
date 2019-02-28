@@ -8,16 +8,44 @@ if($_GPC['keywords']){
 }else{
     $where='%%';
 }
+$getuid=$_GPC['uid'];
+$nickname=pdo_get('mask_user', array('id'=>$getuid,'uniacid'=>$_W['uniacid']),array('nickname'));
 /*	$sql="select *  from " . tablename("mask_user") ." WHERE  name LIKE :name  and uniacid=:uniacid";
 $list=pdo_fetchall($sql,array(':name'=>$where,'uniacid'=>$_W['uniacid']));*/
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
-$sql="select *  from " . tablename("mask_user") ." WHERE  level in (1,2,3,4,5) and (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid order by  level desc";
-$select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
-$list = pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':name'=>$where));
-$total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") .
-    " WHERE level in (1,2,3,4,5) and  (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid ",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
-$pager = pagination($total, $pageindex, $pagesize);
+if($_GPC['types']=='up'){
+    //上级查询
+    $pid=pdo_getcolumn('mask_relation', array('uid' => $_GPC['uid']), 'pid',1);
+    if ($pid){
+        //有推荐人
+        $list=pdo_getall('mask_user', array('id'=>$pid,'uniacid'=>$_W['uniacid']));
+        $pager = pagination(1, $pageindex, $pagesize);
+    }else{
+        //无推荐人
+        $list=array();
+        $pager = pagination(0, $pageindex, $pagesize);
+    }
+}else if($_GPC['types']=='find'){
+    $list=pdo_getall('mask_user', array('id'=>$op,'uniacid'=>$_W['uniacid']));
+    $pager = pagination(1, $pageindex, $pagesize);
+}else{
+    //一级团队合伙人数量
+    $hcountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level>0";
+    $countdatas[':uniacid']=$_W['uniacid'];
+    $countdatas[':pid']=$_GPC['uid'];
+    $hehuocount=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$hcountwhere,$countdatas);
+/////////
+    $sql="select *  from " . tablename("mask_relation") ."r". " left join " . tablename("mask_user") .
+        " u on r.uid=u.id"." WHERE  u.level in (1,2,3,4,5) and (u.nickname LIKE :name || u.user_tel LIKE :name || u.id LIKE :name)
+ and r.uniacid=:uniacid and r.pid={$_GPC['uid']} order by  u.level desc";
+    $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
+    $list = pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':name'=>$where));
+    $total=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation")."r". " left join " . tablename("mask_user") .
+        " u on r.uid=u.id" . " WHERE u.level in (1,2,3,4,5) and  (u.nickname LIKE :name || u.user_tel LIKE :name || u.id LIKE :name) and u.uniacid=:uniacid and r.pid={$_GPC['uid']} ",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
+    $pager = pagination($total, $pageindex, $pagesize);
+}
+
 //	if($_GPC['id']){
 //		$res4=pdo_delete("mask_user",array('u_id'=>$_GPC['id']));
 //		if($res4){
