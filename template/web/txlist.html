@@ -20,21 +20,21 @@
 
     }
     .pa_0{
-      padding: 10px 0;
+        padding: 10px 0;
     }
 </style>
 
 
 <ul class="nav nav-tabs">
-  <span class="ygxian"></span>
-  <div class="ygdangq">当前位置:</div>
+    <span class="ygxian"></span>
+    <div class="ygdangq">当前位置:</div>
 
-  <li   {if $type=='wait'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>wait,'state'=>0));}">待提现</a></li>
+    <li   {if $type=='wait'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>wait,'state'=>0));}">待提现</a></li>
 
-  <li   {if $type=='now'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>now,'state'=>1));}">提现通过</a></li>
+    <li   {if $type=='now'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>now,'state'=>1));}">提现通过</a></li>
 
-  <!--<li   {if $type=='delivery'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>delivery,'state'=>3));}">提现拒绝</a></li>-->
-  <li  {if $type=='all'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>all));}">全部</a></li>
+    <!--<li   {if $type=='delivery'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>delivery,'state'=>3));}">提现拒绝</a></li>-->
+    <li  {if $type=='all'} class="active" {/if}><a href="{php echo $this->createWebUrl('txlist',array('type'=>all));}">全部</a></li>
 
 </ul>
 
@@ -46,9 +46,9 @@
 
         <form action="" method="get" class="col-md-6">
             <input type="hidden" name="c" value="site" />
-                   <input type="hidden" name="a" value="entry" />
-                   <input type="hidden" name="m" value="mask" />
-                   <input type="hidden" name="do" value="txlist" />
+            <input type="hidden" name="a" value="entry" />
+            <input type="hidden" name="m" value="mask" />
+            <input type="hidden" name="do" value="txlist" />
             <div class="input-group" style="width: 300px">
 
                 <input type="text" name="keywords" class="form-control" placeholder="请输入姓名">
@@ -64,12 +64,22 @@
             <input type="hidden" name="token" value="{$_W['token']}"/>
 
         </form>
-
-        
+        <form action="" method="get" class="col-md-6">
+            <input type="hidden" name="c" value="site" />
+            <input type="hidden" name="a" value="entry" />
+            <input type="hidden" name="m" value="mask" />
+            <input type="hidden" name="do" value="txlist" />
+            <input type="hidden" name="types" value="{$type}" />
+            <div class="input-group" style="width: 100px;display: flex;">
+                {php echo tpl_form_field_daterange('time',$_GPC['time'],true);}
+                <input type="submit" class="btn btn-sm ordersucess" name="export_submit" value="导出"/>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}"/>
+        </form>
 
     </div><!-- /.col-lg-6 -->
 
-</div>  
+</div>
 
 <div class="main">
 
@@ -101,90 +111,90 @@
                     </tr>
                     {loop $list $key $item}
                     <tr class="yg5_tr2">
-                      <td class="store_td1">{$item['rbuyername']}</td>
-                      <td>{$item['rmoney']}</td>
-                     <td>
-                         银联
-                     </td>
-                     <td>{$item['name']}</td>
-                     <td>{$item['raddtime']}</td>
-                     {if $item['rsettlement']==0}
+                        <td class="store_td1">{$item['rbuyername']}</td>
+                        <td>{$item['rmoney']}</td>
+                        <td>
+                            银联
+                        </td>
+                        <td>{$item['name']}</td>
+                        <td>{$item['raddtime']}</td>
+                        {if $item['rsettlement']==0}
                         <td>待审</td>
-                     <td >
-                         <span class="label storered">待审核</span>
-                         {if $item['risrefu']==1}
-                         <span class="label storeblue">拒绝过</span>
-                         {/if}
-                     </td >
-                    {elseif $item['rsettlement']==1}
+                        <td >
+                            <span class="label storered">待审核</span>
+                            {if $item['risrefu']==1}
+                            <span class="label storeblue">拒绝过</span>
+                            {/if}
+                        </td >
+                        {elseif $item['rsettlement']==1}
                         <td>{$item['rshtime']}</td>
-                    <td >
-                        <span class="label storeblue">已提现</span>
-                    </td>
-                   {/if}  
-                   <td>
-                       <a href="javascript:;" class="storespan btn btn-xs" data-toggle="modal" data-target="#myModal{$item['id']}">
-                          <span class="fa fa-pencil-square-o" style="margin-right: 0"></span>
-                          <span class="bianji">查看
+                        <td >
+                            <span class="label storeblue">已提现</span>
+                        </td>
+                        {/if}
+                        <td>
+                            <a href="javascript:;" class="storespan btn btn-xs" data-toggle="modal" data-target="#myModal{$item['id']}">
+                                <span class="fa fa-pencil-square-o" style="margin-right: 0"></span>
+                                <span class="bianji">查看
                               <span class="arrowdown"></span>
-                          </span>                            
-                      </a>
-                       {if $item['rsettlement']==0}
-                      <a class="btn ygyouhui2 btn-xs" data-toggle="modal" data-target="#myModal1{$item['id']}">线下打款</a>
-                       {if $item['risrefu']==0}
-                       <a class="btn ygshouqian2 btn-xs"  title="拒绝" data-toggle="modal" data-target="#myModal2{$item['id']}">拒绝</a>
-                       {/if}
+                          </span>
+                            </a>
+                            {if $item['rsettlement']==0}
+                            <a class="btn ygyouhui2 btn-xs" data-toggle="modal" data-target="#myModal1{$item['id']}">线下打款</a>
+                            {if $item['risrefu']==0}
+                            <a class="btn ygshouqian2 btn-xs"  title="拒绝" data-toggle="modal" data-target="#myModal2{$item['id']}">拒绝</a>
+                            {/if}
 
-                       {/if}
-                   </td>
+                            {/if}
+                        </td>
 
-          </tr>
-             <!-- 修改信息弹框（Modal） -->
-      <div class="modal fade" id="myModal{$item['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-          &times;
-        </button>
-        <h4 class="modal-title" id="myModalLabel">
-          编辑信息
-        </h4>
-      </div>
-      <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
-        <div class="modal-body">
-          <div class="qs_box col-md-12 pa_0">
-            <label for="" class="col-md-3">联系方式 :</label>
-            <input type="text" value="{$item['phone']}" name="phone" class="col-md-6 con">
-          </div>
-          <div class="qs_box col-md-12 pa_0">
-            <label for="" class="col-md-3">银行卡号 :</label>
-            <input type="text" value="{$item['cardnumber']}" name="cardnumber" class="col-md-6 con">
-          </div>
-            <div class="qs_box col-md-12 pa_0">
-                <label for=""  class="col-md-3">开户行:</label>
-                <input type="text" value="{$item['openbranch']}" name="openbranch" class="col-md-6 con">
-            </div>
-          <div class="qs_box col-md-12 pa_0">
-            <label for=""  class="col-md-3">所属支行:</label>
-            <input type="text" value="{$item['branch']}" name="branch" class="col-md-6 con">
-          </div>
-         
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">取消
-          </button>
-          <input type="submit" class="btn btn-primary" value="确定" name="submit">
-<!--           <button type="button" class="btn btn-primary">
-            确定
-          </button> -->
-        </div>
-        <input type="hidden" name="id" value="{$item['id']}"/>
-        <input type="hidden" name="token" value="{$_W['token']}"/>
-      </form>
-    </div>
-  </div>
-</div>
+                    </tr>
+                    <!-- 修改信息弹框（Modal） -->
+                    <div class="modal fade" id="myModal{$item['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                        &times;
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">
+                                        编辑信息
+                                    </h4>
+                                </div>
+                                <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+                                    <div class="modal-body">
+                                        <div class="qs_box col-md-12 pa_0">
+                                            <label for="" class="col-md-3">联系方式 :</label>
+                                            <input type="text" value="{$item['phone']}" name="phone" class="col-md-6 con">
+                                        </div>
+                                        <div class="qs_box col-md-12 pa_0">
+                                            <label for="" class="col-md-3">银行卡号 :</label>
+                                            <input type="text" value="{$item['cardnumber']}" name="cardnumber" class="col-md-6 con">
+                                        </div>
+                                        <div class="qs_box col-md-12 pa_0">
+                                            <label for=""  class="col-md-3">开户行:</label>
+                                            <input type="text" value="{$item['openbranch']}" name="openbranch" class="col-md-6 con">
+                                        </div>
+                                        <div class="qs_box col-md-12 pa_0">
+                                            <label for=""  class="col-md-3">所属支行:</label>
+                                            <input type="text" value="{$item['branch']}" name="branch" class="col-md-6 con">
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                                        </button>
+                                        <input type="submit" class="btn btn-primary" value="确定" name="submit">
+                                        <!--           <button type="button" class="btn btn-primary">
+                                                    确定
+                                                  </button> -->
+                                    </div>
+                                    <input type="hidden" name="id" value="{$item['id']}"/>
+                                    <input type="hidden" name="token" value="{$_W['token']}"/>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     <div class="modal fade" id="myModal1{$item['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
@@ -219,30 +229,30 @@
                             </div>
                         </div>
                     </div>
-          {/loop}
-          {if empty($list)}
-          <tr class="yg5_tr2">
-            <td colspan="9">
-              暂无提现信息
-          </td>
-      </tr> 
-      {/if}        
+                    {/loop}
+                    {if empty($list)}
+                    <tr class="yg5_tr2">
+                        <td colspan="9">
+                            暂无提现信息
+                        </td>
+                    </tr>
+                    {/if}
 
 
 
-  </table>
+                </table>
 
-</div>
+            </div>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
 </div>
 
 <div class="text-right we7-margin-top">
 
-   {$pager}
+    {$pager}
 
 </div>
 

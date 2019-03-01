@@ -164,7 +164,7 @@
                 <input type="submit" class="btn btn-sm ordersucess" name="export_submit" value="导出"/>
             </div><!-- /input-group -->
             <input type="hidden" name="token" value="{$_W['token']}"/>
-            <!--         </form> -->
+        </form>
 
     </div><!-- /.col-lg-6 -->
 </div>
@@ -190,13 +190,18 @@
                         <div class="ortypeimg">
                             <img src="../addons/mask/template/images/daizhifu.png">
                         </div>
-                        {elseif $item['order']['pay_type']==4}
+                        {elseif $item['order']['state']>=2&&$item['order']['state']<5}
                         <div class="ortypeimg2">
-                            <img src="../addons/mask/template/images/hdfk.png">
+                            <img src="../addons/mask/template/images/yizhifu.png">
+                        </div>
+                        {elseif $item['order']['state']>=6}
+                        <div class="ortypeimg2">
+                            <!--<img src="../addons/mask/template/images/hdfk.png">-->
+                            <img src="../addons/mask/template/images/yizhifu.png">
                         </div>
                         {else}
                         <div class="ortypeimg2">
-                            <img src="../addons/mask/template/images/yizhifu.png">
+                            <img src="../addons/mask/template/images/daizhifu.png">
                         </div>
                         {/if}
 
@@ -239,7 +244,7 @@
                                 {elseif $item['order']['state']==4}
                                 <div class="left label label-xs orderconhui">已完成</div>
                                 {elseif $item['order']['state']==5}
-                                <div class="left orderconfirm2">已评价</div>
+                                <div class="left orderconfirm2">已取消</div>
                                 {elseif $item['order']['state']==6}
                                 <div class="left orderconfirm2">待退款</div>
                                 <a data-toggle="modal" data-target="#myModal2{$item['order']['id']}"><div class="left orderconfirm">去退款</div></a>

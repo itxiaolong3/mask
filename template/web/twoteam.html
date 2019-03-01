@@ -23,6 +23,11 @@
     <div class="ygdangq">当前用户:</div>
     <li class="active"><a href="javascript:void(0);">二级团队列表</a></li>
     <li class="active"><a href="javascript:history.go(-1);">返回</a></li>
+    <li {if $leveltype=='all'} class="active" {/if}><a href="{php echo $this->createWebUrl('twoteam',array('leveltype'=>all,'uid'=>$getuid));}">全部</a></li>
+    <li {if $leveltype=='vip'} class="active" {/if}><a href="{php echo $this->createWebUrl('twoteam',array('leveltype'=>vip,'uid'=>$getuid));}">合伙人</a></li>
+    <li {if $leveltype=='silver'} class="active" {/if}><a href="{php echo $this->createWebUrl('twoteam',array('leveltype'=>silver,'uid'=>$getuid));}">银卡合伙人</a></li>
+    <li {if $leveltype=='king'} class="active" {/if}><a href="{php echo $this->createWebUrl('twoteam',array('leveltype'=>king,'uid'=>$getuid));}">金卡合伙人</a></li>
+
 </ul>
 <div class="main">
     <div class="panel panel-default">

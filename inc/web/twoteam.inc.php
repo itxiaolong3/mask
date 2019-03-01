@@ -8,6 +8,19 @@ if($_GPC['keywords']){
 }else{
     $where='%%';
 }
+$leveltype=isset($_GPC['leveltype'])?$_GPC['leveltype']:'all';
+$getuid=$_GPC['uid'];
+if ($leveltype=='all'){
+    $levetypewhere=" and u.level in (1,2,3,4,5) ";
+}else if($leveltype=='vip'){
+    $levetypewhere=" and u.level =1 ";
+}else if($leveltype=='silver'){
+    $levetypewhere=" and u.level =2 ";
+}else if($leveltype=='king'){
+    $levetypewhere=" and u.level =3 ";
+}else{
+    $levetypewhere=" and u.level in (1,2,3,4,5) ";
+}
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
 if($_GPC['types']=='find'){
@@ -22,7 +35,7 @@ if($_GPC['types']=='find'){
         $getteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
             " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']} and u.level in (1,2,3,4,5) and (u.nickname LIKE :name || u.user_tel LIKE :name || u.id LIKE :name)",array(':name'=>$where));
         $getteamforpage=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
-            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']} and u.level in (1,2,3,4,5) and (u.nickname LIKE :name || u.user_tel LIKE :name || u.id LIKE :name)".
+            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$v['uid']} ".$levetypewhere." and (u.nickname LIKE :name || u.user_tel LIKE :name || u.id LIKE :name)".
             " LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize,array(':name'=>$where));
         if ($getteamforpage){
             foreach ($getteamforpage as $k=>$v){
