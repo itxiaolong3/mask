@@ -1353,7 +1353,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
         $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$_GPC['uid']} and rsettlement=1 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
         //查询已退款的待结算记录
-        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0");
+        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
         $redata['nosettlement']=number_format($nodeal['con']-$tknodeal['cons'],2);
         $redata['settlement']=number_format($deal['con'],2);
         $this->collectGood();
