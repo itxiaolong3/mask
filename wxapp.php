@@ -1692,6 +1692,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $psw=$_GPC['paypsw'];
         $uid=$_GPC['uid'];
         $smscode=$_GPC['code'];
+        $getphone=$_GPC['phone'];
         $phone=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
         //修改密码
         $paypsw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'paypsw',1);
@@ -1699,6 +1700,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             if ($paypsw==$psw){
                 //原来密码一致
                 echo $this->resultToJson(0,'不能与原密码一致',false);
+            }else if($phone!=$getphone){
+                echo $this->resultToJson(0,'手机号与注册号不一致',false);
             }else{
                 $codeistrue=pdo_get('mask_smscode',array('phone'=>$phone,'code'=>$smscode,'uniacid'=>$_W['uniacid']));
                 if ($codeistrue){
@@ -2146,7 +2149,7 @@ class maskModuleWxapp extends WeModuleWxapp {
 
                             }
                             //市代记录
-                            $sddata['rtype']=1;
+                            $sddata['rtype']=5;
                             $sddata['rstate']=0;
                             $sddata['rmoney']=8;//直推奖励
                             $sddata['rbuyername']=$nickname;
@@ -2154,7 +2157,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $sddata['rcomment']="市代区域奖励(8元)";
                             $sddata['raddtime']=date('Y-m-d H:i:s',time());
                             //省代记录
-                            $shendaidata['rtype']=1;
+                            $shendaidata['rtype']=6;
                             $shendaidata['rstate']=0;
                             $shendaidata['rmoney']=4;//直推奖励
                             $shendaidata['rbuyername']=$nickname;
@@ -2207,7 +2210,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $dldata['rcomment']="合伙人奖励(150元)";
                             $dldata['raddtime']=date('Y-m-d H:i:s',time());
                             //银卡记录
-                            $ykdata['rtype']=1;
+                            $ykdata['rtype']=3;
                             $ykdata['rstate']=0;
                             $ykdata['rmoney']=30;//直推奖励
                             $ykdata['ruid']=$pid;
@@ -2218,7 +2221,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                             $ykdata['rcomment']="银卡销售额奖励(30元)";
                             $ykdata['raddtime']=date('Y-m-d H:i:s',time());
                             //金卡记录
-                            $jkdata['rtype']=1;
+                            $jkdata['rtype']=4;
                             $jkdata['rstate']=0;
                             $jkdata['rmoney']=40;//直推奖励
                             $jkdata['ruid']=$pid;
@@ -2328,7 +2331,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //金银卡都找
     function findlevel($uid,$ordernum,$nickname){
         //间推中的银卡记录
-        $ykdata['rtype']=1;
+        $ykdata['rtype']=3;
         $ykdata['rstate']=0;
         $ykdata['rmoney']=30;//直推奖励
         $ykdata['ruid']=$uid;
@@ -2339,7 +2342,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $ykdata['rcomment']="银卡销售额奖励(30元)";
         $ykdata['raddtime']=date('Y-m-d H:i:s',time());
         //间推中的金卡记录
-        $jkdata['rtype']=1;
+        $jkdata['rtype']=4;
         $jkdata['rstate']=0;
         $jkdata['rmoney']=40;//直推奖励
         $jkdata['ruid']=$uid;
@@ -2385,7 +2388,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     //只找金卡
     function findkinklevel($uid,$ordernum,$nickname){
         //间推中的金卡记录
-        $jkdata['rtype']=1;
+        $jkdata['rtype']=4;
         $jkdata['rstate']=0;
         $jkdata['rmoney']=40;//直推奖励
         $jkdata['ruid']=$uid;
