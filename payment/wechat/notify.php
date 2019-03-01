@@ -108,7 +108,6 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             if (empty($isava)){
                 pdo_insert('mask_record',$hbdata);
             }
-
         }
     }
     $testsql=" select * from ".tablename('mask_order_goods')." where dishes_id=24  and order_id='{$order['id']}'";
@@ -140,7 +139,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
 
             }
             //市代记录
-            $sddata['rtype']=1;
+            $sddata['rtype']=5;
             $sddata['rstate']=0;
             $sddata['rmoney']=8;//直推奖励
             $sddata['rbuyername']=$nickname;
@@ -148,7 +147,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $sddata['rcomment']="市代区域奖励(8元)";
             $sddata['raddtime']=date('Y-m-d H:i:s',time());
             //省代记录
-            $shendaidata['rtype']=1;
+            $shendaidata['rtype']=6;
             $shendaidata['rstate']=0;
             $shendaidata['rmoney']=4;//直推奖励
             $shendaidata['rbuyername']=$nickname;
@@ -205,7 +204,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $dldata['rcomment']="合伙人奖励(150元)";
             $dldata['raddtime']=date('Y-m-d H:i:s',time());
             //银卡记录
-            $ykdata['rtype']=1;
+            $ykdata['rtype']=3;
             $ykdata['rstate']=0;
             $ykdata['rmoney']=30;//直推奖励
             $ykdata['ruid']=$pid;
@@ -216,7 +215,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
             $ykdata['rcomment']="银卡销售额奖励(30元)";
             $ykdata['raddtime']=date('Y-m-d H:i:s',time());
             //金卡记录
-            $jkdata['rtype']=1;
+            $jkdata['rtype']=4;
             $jkdata['rstate']=0;
             $jkdata['rmoney']=40;//直推奖励
             $jkdata['ruid']=$pid;
@@ -323,7 +322,7 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
 //金银卡都找
 function findlevel($uid,$ordernum,$nickname){
     //间推中的银卡记录
-    $ykdata['rtype']=1;
+    $ykdata['rtype']=3;
     $ykdata['rstate']=0;
     $ykdata['rmoney']=30;//直推奖励
     $ykdata['ruid']=$uid;
@@ -334,7 +333,7 @@ function findlevel($uid,$ordernum,$nickname){
     $ykdata['rcomment']="银卡销售额奖励(30元)";
     $ykdata['raddtime']=date('Y-m-d H:i:s',time());
     //间推中的金卡记录
-    $jkdata['rtype']=1;
+    $jkdata['rtype']=4;
     $jkdata['rstate']=0;
     $jkdata['rmoney']=40;//直推奖励
     $jkdata['ruid']=$uid;
@@ -380,7 +379,7 @@ function findlevel($uid,$ordernum,$nickname){
 //只找金卡
 function findkinklevel($uid,$ordernum,$nickname){
     //间推中的金卡记录
-    $jkdata['rtype']=1;
+    $jkdata['rtype']=4;
     $jkdata['rstate']=0;
     $jkdata['rmoney']=40;//直推奖励
     $jkdata['ruid']=$uid;
