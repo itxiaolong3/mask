@@ -704,6 +704,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         //判断提交订单是否合法，免费领取订单每个用户365天一次机会
         foreach ($goodinfo as $k=>$v){
             if ($v['id']==26){
+                $data['ordertype']=2;//下单的订单类型
                 if ($v['num']>1){
                     echo  $this->resultToJson(0,'最多领一盒','');
                     die();
@@ -724,6 +725,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                     }
                 }
             }else if ($v['id']==27){
+                $data['ordertype']=3;//下单的订单类型
                 //积分订单
                 ///所需积分
                 $jifen=$v['num']*5;
@@ -752,6 +754,8 @@ class maskModuleWxapp extends WeModuleWxapp {
                     pdo_insert('mask_integral',$data2);//添加积分明细
                 }
 
+            }else if ($v['id']==24){
+                $data['ordertype']=1;//下单的订单类型
             }
         }
 
@@ -1331,12 +1335,6 @@ class maskModuleWxapp extends WeModuleWxapp {
             }
         }
         $redata['teamcount']=count($twoteamarr)+count($onecount);
-//        $twocount=array();
-//        foreach ($onecount as $k=>$v){
-//            $count=pdo_fetchcolumn("select count(*) as con from " . tablename("mask_relation") ." WHERE  uniacid=:uniacid  and pid =:pid",array(':uniacid'=>$_W['uniacid'],':pid'=>$v['uid']));
-//            array_push($twocount,$count['con']);
-//        }
-//        $redata['teamcount']=array_sum($twocount)+count($onecount);
         //个人信息
         $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level','quyuid'));
         $pid=pdo_getcolumn('mask_relation', array('uid' => $_GPC['uid']), 'pid',1);
@@ -1350,10 +1348,21 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $redata['userinfo']=$userinfo;
         //当月结算统计
-        $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
-        $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$_GPC['uid']} and rsettlement=1 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
+//        $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+//            " WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
+//        $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+//            " WHERE ruid ={$_GPC['uid']} and rsettlement=1 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
+//        //查询已退款的待结算记录
+//        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record').
+//            " WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
+        //不限制时间
+        $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+            " WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and rtype <> 7 ");
+        $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+            " WHERE ruid ={$_GPC['uid']} and rsettlement=1 and rtype <> 7 ");
         //查询已退款的待结算记录
-        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
+        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record').
+            " WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0 ");
         $redata['nosettlement']=number_format($nodeal['con']-$tknodeal['cons'],2);
         $redata['settlement']=number_format($deal['con'],2);
         $this->collectGood();
