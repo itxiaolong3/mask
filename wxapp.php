@@ -1407,7 +1407,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         foreach ($res4 as $k=>$v){
             $res4[$k]['tjname']=pdo_getcolumn('mask_user', array('id' => $v['pid']), 'nickname',1);
         }
-
+        $res4=$this->arr_order($res4,'uid',2);
         $data['one'] = $res;
         $data['two'] = $res4;
         //一级团队人数
@@ -1480,6 +1480,25 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['twocountfs']=array_sum($twocountarrfs);
         // print_r($data);die;
         echo $this->resultToJson(1,'团队详细数据',$data);
+    }
+
+    /**
+     * @param $arr 需要排序的数组
+     * @param 数组里的某个字段
+     * @param $sort 1为正序排序  2为倒序排序
+     * @return mixed 排序后的数组
+     */
+    public function arr_order($arr,$field,$sort){
+        $order = array();
+        foreach($arr as $kay => $value){
+            $order[] = $value[$field];
+        }
+        if($sort==1){
+            array_multisort($order,SORT_ASC,$arr);
+        }else{
+            array_multisort($order,SORT_DESC,$arr);
+        }
+        return $arr;
     }
     //队员信息
     public function doPageteaminfodetail(){
