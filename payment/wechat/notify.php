@@ -51,10 +51,11 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
     }
     $url=substr($str,0,$n);
 
+    pdo_update('mask_order',array('state'=>2),array('code'=>$logno));
     $order=pdo_get('mask_order',array('code'=>$logno));
     //更新订单状态和子订单状态
     pdo_update('mask_order_goods',array('state'=>2),array('order_id'=>$order['id']));
-    pdo_update('mask_order',array('state'=>2),array('code'=>$logno));
+
 
     //自己的信息
     $nickname=pdo_getcolumn('mask_user', array('id' => $order['user_id']), 'nickname',1);

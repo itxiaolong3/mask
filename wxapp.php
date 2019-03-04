@@ -37,64 +37,193 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPagetest(){
         global $_W, $_GPC;
         $pid=100003;
-        $nickname='明天会更好';
-        $ordernum=201902211404038288;
-
+        $jtid=100067;
+        $yinkaid=100003;
+        $jinkaid=100067;
+        $shidaiid=100067;
+        $shendaiid=100067;
+        $nickname='刘娭毑';
+        $ordernum=201903021343525512;
+        //直推
         $dldata['rtype']=1;
         $dldata['rstate']=0;
-        $dldata['rmoney']=48;//直推奖励
+        $dldata['rmoney']=150;
         $dldata['ruid']=$pid;
         $dldata['rbuyername']=$nickname;
         $dldata['rordernumber']=$ordernum;
         $card=pdo_get('mask_bankcard', array('uid'=>$pid));
         $dldata['rcardid']=$card['id'];
-        $dldata['rcomment']="二级合伙人奖励(48元)";
+        $dldata['rcomment']="合伙人奖励(150元)";
         $dldata['raddtime']=date('Y-m-d H:i:s',time());
 
-        $isava=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$ordernum,'rmoney'=>48));
+        $isava=pdo_get('mask_record', array('ruid'=>$pid,'rordernumber'=>$ordernum,'rmoney'=>150));
 
-//        if (empty($isava)){
-//            $res=pdo_insert('mask_record',$dldata);
-//        }else{
-//            $res=0;
-//        }
+        if (empty($isava)){
+            $res=pdo_insert('mask_record',$dldata);
+        }else{
+            $res=0;
+        }
+        $jtdata['rtype']=2;
+        $jtdata['rstate']=0;
+        $jtdata['rmoney']=48;//间推奖励
+        $jtdata['ruid']=$jtid;
+        $jtdata['rbuyername']=$nickname;
+        $jtdata['rordernumber']=$ordernum;
+        $card=pdo_get('mask_bankcard', array('uid'=>$jtid));
+        $jtdata['rcardid']=$card['id'];
+        $jtdata['rcomment']="二级合伙人奖励(48元)";
+        $jtdata['raddtime']=date('Y-m-d H:i:s',time());
 
-        $ykdata['rtype']=1;
+        $isavajt=pdo_get('mask_record', array('ruid'=>$jtid,'rordernumber'=>$ordernum,'rmoney'=>48));
+
+        if (empty($isavajt)){
+            $res=pdo_insert('mask_record',$jtdata);
+        }else{
+            $res=0;
+        }
+
+        $ykdata['rtype']=3;
         $ykdata['rstate']=0;
-        $ykdata['rmoney']=30;//直推奖励
-        $ykdata['ruid']=100003;
+        $ykdata['rmoney']=30;
+        $ykdata['ruid']=$yinkaid;
         $ykdata['rbuyername']=$nickname;
         $ykdata['rordernumber']=$ordernum;
-        $card=pdo_get('mask_bankcard', array('uid'=>100003));//银卡
+        $card=pdo_get('mask_bankcard', array('uid'=>$yinkaid));//银卡
         $ykdata['rcardid']=$card['id'];
         $ykdata['rcomment']="银卡销售额奖励(30元)";
         $ykdata['raddtime']=date('Y-m-d H:i:s',time());
 
-        $isava2=pdo_get('mask_record', array('ruid'=>100003,'rordernumber'=>$ordernum,'rmoney'=>30));
+        $isava2=pdo_get('mask_record', array('ruid'=>$yinkaid,'rordernumber'=>$ordernum,'rmoney'=>30));
         if (empty($isava2)){
             $res=pdo_insert('mask_record',$ykdata);
         }else{
             $res=0;
         }
+        $jinkadata['rtype']=4;
+        $jinkadata['rstate']=0;
+        $jinkadata['rmoney']=40;
+        $jinkadata['ruid']=$jinkaid;
+        $jinkadata['rbuyername']=$nickname;
+        $jinkadata['rordernumber']=$ordernum;
+        $card=pdo_get('mask_bankcard', array('uid'=>$jinkaid));//银卡
+        $jinkadata['rcardid']=$card['id'];
+        $jinkadata['rcomment']="金卡招商奖励(40元)";
+        $jinkadata['raddtime']=date('Y-m-d H:i:s',time());
 
-        $shendaidata['rtype']=1;
+        $isavajin=pdo_get('mask_record', array('ruid'=>$jinkaid,'rordernumber'=>$ordernum,'rmoney'=>40));
+        if (empty($isavajin)){
+            $res=pdo_insert('mask_record',$jinkadata);
+        }else{
+            $res=0;
+        }
+        //市代
+        $shidaidata['rtype']=5;
+        $shidaidata['rstate']=0;
+        $shidaidata['rmoney']=8;//直推奖励
+        $shidaidata['rbuyername']=$nickname;
+        $shidaidata['rordernumber']=$ordernum;
+        $shidaidata['ruid']=$shidaiid;
+        $card=pdo_get('mask_bankcard', array('uid'=>$shidaiid)); //银卡
+        $shidaidata['rcardid']=$card['id'];
+        $shidaidata['rcomment']="市代区域奖励(8元)";
+        $shidaidata['raddtime']=date('Y-m-d H:i:s',time());
+        $shiisava=pdo_get('mask_record', array('ruid'=>$shidaiid,'rordernumber'=>$ordernum,'rmoney'=>8));
+        if (empty($shiisava)){
+            $res=pdo_insert('mask_record',$shidaidata);
+        }else{
+            $res=0;
+        }
+        //省代
+        $shendaidata['rtype']=6;
         $shendaidata['rstate']=0;
-        $shendaidata['rmoney']=4;//直推奖励
+        $shendaidata['rmoney']=4;
         $shendaidata['rbuyername']=$nickname;
         $shendaidata['rordernumber']=$ordernum;
-        $shendaidata['ruid']=100067;
-        $card=pdo_get('mask_bankcard', array('uid'=>100067)); //银卡
+        $shendaidata['ruid']=$shendaiid;
+        $card=pdo_get('mask_bankcard', array('uid'=>$shendaiid)); //银卡
         $shendaidata['rcardid']=$card['id'];
         $shendaidata['rcomment']="省代区域奖励(4元)";
         $shendaidata['raddtime']=date('Y-m-d H:i:s',time());
 
-        $isava=pdo_get('mask_record', array('ruid'=>100067,'rordernumber'=>$ordernum,'rmoney'=>4));
-//        if (empty($isava)){
+        $isavashengdai=pdo_get('mask_record', array('ruid'=>$shendaiid,'rordernumber'=>$ordernum,'rmoney'=>4));
+//        if (empty($isavashengdai)){
 //            $res=pdo_insert('mask_record',$shendaidata);
 //        }else{
 //            $res=0;
 //        }
         echo $res;
+    }
+    public function doPageMyEarnTest(){
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $type=$_GPC['type'];
+        $dates=$_GPC['dates'];
+        //指定日期的前30天数据
+        $end_time1=mktime(23, 59, 59, date('m'), date('t'), date('Y'));
+        $end_time=date('Y-m-d',$end_time1);
+        if ($type){
+            switch ($type){
+                case 1:
+                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2)  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2) and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2) and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2) and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
+                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2) and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    break;
+                case 2:
+                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3 and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3 and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
+                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3 and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    break;
+                case 3:
+                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
+                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    break;
+                case 4:
+                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6)  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6) and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6) and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6) and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
+                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6) and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    break;
+                case 5:
+                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
+                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+                    break;
+            }
+
+            foreach ($list as $k=>$v){
+                if ($v['rstate']){
+                    $list[$k]['rmoney']='(退)'.$v['rmoney'];
+                }
+            }
+        }else{
+            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and  rtype <> 7  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid}  and  rtype <> 7 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and  rtype <> 7 and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and  rtype <> 7 and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
+            foreach ($list as $k=>$v){
+                if ($v['rstate']){
+                    $list[$k]['rmoney']='(退)'.$v['rmoney'];
+                }
+            }
+            $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype <> 7 and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
+        }
+
+        $redata['alltotal']=number_format($allrecord['con']-$tknodeal['cons'],2);
+        $redata['nodealtotal']=number_format($nodeal['con']-$tknodeal['cons'],2);
+        $redata['dealtotal']=number_format($deal['con'],2);
+        $redata['list']=$list;
+        echo $this->resultToJson(1,'测试收益页数据',$redata);
+
     }
     public function doPageTeamTest(){
         global $_W, $_GPC;
@@ -109,10 +238,11 @@ class maskModuleWxapp extends WeModuleWxapp {
         $countdatas[':pid']=$_GPC['uid'];
         $hehuocount=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$hcountwhere,$countdatas);
         $fscount=pdo_fetchcolumn("select count(*) from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$fscountwhere,$countdatas);
+
         $oneteamforpage=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
             " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$_GPC['uid']}"." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize);
         $oneteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
-            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$_GPC['uid']}" );
+            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$_GPC['uid']}");
         $data['oneteam']=$oneteam;
         $data['oneteamforpage']=$oneteamforpage;
         $data['onecount']=$count['count'];
@@ -143,11 +273,13 @@ class maskModuleWxapp extends WeModuleWxapp {
                 }
             }
             if ($gethhteam){
+                //array_push($twohhteamarr,$gethhteam);
                 foreach ($gethhteam as $k=>$v){
                     array_push($twohhteamarr,$v);
                 }
             }
             if ($getfsteam){
+                //array_push($twofsteamarr,$getfsteam);
                 foreach ($getfsteam as $k=>$v){
                     array_push($twofsteamarr,$v);
                 }
@@ -159,6 +291,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['twocount']=count($twoteamarr);
         $data['twohhcount']=count($twohhteamarr);
         $data['twofscount']=count($twofsteamarr);
+        $data['sql']="select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
+            " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid=100003";
         echo json_encode($data);
     }
     //获取openid并保存用户信息
@@ -241,9 +375,9 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_GPC, $_W;
         $getlid=$_GPC['id'];//专栏id
         if($getlid>1){
-            $resdata=pdo_getall('mask_goodmy',array('tid'=>$getlid));
+            $resdata=pdo_getall('mask_goodmy',array('tid'=>$getlid,'Statu'=>1));
         }else{
-            $resdata=pdo_getall('mask_goodmy',array());
+            $resdata=pdo_getall('mask_goodmy',array('Statu'=>1));
         }
         if ($resdata){
             echo $this->resultToJson(1,'返回商品',$resdata);
@@ -756,6 +890,18 @@ class maskModuleWxapp extends WeModuleWxapp {
 
             }else if ($v['id']==24){
                 $data['ordertype']=1;//下单的订单类型
+            }else if($v['id']==29){
+                //活动订单
+                if ($v['num']>1){
+                    echo  $this->resultToJson(0,'最多1单10盒','');
+                    die();
+                }else{
+                    $getlevel=pdo_getcolumn('mask_user', array('id' => $uid), 'level',1);
+                    if (!$getlevel){
+                        echo  $this->resultToJson(0,'只限合伙人哦','');
+                        die();
+                    }
+                }
             }
         }
 
@@ -941,7 +1087,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $openid=$_GPC['openid'];//oQKgL0ZKHwzAY-KhiyEEAsakW5Zg
         $mch_id=$res['mchid'];
         $key=$res['wxkey'];
-        $out_trade_no = rand(11,99).date('YmdHis',time());//订单号
+        $out_trade_no =date('YmdHis',time());//订单号
         $root=$_W['siteroot'];
         pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$_GPC['orderid']));
         $total_fee =$_GPC['money'];
@@ -1323,6 +1469,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $twoteamarr=array();
         $onecount=pdo_getall('mask_relation', array('pid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
+        $onecount=pdo_getall('mask_relation', array('pid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
         $oneteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
             " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$_GPC['uid']}" );
         foreach ($oneteam as $k=>$v){
@@ -1335,6 +1482,12 @@ class maskModuleWxapp extends WeModuleWxapp {
             }
         }
         $redata['teamcount']=count($twoteamarr)+count($onecount);
+//        $twocount=array();
+//        foreach ($onecount as $k=>$v){
+//            $count=pdo_fetchcolumn("select count(*) as con from " . tablename("mask_relation") ." WHERE  uniacid=:uniacid  and pid =:pid",array(':uniacid'=>$_W['uniacid'],':pid'=>$v['uid']));
+//            array_push($twocount,$count['con']);
+//        }
+//        $redata['teamcount']=array_sum($twocount)+count($onecount);
         //个人信息
         $userinfo=pdo_get('mask_user', array('id'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']),array('nickname', 'headerimg','id','level','quyuid'));
         $pid=pdo_getcolumn('mask_relation', array('uid' => $_GPC['uid']), 'pid',1);
@@ -1348,7 +1501,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $redata['userinfo']=$userinfo;
         //当月结算统计
-//        $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+        //        $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
 //            " WHERE  ruid ={$_GPC['uid']} and rsettlement=0 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )");
 //        $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
 //            " WHERE ruid ={$_GPC['uid']} and rsettlement=1 and rtype <> 7 and DATE_FORMAT( raddtime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' ) ");
@@ -1407,6 +1560,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         foreach ($res4 as $k=>$v){
             $res4[$k]['tjname']=pdo_getcolumn('mask_user', array('id' => $v['pid']), 'nickname',1);
         }
+        //array_multisort('uid',SORT_DESC,$res4);
         $res4=$this->arr_order($res4,'uid',2);
         $data['one'] = $res;
         $data['two'] = $res4;
@@ -1481,7 +1635,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         // print_r($data);die;
         echo $this->resultToJson(1,'团队详细数据',$data);
     }
-
     /**
      * @param $arr 需要排序的数组
      * @param 数组里的某个字段
@@ -1510,79 +1663,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         echo $this->resultToJson(1,'队员信息详细',$redata);
     }
     //收益页
-    public function doPageMyEarnTest(){
-        global $_W, $_GPC;
-        $uid=$_GPC['uid'];
-        $type=$_GPC['type'];
-        $dates=$_GPC['dates'];
-        //指定日期的前30天数据
-        $end_time1=mktime(23, 59, 59, date('m'), date('t'), date('Y'));
-        $end_time=date('Y-m-d',$end_time1);
-        if ($type){
-            switch ($type){
-                case 1:
-                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2)  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2) and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2) and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2) and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
-                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (1,2) and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    break;
-                case 2:
-                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3 and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3 and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
-                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=3 and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    break;
-                case 3:
-                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
-                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=4 and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    break;
-                case 4:
-                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6)  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6) and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6) and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6) and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
-                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype in (5,6) and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    break;
-                case 5:
-                    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
-                    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype=8 and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-                    break;
-            }
-
-            foreach ($list as $k=>$v){
-                if ($v['rstate']){
-                    $list[$k]['rmoney']='(退)'.$v['rmoney'];
-                }
-            }
-        }else{
-            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and  rtype <> 7  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid}  and  rtype <> 7 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and  rtype <> 7 and rsettlement=1  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and  rtype <> 7 and raddtime BETWEEN '{$dates}' and '{$end_time}' order by raddtime desc");
-            foreach ($list as $k=>$v){
-                if ($v['rstate']){
-                    $list[$k]['rmoney']='(退)'.$v['rmoney'];
-                }
-            }
-            $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$uid} and rtype <> 7 and rstate=1 and rsettlement=0  and raddtime BETWEEN '{$dates}' and '{$end_time}'");
-        }
-
-        $redata['alltotal']=number_format($allrecord['con']-$tknodeal['cons'],2);
-        $redata['nodealtotal']=number_format($nodeal['con']-$tknodeal['cons'],2);
-        $redata['dealtotal']=number_format($deal['con'],2);
-        $redata['list']=$list;
-        echo $this->resultToJson(1,'测试收益页数据',$redata);
-
-    }
-    //收益页废弃
     public function doPageMyEarnings(){
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
@@ -5174,10 +5254,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $id=$_GPC['id'];
         $output_path="../addons/mask/call/test".$id.".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
@@ -7026,8 +7106,8 @@ class maskModuleWxapp extends WeModuleWxapp {
             function set_msg($user_id) {
                 $access_token = getaccess_token();
                 $data2 = array("scene" => $user_id,
-                    "page"=>"mask/pages/Liar/loginindex",
-                    "width" => 400);
+                               "page"=>"mask/pages/Liar/loginindex",
+                               "width" => 400);
                 $data2 = json_encode($data2);
                 $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token . "";
                 $ch = curl_init();
@@ -8900,10 +8980,10 @@ class maskModuleWxapp extends WeModuleWxapp {
         $appkey=$store['apikey'];
         $output_path="../addons/mask/call/yc".$number['code'].$number['id'].".wav";
         $param = [ 'engine_type' => 'intp65',
-            'auf' => 'audio/L16;rate=16000',
-            'aue' => 'raw',
-            'voice_name' => 'xiaoyan',
-            'speed' => '0'
+                   'auf' => 'audio/L16;rate=16000',
+                   'aue' => 'raw',
+                   'voice_name' => 'xiaoyan',
+                   'speed' => '0'
         ];
         $cur_time = (string)time();
         $x_param = base64_encode(json_encode($param));
