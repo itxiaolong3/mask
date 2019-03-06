@@ -8,7 +8,9 @@ if (!empty($input) && empty($_GET['out_trade_no'])) {
     $obj = isimplexml_load_string($input, 'SimpleXMLElement', LIBXML_NOCDATA);
     $res = $data = json_decode(json_encode($obj), true);
     $filename=$_W['attachurl'].'notifyinfo.txt';
+    $filename1=$_W['attachurl'].'newpaynotify.txt';
     file_put_contents($filename,$data['result_code'].'==result_code'.$data['return_code'].'===return_code');
+    file_put_contents($filename1,json_encode($res));
     if (empty($data)) {
         $result = array(
             'return_code' => 'FAIL',
@@ -50,9 +52,11 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
         $i != 3 && $n++;
     }
     $url=substr($str,0,$n);
-
-    pdo_update('mask_order',array('state'=>2),array('code'=>$logno));
-    $order=pdo_get('mask_order',array('code'=>$logno));
+    $getoid=trim($res['attach']);
+    //pdo_update('mask_order',array('state'=>2),array('code'=>$logno));
+    pdo_update('mask_order',array('state'=>2),array('id'=>$getoid));
+    //$order=pdo_get('mask_order',array('code'=>$logno));
+    $order=pdo_get('mask_order',array('id'=>$getoid));
     //更新订单状态和子订单状态
     pdo_update('mask_order_goods',array('state'=>2),array('order_id'=>$order['id']));
 

@@ -679,10 +679,8 @@ if($_GPC['op']=='refund'){
 
 }
 if($_GPC['op']=='reject'){
-    //$orderinfo=pdo_get('mask_order', array('id' => $_GPC['id']), array('order_num','getgoodtype','user_id','money'));
     //更改订单操作
-    $rst=pdo_update('mask_order',array('state'=>8),array('id'=>$_GPC['id']));
-    //pdo_update('mask_record',array('risrefu'=>1,'jujuetime'=>date('Y-m-d H:i:s',time())),array('rordernumber'=>$orderinfo['order_num']));
+    $rst=pdo_update('mask_order',array('state'=>2),array('id'=>$_GPC['id']));
     if($rst){
         $this->updcommission($_GPC['id']);
         message('拒绝成功',$this->createWebUrl('order',array()),'success');

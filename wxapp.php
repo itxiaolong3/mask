@@ -902,6 +902,11 @@ class maskModuleWxapp extends WeModuleWxapp {
                         die();
                     }
                 }
+            }else if($v['id']==30){
+                if ($uid!=100000){
+                    echo  $this->resultToJson(0,'这个是开发人员下的单','');
+                    die();
+                }
             }
         }
 
@@ -1089,7 +1094,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         $key=$res['wxkey'];
         $out_trade_no =date('YmdHis',time());//订单号
         $root=$_W['siteroot'];
-        pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$_GPC['orderid']));
+        $oid=$_GPC['orderid'];
+        pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$oid));
         $total_fee =$_GPC['money'];
         if(empty($total_fee)) //默认1分
         {
@@ -1099,7 +1105,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $body = $res2['url_name'];
             $total_fee = floatval($total_fee*100);
         }
-        $weixinpay = new WeixinPay($appid,$openid,$mch_id,$key,$out_trade_no,$body,$total_fee,$root);
+        $weixinpay = new WeixinPay($appid,$openid,$mch_id,$key,$out_trade_no,$body,$total_fee,$root,$oid);
         $return=$weixinpay->pay();
         echo $this->resultToJson(1,'支付参数'.$total_fee,$return);
     }
@@ -1880,9 +1886,9 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $type=$_GPC['type'];//2表示全部
         if ($type<2){
-            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rstate'=>$type,'rsettlement'=>1),array('rid','rtype','rcomment','raddtime','rmoney','rstate','rsqmoney'));
+            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rstate'=>$type,'rsettlement'=>1),array('rid','rtype','rcomment','raddtime','rmoney','rstate','rsqmoney'), '' , 'raddtime DESC' );
         }else{
-            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rsettlement'=>1),array('rid','rtype','rcomment','raddtime','rmoney','rstate','rsqmoney'));
+            $recoord=pdo_getall('mask_record',array('ruid'=>$_GPC['uid'],'rsettlement'=>1),array('rid','rtype','rcomment','raddtime','rmoney','rstate','rsqmoney', '' , 'raddtime DESC'));
         }
         if ($recoord){
             foreach ($recoord as $k=>$v){
@@ -1899,7 +1905,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageGetwithdrawal(){
         global $_W, $_GPC;
         $dates=$_GPC['dates'];
-        $list=pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype=7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+        $list=pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype=7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime) order by raddtime");
         foreach ($list as $k=>$v){
             $list[$k]['rmoney']='-'.$v['rsqmoney'];
         }

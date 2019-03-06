@@ -12,7 +12,8 @@
     protected $body;
     protected $total_fee;
     protected $root;
-            function __construct($appid, $openid, $mch_id, $key,$out_trade_no,$body,$total_fee,$root) {
+    protected $attach;
+            function __construct($appid, $openid, $mch_id, $key,$out_trade_no,$body,$total_fee,$root,$attach) {
          $this->appid = $appid;
         $this->openid = $openid;
         $this->mch_id = $mch_id;
@@ -21,6 +22,7 @@
         $this->body = $body;
         $this->total_fee = $total_fee;
         $this->root = $root;
+        $this->attach = $attach;
     }
 
 
@@ -40,7 +42,7 @@
             'nonce_str' => $this->createNoncestr(), //随机字符串
 //            'body' => 'test', //商品描述
             'body' => $this->body,
-//            'out_trade_no' => '2015450806125348', //商户订单号
+            'attach' => $this->attach, //订单id，自带参数
             'out_trade_no'=> $this->out_trade_no,
 //            'total_fee' => floatval(0.01 * 100), //总金额 单位 分
             'total_fee' => $this->total_fee,
