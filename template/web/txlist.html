@@ -100,8 +100,10 @@
                     <tr class="yg5_tr1">
 
                         <td class="store_td1">用户昵称</td>
-                        <td>提现金额</td>
-                        <!-- <td>实际金额</td>  -->
+                        <td>用户ID</td>
+                        <td>打款金额</td>
+                         <td>提现金额</td>
+                        <td>手续费</td>
                         <td>提现方式</td>
                         <td>收款人</td>
                         <td>提现时间</td>
@@ -112,7 +114,10 @@
                     {loop $list $key $item}
                     <tr class="yg5_tr2">
                         <td class="store_td1">{$item['rbuyername']}</td>
+                        <td>{$item['ruid']}</td>
                         <td>{$item['rmoney']}</td>
+                        <td>{$item['rsqmoney']}</td>
+                        <td>{$item['rsqmoney']-$item['rmoney']}</td>
                         <td>
                             银联
                         </td>
@@ -141,9 +146,9 @@
                             </a>
                             {if $item['rsettlement']==0}
                             <a class="btn ygyouhui2 btn-xs" data-toggle="modal" data-target="#myModal1{$item['id']}">线下打款</a>
-                            {if $item['risrefu']==0}
-                            <a class="btn ygshouqian2 btn-xs"  title="拒绝" data-toggle="modal" data-target="#myModal2{$item['id']}">拒绝</a>
-                            {/if}
+                            <!--{if $item['risrefu']==0}-->
+                            <!--<a class="btn ygshouqian2 btn-xs"  title="拒绝" data-toggle="modal" data-target="#myModal2{$item['id']}">拒绝</a>-->
+                            <!--{/if}-->
 
                             {/if}
                         </td>

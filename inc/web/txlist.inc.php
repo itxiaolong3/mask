@@ -25,10 +25,14 @@ $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list=pdo_fetchall($select_sql,$data);
 $pager = pagination($total, $pageindex, $pagesize);
 
-
 if($operation=='adopt'){//审核通过
     $id=$_GPC['id'];
-    $res=pdo_update('mask_record',array('rsettlement'=>1,'rshtime'=>date('Y-m-d H:i:s')),array('rid'=>$id));
+    //如果开启拒绝退款就开启下面的判断
+//    $recordinfo=pdo_get('mask_record', array('rid'=>$id));
+//    if ($recordinfo['risrefu']){
+//        $walletrs=pdo_update('mask_user', array('wallet -=' => $recordinfo['rsqmoney']), array('id' => $recordinfo['ruid']));
+//    }
+    $res=pdo_update('mask_record',array('rsettlement'=>1,'risrefu'=>0,'rshtime'=>date('Y-m-d H:i:s')),array('rid'=>$id));
     if($res){
         message('审核成功',$this->createWebUrl('txlist',array()),'success');
     }else{
@@ -144,7 +148,7 @@ if($operation=='adopt2'){
 
 if($operation=='reject'){
     $id=$_GPC['id'];
-    $res=pdo_update('mask_record',array('rsettlement'=>0,'risrefu'=>1,'rshtime'=>date('Y-m-d H:i:s')),array('rid'=>$id));
+    //$res=pdo_update('mask_record',array('rsettlement'=>0,'risrefu'=>1,'rshtime'=>date('Y-m-d H:i:s')),array('rid'=>$id));
     //恢复金额
     $rsqmoney=$_GPC['rsqmoney'];
     $ruid=$_GPC['ruid'];

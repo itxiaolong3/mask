@@ -545,6 +545,11 @@ if($_GPC['op']=='refund'){
     if($rst){
         //修改收益记录为支出
         pdo_update('mask_record',array('rstate'=>1),array('rordernumber'=>$orderinfo['order_num']));
+        //如果是已结算的进行退款就减少用户余额
+        $getallrecord=pdo_getall('mask_record', array('rordernumber'=>$orderinfo['order_num'],'rsettlement'=>1));
+        foreach ($getallrecord as $k=>$v){
+            pdo_update('mask_user', array('wallet -=' => $v['rmoney']), array('id' => $v['ruid']));
+        }
         //判断是否是399订单
         if ($orderinfo['money']>=399){
             if ($ordernumber['ordernumber']<2){
@@ -674,13 +679,15 @@ if($_GPC['op']=='refund'){
 
 }
 if($_GPC['op']=='reject'){
+    //$orderinfo=pdo_get('mask_order', array('id' => $_GPC['id']), array('order_num','getgoodtype','user_id','money'));
     //更改订单操作
     $rst=pdo_update('mask_order',array('state'=>8),array('id'=>$_GPC['id']));
+    //pdo_update('mask_record',array('risrefu'=>1,'jujuetime'=>date('Y-m-d H:i:s',time())),array('rordernumber'=>$orderinfo['order_num']));
     if($rst){
         $this->updcommission($_GPC['id']);
-        message('操作成功',$this->createWebUrl('order',array()),'success');
+        message('拒绝成功',$this->createWebUrl('order',array()),'success');
     }else{
-        message('操作失败！','','error');
+        message('拒绝失败！','','error');
     }
 }
 //批量发货
