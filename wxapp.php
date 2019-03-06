@@ -36,14 +36,14 @@ class maskModuleWxapp extends WeModuleWxapp {
     //测试接口
     public function doPagetest(){
         global $_W, $_GPC;
-        $pid=100003;
-        $jtid=100067;
-        $yinkaid=100003;
+        $pid=101167;
+        $jtid=100909;
+        $yinkaid=100067;
         $jinkaid=100067;
         $shidaiid=100067;
         $shendaiid=100067;
-        $nickname='刘娭毑';
-        $ordernum=201903021343525512;
+        $nickname='巧儿';
+        $ordernum=201903061448541226;
         //直推
         $dldata['rtype']=1;
         $dldata['rstate']=0;
@@ -128,11 +128,11 @@ class maskModuleWxapp extends WeModuleWxapp {
         $shidaidata['rcomment']="市代区域奖励(8元)";
         $shidaidata['raddtime']=date('Y-m-d H:i:s',time());
         $shiisava=pdo_get('mask_record', array('ruid'=>$shidaiid,'rordernumber'=>$ordernum,'rmoney'=>8));
-        if (empty($shiisava)){
-            $res=pdo_insert('mask_record',$shidaidata);
-        }else{
-            $res=0;
-        }
+//        if (empty($shiisava)){
+//            $res=pdo_insert('mask_record',$shidaidata);
+//        }else{
+//            $res=0;
+//        }
         //省代
         $shendaidata['rtype']=6;
         $shendaidata['rstate']=0;
