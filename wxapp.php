@@ -1910,6 +1910,9 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
         $weekday=date('w',time());
+        if ($uid==100003||$uid==100006||$uid==100012||$uid==100013||$uid==100097||$uid==100035){
+            echo $this->resultToJson(1,'可提现',true);die();
+        }
         if ($weekday==1){
             //判断今日是否已经提现过
             $istixian=pdo_fetch("SELECT * FROM ".tablename('mask_record')." WHERE ruid ={$uid} and rtype=7 and  DATE_FORMAT(raddtime, '%Y%m%d') = DATE_FORMAT(now(), '%Y%m%d')");
