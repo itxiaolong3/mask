@@ -1563,7 +1563,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $twoteamarr=array();
         $onecount=pdo_getall('mask_relation', array('pid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
-        $onecount=pdo_getall('mask_relation', array('pid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid']));
         $oneteam=pdo_fetchall("select * from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") .
             " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid={$_GPC['uid']}" );
         foreach ($oneteam as $k=>$v){
@@ -2618,6 +2617,11 @@ class maskModuleWxapp extends WeModuleWxapp {
                 $this->findkinklevel($fpid,$ordernum,$nickname);
             }
         }
+    }
+    //统计所有团队人数
+    function countallteamnum($uid){
+        $allcountarr=array();
+        
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid
