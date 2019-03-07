@@ -1391,6 +1391,94 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
 
     }
+    //app用户注册和找回密码
+    public function doPageAppReg(){
+        global $_GPC, $_W;
+        $getphone=$_GPC['user_tel'];
+        $getpsw=md5('itxiaolong'.$_GPC['psw']);
+        $getuid=$_GPC['uid'];
+        $types=$_GPC['type'];//0注册，1，找回密码
+        $getcode=$_GPC['code'];//短信验证码
+        if (!$getphone){
+            echo $this->resultToJson(0,'手机号为空！','');
+            die();
+        }
+        //判断验证码是否正确
+        $codeistrue=pdo_get('mask_smscode',array('phone'=>$getphone,'code'=>$getcode,'uniacid'=>$_W['uniacid']));
+        if ($types){
+            //找回密码
+            $cdata=array();
+            $cdata['psw']=$getpsw;
+            //判断验证码是否正常
+            if ($codeistrue){
+                $cres=pdo_update('mask_user',$cdata,array('user_tel'=>$getphone));
+                if ($cres){
+                    //删除验证码
+                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
+                    echo $this->resultToJson(1,'找回密码成功','');
+                    die();
+                }else{
+                    echo $this->resultToJson(0,'找回密码失败','');
+                    die();
+                }
+            }else{
+                echo $this->resultToJson(0,'验证码错误','');
+                die();
+            }
+        }else{
+            //注册
+            $getpid=$_GPC['pid'];
+            if (!$getpid){
+                echo $this->resultToJson(0,'请输入邀请人ID！','');
+                die();
+            }
+            $inserdata=array();
+            $inserdata['user_tel']=$getphone;
+            $inserdata['psw']=$getpsw;
+            $inserdata['uniacid']=$_W['uniacid'];
+            $inserdata['dq_time']=date('Y-m-d H:i:s',time());
+            $inserdata['nickname']=$_GPC['nickname'];
+
+            //$inserdata['username']=$this->randName(7);
+            if ($codeistrue){
+                //查询该手机号是否已注册
+                $isreged=pdo_get('mask_user',array('user_tel'=>$getphone));
+                if ($isreged){
+                    //已注册过
+                    echo $this->resultToJson(0,'该手机号已注册过','');
+                    die();
+                }
+                $res=pdo_insert('mask_user',$inserdata);
+                if ($res){
+                    //删除验证码
+                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
+                    //绑定用户
+                    $isbang=pdo_get('mask_relation',array('uid'=>$getuid,'uniacid'=>$_W['uniacid']));
+                    if($isbang){
+                        echo $this->resultToJson(1,'注册成功，已被推荐过','');
+                    }else{
+                        if ($getpid){
+                            $bingsucc=pdo_insert('mask_relation',array('uid'=>$getuid,'pid'=>$getpid,'uniacid'=>$_W['uniacid'],'addtime'=>date('Y-m-d H:i:s',time())));
+                            if ($bingsucc){
+                                echo $this->resultToJson(1,'注册成功，绑定成功','');
+                            }else{
+                                echo $this->resultToJson(1,'注册成功，绑定失败','');
+                            }
+                        }else{
+                            echo $this->resultToJson(0,'注册失败,缺推荐人','');
+                        }
+
+                    }
+                }else{
+                    echo $this->resultToJson(0,'注册失败','');
+                }
+            }else{
+                echo $this->resultToJson(-1,'验证码错误','');
+            }
+
+        }
+
+    }
 
     //短信验证码,聚合或者腾讯云的或者阿里云的
     public function doPageSmscode(){
