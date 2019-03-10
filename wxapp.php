@@ -903,7 +903,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                     }
                 }
             }else if($v['id']==30){
-                if ($uid!=100000){
+                if ($uid!=100000||$uid!=100001){
                     echo  $this->resultToJson(0,'这个是开发人员下的单','');
                     die();
                 }
