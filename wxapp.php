@@ -1827,34 +1827,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         $res=pdo_get('mask_bankcard',array('uid'=>$ID));
         echo $this->resultToJson(1,'返回银行卡',$res);
     }
-    //申请省代市代
-    public function doPageSqproorcity(){
-        global $_W, $_GPC;
-        $adddata['uid']=$_GPC['uid'];
-        $adddata['name']=$_GPC['name'];
-        $adddata['phone']=$_GPC['phone'];
-        $adddata['address']=$_GPC['address'];
-        $adddata['comment']=$_GPC['comment'];
-        $adddata['addtime']=date('Y-m-d H:i:s',time());
-        $adddata['uniacid']=$_W['uniacid'];
-        $ishava=pdo_get('mask_areaagent',array('uid'=>$_GPC['uid']));
-        if ($ishava){
-            //已申请
-            $res=pdo_update('mask_areaagent',$adddata,array('uid'=>$_GPC['uid']));
-            if ($res){
-                echo $this->resultToJson(1,'更新申请成功','');
-            }else{
-                echo $this->resultToJson(0,'更新申请失败','');
-            }
-        }else{
-            $res=pdo_insert('mask_areaagent',$adddata);
-            if ($res){
-                echo $this->resultToJson(1,'申请成功','');
-            }else{
-                echo $this->resultToJson(0,'申请失败','');
-            }
-        }
-    }
     //判断是否有支付密码
     public function doPageGetpaypsw(){
         global $_W, $_GPC;
@@ -1926,6 +1898,14 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageUpdateInfo(){
         global $_W, $_GPC;
         $id=$_GPC['uid'];
+        $nickname=$_GPC['nickname'];
+        $headerimg=$_GPC['headerimg'];
+        if ($nickname){
+            $adddata['nickname']=$nickname;
+        }
+        if($headerimg){
+            $adddata['headerimg']=$headerimg;
+        }
         $adddata['user_name']=$_GPC['user_name'];
         $adddata['sex']=$_GPC['sex'];
         $adddata['qq']=$_GPC['qq'];
@@ -1946,7 +1926,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageGetUserinfo(){
         global $_W, $_GPC;
         $ID=$_GPC['uid'];
-        $res=pdo_get('mask_user',array('id'=>$ID),array('user_name','id','sex','qq','wechat','user_tel','birthday','address'));
+        $res=pdo_get('mask_user',array('id'=>$ID),array('user_name','id','sex','qq','wechat','user_tel','birthday','address','nickname','headerimg'));
         $paypsw=pdo_getcolumn('mask_user', array('id' => $ID), 'paypsw',1);
         if ($paypsw){
             $res['issetpsw']=1;
@@ -2058,6 +2038,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
 
     }
+    //签到领积分部分
     //会员卡
     public function doPageVipcardinfo(){
         global $_W, $_GPC;
@@ -2161,6 +2142,8 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageVipindexInfo(){
         global $_W, $_GPC;
         $info = pdo_get('mask_user', array('id' => $_GPC['uid']), array('nickname', 'headerimg','level','quyuid'));
+        //检查是否符合升级条件
+        $this->checkupvip($_GPC['uid']);
         echo $this->resultToJson(1,'特权页信息',$info);
     }
     //我的会员卡页面
@@ -2249,7 +2232,7 @@ class maskModuleWxapp extends WeModuleWxapp {
 
         //个人累积消费
         $personfell=pdo_fetch("select sum(money) as total from ". tablename("mask_order")." where user_id={$_GPC['uid']} and state=4");
-        $data['Personalconsumption']=$personfell['total'];
+        $data['Personalconsumption']=$personfell['total']?$personfell['total']:0;
 
         //推广销售额
         $where=" WHERE r.uniacid=:uniacid and r.pid=:pid and o.state=4 ";
@@ -2258,6 +2241,34 @@ class maskModuleWxapp extends WeModuleWxapp {
         $completenum=number_format($wm['total'],2);
         $data['tgmoenycount']=$completenum;
         echo $this->resultToJson(1,'区域商页面返回数据',$data);
+    }
+    //区域商申请
+    public function doPageSqproorcity(){
+        global $_W, $_GPC;
+        $adddata['uid']=$_GPC['uid'];
+        $adddata['name']=$_GPC['name'];
+        $adddata['phone']=$_GPC['phone'];
+        $adddata['address']=$_GPC['address'];
+        $adddata['comment']=$_GPC['comment'];
+        $adddata['addtime']=date('Y-m-d H:i:s',time());
+        $adddata['uniacid']=$_W['uniacid'];
+        $ishava=pdo_get('mask_areaagent',array('uid'=>$_GPC['uid']));
+        if ($ishava){
+            //已申请
+            $res=pdo_update('mask_areaagent',$adddata,array('uid'=>$_GPC['uid']));
+            if ($res){
+                echo $this->resultToJson(1,'更新申请成功','');
+            }else{
+                echo $this->resultToJson(0,'更新申请失败','');
+            }
+        }else{
+            $res=pdo_insert('mask_areaagent',$adddata);
+            if ($res){
+                echo $this->resultToJson(1,'申请成功','');
+            }else{
+                echo $this->resultToJson(0,'申请失败','');
+            }
+        }
     }
     //余额支付
     public function doPageYuePay(){
@@ -2622,6 +2633,49 @@ class maskModuleWxapp extends WeModuleWxapp {
     function countallteamnum($uid){
         $allcountarr=array();
         
+    }
+    //检查是否符合等级升级
+    function checkupvip($uid){
+        global $_W, $_GPC;
+        $twonum = pdo_get('mask_system', array('uniacid' => $_W['uniacid']), array('zhituinum', 'yingkanum'));
+        $zhituinum=$twonum['zhituinum'];
+        $yingkanum=$twonum['yingkanum'];
+
+        $hcountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and o.state=4 ";
+        $countdatas[':uniacid']=$_W['uniacid'];
+        $countdatas[':pid']=$uid;
+        //直接销售额
+        $wm=pdo_fetch("select sum(money) as total from ". tablename("mask_order") . " o"
+            . " left join " . tablename("mask_relation") . " r on o.user_id=r.uid".$hcountwhere,$countdatas);
+        //银卡成交数量
+        $yinkawhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level=2";
+        $jinkacount=pdo_fetch("select count(*) as con from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$yinkawhere,$countdatas);
+        $completeyinkanum=$jinkacount['con'];
+        //判断是否达到要求
+        if ($wm['total']>=$zhituinum){
+            //达成银卡升级条件
+            $upres=pdo_update('mask_user',array('level'=>2),array('id'=>$uid));
+            if ($upres){
+                $userinfo=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','headerimg','img','level'));
+                //升级银卡成功奖励300元到余额
+//                $jldata['rtype']=1;
+//                $jldata['rstate']=0;
+//                $jldata['rmoney']=8;//直推奖励
+//                $jldata['ruid']=$uid;
+//                $jldata['rbuyername']=$userinfo['nickname'];
+//                $jldata['rordernumber']=0;
+//                $card=pdo_get('mask_bankcard', array('uid'=>$_GPC['uid'],'uniacid'=>$_W['uniacid'])); //银行卡
+//                $jldata['rcardid']=$card['id'];
+//                $jldata['rcomment']="银卡升级奖励：300元";
+//                $jldata['raddtime']=date('Y-m-d H:i:s',time());
+                //更新余额
+                //pdo_update('mask_user', array('wallet +=' => 300), array('id' => $_GPC['uid']));
+            }
+            if ($completeyinkanum>=$yingkanum){
+                //达成金卡升级条件
+                pdo_update('mask_user',array('level'=>3),array('id'=>$uid));
+            }
+        }
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid
@@ -4816,7 +4870,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         $pinfo=pathinfo($destination);
         $fname="mask/".date(Y)."/".date(m)."/".date(d)."/".$pinfo['basename'];
-        echo $fname;
+        echo $_W['attachurl'].$fname;
         @require_once (IA_ROOT . '/framework/function/file.func.php');
         @$filename=$fname;
         @file_remote_upload($filename);
