@@ -1396,7 +1396,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_GPC, $_W;
         $getphone=$_GPC['user_tel'];
         $getpsw=md5('itxiaolong'.$_GPC['psw']);
-        $getuid=$_GPC['uid'];
         $types=$_GPC['type'];//0注册，1，找回密码
         $getcode=$_GPC['code'];//短信验证码
         if (!$getphone){
@@ -1449,20 +1448,21 @@ class maskModuleWxapp extends WeModuleWxapp {
                     die();
                 }
                 $res=pdo_insert('mask_user',$inserdata);
+                $insert_id=pdo_insertid();
                 if ($res){
                     //删除验证码
                     pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
                     //绑定用户
-                    $isbang=pdo_get('mask_relation',array('uid'=>$getuid,'uniacid'=>$_W['uniacid']));
+                    $isbang=pdo_get('mask_relation',array('uid'=>$insert_id,'uniacid'=>$_W['uniacid']));
                     if($isbang){
-                        echo $this->resultToJson(1,'注册成功，已被推荐过','');
+                        echo $this->resultToJson(1,'注册成功，已被推荐过',$insert_id);
                     }else{
                         if ($getpid){
-                            $bingsucc=pdo_insert('mask_relation',array('uid'=>$getuid,'pid'=>$getpid,'uniacid'=>$_W['uniacid'],'addtime'=>date('Y-m-d H:i:s',time())));
+                            $bingsucc=pdo_insert('mask_relation',array('uid'=>$insert_id,'pid'=>$getpid,'uniacid'=>$_W['uniacid'],'addtime'=>date('Y-m-d H:i:s',time())));
                             if ($bingsucc){
-                                echo $this->resultToJson(1,'注册成功，绑定成功','');
+                                echo $this->resultToJson(1,'注册成功，绑定成功',$insert_id);
                             }else{
-                                echo $this->resultToJson(1,'注册成功，绑定失败','');
+                                echo $this->resultToJson(1,'注册成功，绑定失败',$insert_id);
                             }
                         }else{
                             echo $this->resultToJson(0,'注册失败,缺推荐人','');
