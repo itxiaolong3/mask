@@ -2136,9 +2136,14 @@ class maskModuleWxapp extends WeModuleWxapp {
         //用户信息
         $userinfo=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','wallet','paypsw'));
         $data['rbuyername'] = $userinfo['nickname']; //昵称
+        //新增收益和大米的判断
+        $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+            " WHERE ruid ={$uid} and rsettlement=1 and rtype <> 7 ");
         if ($money>$userinfo['wallet']){
             //提现金额大于余额
             echo $this->resultToJson(0,'提现金额超出余额'.'');
+        }else if($deal['con']<$userinfo['wallet']){
+            echo $this->resultToJson(0,'余额异常，请找客服！'.'');
         }else if($money<100){
             echo $this->resultToJson(0,'提现金额必须大于100'.'');
         }else if($paypsw!=$userinfo['paypsw']){
@@ -2146,6 +2151,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         }else if(empty($cid)){
             echo $this->resultToJson(0,'请绑定银行卡'.'');
         }else{
+            $data['rbeforemoney']=$userinfo['wallet'];
+            $data['rbeforedeal']=$deal['con'];
             $res = pdo_insert('mask_record', $data);
             //更新用户余额
             $updatawallet=pdo_update('mask_user', array('wallet -=' => $money), array('id' => $uid));
