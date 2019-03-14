@@ -31,7 +31,11 @@
         $return = $this->weixinapp();
         return $return;
     }
-
+    public function payh5() {
+        //统一下单接口
+        $return = $this->unifiedorderforH5();
+        return $return;
+    }
 
     //统一下单接口
     private function unifiedorder() {
@@ -60,7 +64,30 @@
         $return = $this->xmlToArray($this->postXmlCurl($xmlData, $url, 60));
         return $return;
     }
-
+    //H5微信支付
+    private function unifiedorderforH5() {
+        $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
+        $notifyurl=$this->root.'addons/mask/payment/wechat/notify.php';
+        $parameters = array(
+            'appid' => $this->appid, //小程序ID
+            'mch_id' => $this->mch_id, //商户号
+            'nonce_str' => $this->createNoncestr(), //随机字符串
+            'body' => $this->body,
+            'attach' => $this->attach, //订单id，自带参数
+            'out_trade_no'=> $this->out_trade_no,
+            'total_fee' => $this->total_fee,//总金额 单位 分
+            'spbill_create_ip' => $_SERVER['REMOTE_ADDR'], //终端IP
+            'notify_url' => $notifyurl, //通知地址  确保外网能正常访问
+           // 'openid' => $this->openid, //用户id
+            'trade_type' => 'JSAPI',//交易类型
+            'scene_info'=>"{'h5_info': {'type':'Wap','wap_url':  $notifyurl,'wap_name': '紫色魅影支付'}}",
+        );
+        //统一下单签名
+        $parameters['sign'] = $this->getSign($parameters);
+        $xmlData = $this->arrayToXml($parameters);
+        $return = $this->xmlToArray($this->postXmlCurl($xmlData, $url, 60));
+        return $return;
+    }
 
     private static function postXmlCurl($xml, $url, $second = 30) 
     {

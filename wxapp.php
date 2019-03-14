@@ -241,6 +241,41 @@ class maskModuleWxapp extends WeModuleWxapp {
         echo $this->resultToJson(1,'测试收益页数据',$redata);
 
     }
+    //收益详细
+    public function doPageEarndetail(){
+        global $_W, $_GPC;
+        $rid=$_GPC['rid'];
+        $earninfo=pdo_get('mask_record',array('rid'=>$rid));
+        if ($earninfo['rstate']){
+            $earninfo['rmoney']='(退)'.$earninfo['rmoney'];
+        }
+        switch ($earninfo['rtype']){
+            case 1:
+                $earninfo['typestr']='直推奖励';
+                break;
+            case 2:
+                $earninfo['typestr']='间推奖励';
+                break;
+            case 3:
+                $earninfo['typestr']='银卡奖励';
+                break;
+            case 4:
+                $earninfo['typestr']='金卡奖励';
+                break;
+            case 5:
+                $earninfo['typestr']='市代奖励';
+                break;
+            case 6:
+                $earninfo['typestr']='市省奖励';
+                break;
+            case 8:
+                $earninfo['typestr']='红包奖励';
+                break;
+            default:
+                $earninfo['typestr']='未知奖励';
+        }
+        echo $this->resultToJson(1,'收益页详细',$earninfo);
+    }
     public function doPageTeamTest(){
         global $_W, $_GPC;
         $pageindex = max(1, intval($_GPC['page']));
@@ -962,6 +997,157 @@ class maskModuleWxapp extends WeModuleWxapp {
                     pdo_delete('mask_cart',array('gid'=>$v['id'],"uid"=>$uid));
                     pdo_update('mask_goodmy', array('TotalQty +=' => $v['num']), array('gID' => $v['id']));
                 }
+                echo $this->resultToJson(1,'提交订单成功',$order_id);
+            }else{
+                echo $this->resultToJson(0,'提交订单失败1=',$data3);
+            }
+
+        }else{
+            echo $this->resultToJson(0,'提交订单失败2','');
+        }
+
+    }
+    public function doPageAddMyOrdertest(){
+
+        global $_W, $_GPC;
+        $uid=$_GPC['uid'];
+        $gid=$_GPC['gid'];
+        $num=$_GPC['num'];//数量
+        $money=$_GPC['money'];
+        $type=$_GPC['type'];
+        $addid=$_GPC['aid'];//地址id
+        $totalfreght=$_GPC['totalfreght'];
+        $integral=$_GPC['integral'];//商品积分
+        $TotalQty=$_GPC['TotalQty'];//商品销量
+        //先判断用户是否登录
+        $islogin=pdo_getcolumn('mask_user', array('id' => $uid), 'user_tel',1);
+        $psw=pdo_getcolumn('mask_user', array('id' => $uid), 'psw',1);
+        //是否有推荐人
+        $isok=pdo_get('mask_relation',array('uid'=>$uid));
+        if (!$psw){
+            echo $this->resultToJson(-1,'未登录密码，请点击忘记密码进行重设','');
+            die();
+        }
+        if (!$islogin){
+            echo $this->resultToJson(-1,'请登录！','');
+            die();
+        }
+        if (!$isok){
+            echo $this->resultToJson(-1,'无推荐人，无法下单','');
+            die();
+        }
+        //查询用户地址信息
+        $addinfo=pdo_get('mask_address',array('aid'=>$addid));
+        $data['user_id']=$uid;//用户id
+        $data['name']=$addinfo['name'];//姓名
+        $data['address']=$addinfo['address'].' '.$addinfo['detailadd'];//地址
+        $data['money']=$money;//付款金额
+        $data['type']=$type;//订单类型
+        $data['postfee']=$totalfreght;//总运费
+        $data['tel']=$addinfo['phone'];//手机号
+        $data['uniacid']=$_W['uniacid'];//小程序id
+        $data['order_num']=date('YmdHis',time()).rand(1111,9999);//订单号
+        $data['time']=date("Y-m-d H:i:s",time());//下单时间
+        //"共2款,3件,合计¥ 667.21"
+        $typenum=1;//款数
+        $data['Summary']='共'.$typenum.'款,'.$num.'件,合计￥'.$money;//购买数量情况
+        if (empty($gid)){
+            echo  $this->resultToJson(0,'请传商品gid','');
+            die();
+        }
+        //判断提交订单是否合法，免费领取订单每个用户365天一次机会
+        if ($gid==26){
+            $data['ordertype']=2;//下单的订单类型
+            if ($num>1){
+                echo  $this->resultToJson(0,'最多领一盒','');
+                die();
+            }
+            //免费领取订单
+            $ishava=pdo_fetch("select o.time from ims_mask_order_goods g LEFT JOIN ims_mask_order  o ON g.order_id=o.id where g.dishes_id=26 and o.user_id={$uid} ORDER BY o.time desc LIMIT 1");
+            if ($ishava['time']){
+                //有数据
+                $Date_1 = date("Y-m-d");
+                $Date_2 = $ishava['time'];
+                $d1 = strtotime($Date_1);
+                $d2 = strtotime($Date_2);
+                $Days = round(($d1-$d2)/3600/24);
+                if ($Days<360){
+                    //不可以购买
+                    echo $this->resultToJson(0,'365天只能买一次,请看待支付订单是否已存在该订单','');
+                    die();
+                }
+            }
+        }else if ($gid==27){
+            $data['ordertype']=3;//下单的订单类型
+            //积分订单
+            ///所需积分
+            $jifen=$num*5;
+            if ($num!=1&&$num!=5&&$num!=10){
+                echo  $this->resultToJson(0,'只能1盒，5盒，10盒','');
+                die();
+            }
+            ///查询用户积分
+            $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$uid} and type=0");
+            $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$uid} and type=1");
+            $getjifen=$getjifenf['getscore']-$payjifenf['payscore'];
+            if ($jifen>$getjifen){
+                //积分不够
+                echo $this->resultToJson(0,'积分不够,请看待支付订单是否已存在该订单','');
+                die();
+            }else{
+                //抵扣积分
+                $data2['beforescore']=$getjifen;
+                $data2['afterscore']=$getjifen-$jifen;
+                $data2['score']=$jifen;
+                $data2['note']='消费积分';
+                $data2['type']=1;
+                $data2['user_id']=$uid;
+                $data2['cerated_time']=date('Y-m-d H:i:s');
+                $data2['uniacid']=$_W['uniacid'];//小程序id
+                pdo_insert('mask_integral',$data2);//添加积分明细
+            }
+
+        }else if ($gid==24){
+            $data['ordertype']=1;//下单的订单类型
+        }else if($gid==29){
+            //活动订单
+            if ($num>1){
+                echo  $this->resultToJson(0,'最多1单10盒','');
+                die();
+            }else{
+                $getlevel=pdo_getcolumn('mask_user', array('id' => $uid), 'level',1);
+                if (!$getlevel){
+                    echo  $this->resultToJson(0,'只限合伙人哦','');
+                    die();
+                }
+            }
+        }else if($gid==30){
+            if ($uid!=100000||$uid!=100001){
+                echo  $this->resultToJson(0,'这个是开发人员下的单','');
+                die();
+            }
+        }
+        $res=pdo_insert('mask_order',$data);
+        $order_id=pdo_insertid();
+        if($res){
+            $onegood=pdo_get('mask_goodmy',array('gID'=>$gid));
+            $data3['name']=$onegood['Title'];//商品名称
+            $data3['number']=$num;//商品数量
+            $data3['integral']=$integral;//商品积分
+            $data3['TotalQty']=$TotalQty;//商品销量
+            $data3['money']=$onegood['Price'];//商品单价
+            $data3['img']=$onegood['Itemcover'];//商品图片
+            //$data3['spec']=$v['msg'];//商品规格
+            $data3['dishes_id']=$gid;//商品id
+            // $data2['fid']=$v['fid'];//发货地id
+            $data3['uniacid']=$_W['uniacid'];//小程序id
+            $data3['order_id']=$order_id;
+            //$data3['Code']=date('Ymd',time()).'-'.$this->randNum(8);
+            $res2=pdo_insert('mask_order_goods',$data3);
+            if($res2){
+                //清除购物车和新增销售量
+                pdo_delete('mask_cart',array('gid'=>$gid,"uid"=>$uid));
+                pdo_update('mask_goodmy', array('TotalQty +=' => $num), array('gID' => $gid));
                 echo $this->resultToJson(1,'提交订单成功',$order_id);
             }else{
                 echo $this->resultToJson(0,'提交订单失败1=',$data3);
@@ -4299,7 +4485,39 @@ class maskModuleWxapp extends WeModuleWxapp {
         $return=$weixinpay->pay();
         echo json_encode($return);
     }
-
+    //H5支付
+    public function doPagedoPayH5(){
+        global $_W, $_GPC;
+        include IA_ROOT.'/addons/mask/wxpay.php';
+        $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
+        $res2=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+        if($res2['url_name']){
+            $res2['url_name']=$res2['url_name'];
+        }else{
+            $res2['url_name']='紫色魅影';
+        }
+        //支付需要传入的参数 openid 订单id 支付金额
+        $appid=$res2['appid'];
+        $openid='';//h5不需要openid
+        $mch_id=$res['mchid'];
+        $key=$res['wxkey'];
+        $out_trade_no =date('YmdHis',time());//订单号
+        $root=$_W['siteroot'];
+        $oid=$_GPC['orderid'];
+        pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$oid));
+        $total_fee =$_GPC['money'];
+        if(empty($total_fee)) //默认1分
+        {
+            $body =$res2['url_name'];
+            $total_fee = floatval(1*100);
+        }else{
+            $body = $res2['url_name'];
+            $total_fee = floatval($total_fee*100);
+        }
+        $weixinpay = new WeixinPay($appid,$openid,$mch_id,$key,$out_trade_no,$body,$total_fee,$root,$oid);
+        $return=$weixinpay->payh5();
+        echo $this->resultToJson(1,'支付参数',$return);
+    }
 //改变订单状态
     public function doPagePayOrder(){
         global $_W, $_GPC;
