@@ -1163,6 +1163,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $this->collectGood();
         $uid=$_GPC['uid'];
+        $this->closeorder($uid);
         $statuid=$_GPC['state'];//订单状态
         // $data=array();
         // $where=" WHERE o.uniacid=:uniacid";
@@ -2742,7 +2743,10 @@ class maskModuleWxapp extends WeModuleWxapp {
                     $type=pdo_get('mask_order_goods', array('order_id'=>$orderid,'dishes_id'=>24,'uniacid'=>$_W['uniacid']));
                     if ($type){
                         //直接升级会员身份level
-                        pdo_update('mask_user', array('level' => 1), array('id' => $order['user_id']));
+                        $getulevel=pdo_getcolumn('mask_user', array('id' => $order['user_id']), 'level',1);
+                        if ($getulevel<1){
+                            pdo_update('mask_user', array('level' => 1), array('id' => $order['user_id']));
+                        }
                         if ($pid){
                             //间推等级
                             $twopid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
@@ -2952,6 +2956,16 @@ class maskModuleWxapp extends WeModuleWxapp {
             }
         }
     }
+    //24小时未支付的订单自动取消订单
+    public function closeorder($uid){
+        global $_W, $_GPC;
+        $daytimes=1*86400;
+        $orders = pdo_fetchall('select user_id,state,id,order_num from ' . tablename('mask_order') . " where user_id={$uid} and uniacid=" . $_W['uniacid'] . ' and state=1 and UNIX_TIMESTAMP(time) + ' . $daytimes . ' <=unix_timestamp() ');
+        foreach ($orders as $k=>$v){
+            pdo_update('mask_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$v['id']));
+            pdo_update('mask_order_goods',array('state'=>5),array('order_id'=>$v['id']));
+        }
+    }
     //随机生成0.08-1
     function randFloat($min, $max){
         return $min + mt_rand()/mt_getrandmax() * ($max-$min);
@@ -3062,9 +3076,13 @@ class maskModuleWxapp extends WeModuleWxapp {
         //判断是否达到要求
         if ($wm['total']>=$zhituinum){
             //达成银卡升级条件
-            $upres=pdo_update('mask_user',array('level'=>2),array('id'=>$uid));
-            if ($upres){
-                $userinfo=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','headerimg','img','level'));
+            $uidinfo=pdo_get('mask_user',array('id'=>$uid));
+            if ($uidinfo['level']==1){
+                $upres=pdo_update('mask_user',array('level'=>2),array('id'=>$uid));
+            }
+
+            //if ($upres){
+                //$userinfo=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','headerimg','img','level'));
                 //升级银卡成功奖励300元到余额
 //                $jldata['rtype']=1;
 //                $jldata['rstate']=0;
@@ -3078,7 +3096,7 @@ class maskModuleWxapp extends WeModuleWxapp {
 //                $jldata['raddtime']=date('Y-m-d H:i:s',time());
                 //更新余额
                 //pdo_update('mask_user', array('wallet +=' => 300), array('id' => $_GPC['uid']));
-            }
+            //}
             if ($completeyinkanum>=$yingkanum){
                 //达成金卡升级条件
                 pdo_update('mask_user',array('level'=>3),array('id'=>$uid));

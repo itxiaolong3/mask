@@ -120,9 +120,11 @@ if($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS' ){
     $filenotify1=$_W['attachurl'].'xiaolonglaji.txt';
     if ($ress){
         //直接升级会员身份level
-        $uplevel=pdo_update('mask_user', array('level' => 1), array('id' => $order['user_id']));
+        $getulevel=pdo_getcolumn('mask_user', array('id' => $order['user_id']), 'level',1);
+        if ($getulevel<1){
+            pdo_update('mask_user', array('level' => 1), array('id' => $order['user_id']));
+        }
         $filenotify=$_W['attachurl'].'wxloginfo.txt';
-        //file_put_contents($filenotify,"用户id=".$order['user_id']."----结果=".$uplevel);
         if ($pid){
             //间推等级
             $twopid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
