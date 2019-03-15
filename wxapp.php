@@ -904,7 +904,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                     die();
                 }
                 //免费领取订单
-                $ishava=pdo_fetch("select o.time from ims_mask_order_goods g LEFT JOIN ims_mask_order  o ON g.order_id=o.id where g.dishes_id=26 and o.user_id={$uid} ORDER BY o.time desc LIMIT 1");
+                $ishava=pdo_fetch("select o.time from ims_mask_order_goods g LEFT JOIN ims_mask_order  o ON g.order_id=o.id where g.dishes_id=26 and o.state<5 and o.user_id={$uid} ORDER BY o.time desc LIMIT 1");
                 if ($ishava['time']){
                     //有数据
                     $Date_1 = date("Y-m-d");
