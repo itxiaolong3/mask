@@ -526,7 +526,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                     echo  $this->resultToJson(0,'最多一盒','');
                     die();
                 }
-            }else if($gid=27){
+            }else if($gid==27){
                 if ($num!=1&&$num!=5&&$num!=10){
                     echo  $this->resultToJson(0,'只能1盒，5盒，10盒','');
                     die();
