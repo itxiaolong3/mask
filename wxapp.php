@@ -939,12 +939,11 @@ class maskModuleWxapp extends WeModuleWxapp {
 
             }else if ($v['id']==24){
                 $data['ordertype']=1;//下单的订单类型
-                //先判断用户是否登录
+                //待放服务器
                 $islogin=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
                 $psw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'psw',1);
-
                 if (!$psw||!$islogin){
-                    echo $this->resultToJson(-1,'未登录密码，请点击忘记密码进行重设','');
+                    echo $this->resultToJson(-1,'请在编辑资料中绑定手机号和密码','');
                     die();
                 }
             }else if($v['id']==29){
