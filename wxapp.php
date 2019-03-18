@@ -346,6 +346,37 @@ class maskModuleWxapp extends WeModuleWxapp {
             " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid=100003";
         echo json_encode($data);
     }
+    //获取unionid
+    public function doPageGetUnionID(){
+        global $_W, $_GPC;
+        $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+        $code=$_GPC['code'];
+        $encryptedData=$_GPC['encryptedData'];
+        $iv=$_GPC['iv'];
+        $appid=$res['appid'];
+        $secret=$res['appsecret'];
+        $url="https://api.weixin.qq.com/sns/jscode2session?appid=".$appid."&secret=".$secret."&js_code=".$code."&grant_type=authorization_code";
+        function getsession_key($url,$data = null){
+            $con = file_get_contents($url);
+            $getcode = json_decode($con);
+            return $getcode->session_key;
+        }
+        $getsessionkey=getsession_key($url);
+        $personinfo=$this->decodephone($appid,$getsessionkey,$encryptedData,$iv);
+       echo $this->resultToJson(1,'获取私人信息',htmlspecialchars_decode($personinfo));
+    }
+    //解密私人信息，包括手机号，unionid
+    public function  decodephone($appid,$sessionKey,$encryptedData,$iv){
+        include IA_ROOT.'/addons/mask/getphonelib/wxBizDataCrypt.php';
+        //include_once "getphonelib/wxBizDataCrypt.php";
+        $pc = new WXBizDataCrypt($appid, $sessionKey);
+        $errCode = $pc->decryptData($encryptedData, $iv, $data );
+        if ($errCode == 0) {
+            return $data;
+        } else {
+            return $data;
+        }
+    }
     //获取openid并保存用户信息
     public function doPageOpenid(){
         global $_W, $_GPC;
