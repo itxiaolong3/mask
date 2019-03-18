@@ -885,20 +885,9 @@ class maskModuleWxapp extends WeModuleWxapp {
 
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
-
-        //先判断用户是否登录
-        $islogin=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
-        $psw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'psw',1);
         //是否有推荐人
         $isok=pdo_get('mask_relation',array('uid'=>$uid));
-        if (!$psw){
-            echo $this->resultToJson(-1,'未登录密码，请点击忘记密码进行重设','');
-            die();
-        }
-        if (!$islogin){
-            echo $this->resultToJson(-1,'请登录！','');
-            die();
-        }
+
         if (!$isok){
             echo $this->resultToJson(-1,'无推荐人，无法下单','');
             die();
@@ -981,6 +970,13 @@ class maskModuleWxapp extends WeModuleWxapp {
 
             }else if ($v['id']==24){
                 $data['ordertype']=1;//下单的订单类型
+                //待放服务器
+                $islogin=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
+                $psw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'psw',1);
+                if (!$psw||!$islogin){
+                    echo $this->resultToJson(-1,'请在编辑资料中绑定手机号和密码','');
+                    die();
+                }
             }else if($v['id']==29){
                 //活动订单
                 if ($v['num']>1){
@@ -1773,6 +1769,47 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
 
     }
+    //取消手机登录后的设置登录密码
+    public function doPageSettingpsw(){
+        global $_GPC, $_W;
+        $getphone=$_GPC['phone'];
+        $getpsw=md5('itxiaolong'.$_GPC['psw']);
+        if (!$getphone){
+            echo $this->resultToJson(0,'手机号为空！','');
+            die();
+        }
+        $getpid=$_GPC['pid'];
+        $getcode=$_GPC['code'];
+        $res=pdo_get('mask_user',array('user_tel'=>$getphone,'uniacid'=>$_W['uniacid']));
+        $codeistrue=pdo_get('mask_smscode',array('phone'=>$getphone,'code'=>$getcode,'uniacid'=>$_W['uniacid']));
+        if ($res){//找回密码，也就是重新设置密码
+            $cdata=array();
+            $cdata['psw']=$getpsw;
+            //判断验证码是否正常
+            if ($codeistrue){
+                $cres=pdo_update('mask_user',$cdata,array('user_tel'=>$getphone));
+                if ($cres){
+                    //删除验证码
+                    pdo_delete('mask_smscode',array('id'=>$codeistrue['id']));
+                    //生成专属二维码
+                    $qrcodeimg = pdo_get('mask_user', array('id' => $res['id']), array('id','img'));
+                    if (!$qrcodeimg['img']){
+                        //生成二维码
+                        $getimg=$this->getqrcodecode($res['id']);
+                        pdo_update('mask_user',array('img'=>$getimg),array('id'=>$res['id']));
+                    }
+                    echo $this->resultToJson(1,'找回密码成功',$getimg);
+                }else{
+                    echo $this->resultToJson(0,'找回密码失败','');
+                }
+            }else{
+                echo $this->resultToJson(0,'验证码错误','');
+            }
+
+        }else{
+            echo $this->resultToJson(0,'手机号不存在，请绑定手机号','');
+        }
+    }
     //app用户注册和找回密码
     public function doPageAppReg(){
         global $_GPC, $_W;
@@ -2339,8 +2376,8 @@ class maskModuleWxapp extends WeModuleWxapp {
         global $_W, $_GPC;
         $ID=$_GPC['uid'];
         $res=pdo_get('mask_user',array('id'=>$ID),array('user_name','id','sex','qq','wechat','user_tel','birthday','address','nickname','headerimg'));
-        $paypsw=pdo_getcolumn('mask_user', array('id' => $ID), 'paypsw',1);
-        if ($paypsw){
+        $psw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'psw',1);
+        if ($psw){
             $res['issetpsw']=1;
         }else{
             $res['issetpsw']=0;
