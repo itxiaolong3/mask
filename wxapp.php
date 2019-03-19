@@ -411,6 +411,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $sdata['headerimg']=$_GPC['headerimg'];
             $sdata['uniacid']=$_W['uniacid'];
             $sdata['openid']=$getopenid;
+            $sdata['unionId']=$_GPC['unionId'];
             $sdata['dq_time']=date('Y-m-d H:i:s',time());
             if (empty($_GPC['nickname'])||empty($_GPC['headerimg'])){
                 echo $this->resultToJson(0,'昵称或者头像为空',$_GPC['nickname'].'头像='.$_GPC['headerimg']);
@@ -418,7 +419,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             }
             $getuserinfo=pdo_get('mask_user',array('openid'=>$getopenid));
             if ($getuserinfo){
-                pdo_update('mask_user',array('dq_time'=>date('Y-m-d H:i:s',time()),'headerimg'=>$_GPC['headerimg'],'nickname'=>$_GPC['nickname']),array('openid'=>$getopenid));
+                pdo_update('mask_user',array('dq_time'=>date('Y-m-d H:i:s',time()),'unionId'=>$_GPC['unionId'],'headerimg'=>$_GPC['headerimg'],'nickname'=>$_GPC['nickname']),array('openid'=>$getopenid));
                 echo $this->resultToJson(1,'保存openid成功',$getuserinfo);
             }else{
                 $insres=pdo_insert('mask_user',$sdata);
