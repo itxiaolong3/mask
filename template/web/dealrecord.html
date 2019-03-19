@@ -37,7 +37,18 @@
                 </div>
                 <input type="hidden" name="token" value="{$_W['token']}"/>
             </form>
-
+            <form action="" method="get" class="col-md-6">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="mask" />
+                <input type="hidden" name="do" value="dealrecord" />
+                <input type="hidden" name="keywords" value="{$keywords}" />
+                <div class="input-group" style="width: 100px;display: flex;">
+                    <!--{php echo tpl_form_field_daterange('time',$_GPC['time'],true);}-->
+                    <input type="submit" class="btn btn-sm ordersucess" name="export_submit" value="输入ID查找后导出"/>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}"/>
+            </form>
 
         </div>
     </div>

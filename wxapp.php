@@ -1958,10 +1958,11 @@ class maskModuleWxapp extends WeModuleWxapp {
             $this->checkupvip($uid);
         }
         $info=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','headerimg','img','level','quyuid'));
+        $info['shen']=1;
         if ($info){
             echo $this->resultToJson(1,'海报数据成功',$info);
         }else{
-            echo $this->resultToJson(0,'返回海报数据失败','');
+            echo $this->resultToJson(0,'返回海报数据失败',$info);
         }
     }
     //投诉电话
