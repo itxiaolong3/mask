@@ -919,6 +919,12 @@ class maskModuleWxapp extends WeModuleWxapp {
         $data['Summary']='共'.$typenum.'款,'.array_sum($misc).'件,合计￥'.$_GPC['money'];//购买数量情况
         //判断提交订单是否合法，免费领取订单每个用户365天一次机会
         foreach ($goodinfo as $k=>$v){
+            //判断是否下架
+            $goodmyinfo=pdo_get('mask_goodmy', array('gID' => $v['id']));
+            if ($goodmyinfo['Statu']==2){
+                echo  $this->resultToJson(0,$goodmyinfo['Title'].'已下架','');
+                die();
+            }
             if ($v['id']==26){
                 $data['ordertype']=2;//下单的订单类型
                 if ($v['num']>1){
@@ -1063,6 +1069,12 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
         if (!$isok){
             echo $this->resultToJson(-1,'无推荐人，无法下单','');
+            die();
+        }
+        //判断是否下架
+        $goodmyinfo=pdo_get('mask_goodmy', array('gID' => $gid));
+        if ($goodmyinfo['Statu']==2){
+            echo  $this->resultToJson(0,$goodmyinfo['Title'].'已下架','');
             die();
         }
         //查询用户地址信息
