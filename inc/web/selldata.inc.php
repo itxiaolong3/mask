@@ -7,46 +7,111 @@ $pagesize=8;
 $type2=isset($_GPC['type2'])?$_GPC['type2']:'today';
 $where=" where uniacid=:uniacid and state in (2,3,4) ";
 $data[':uniacid']=$_W['uniacid'];
+$findtime='';
 if($_GPC['time']){
     $start=$_GPC['time']['start'];
     $end=$_GPC['time']['end'];
     $where.=" and time >='{$start}' and time<='{$end}'";
+    $findtime=$start."到".$end;
 }else{
     if($type2=='today'){
         $time=date("Y-m-d",time());
         $where.="  and time LIKE '%{$time}%' ";
+        $findtime=$time;
     }
     if($type2=='yesterday'){
         $time=date("Y-m-d",strtotime("-1 day"));
         $where.="  and time LIKE '%{$time}%' ";
+        $findtime=$time;
     }
     if($type2=='week'){
         $time=strtotime(date("Y-m-d",strtotime("-7 day")));
 
         $where.=" and UNIX_TIMESTAMP(time) >".$time;
+        $findtime=$time."到".date('Y-m-d',time());
     }
     if($type2=='month'){
         $time=date("Y-m");
         $where.="  and time LIKE '%{$time}%' ";
+        $findtime='本月';
     }
 }
 $ordertype=$_GPC['is_show2'];
-if($ordertype){
-    $where.=" and ordertype=".$ordertype;
+//ordertype，money nums allmoney findtime
+
+switch ($ordertype){
+    case 0:
+        $sql1="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where." and ordertype=1";
+        $getallmoney1=pdo_fetch($sql1,$data);
+        $sql2="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where." and ordertype=1";
+        $getallcount1=pdo_fetch($sql2,$data);
+        $list[0]['ordertype']=1;
+        $list[0]['nums']=$getallcount1['allcount'];
+        $list[0]['allmoney']=$getallmoney1['allmoney'];
+        $list[0]['findtime']=$findtime;
+
+
+        $sql3="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where." and ordertype=2";
+        $getallmoney2=pdo_fetch($sql3,$data);
+        $sql4="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where." and ordertype=2";
+        $getallcount2=pdo_fetch($sql4,$data);
+        $list[1]['ordertype']=2;
+        $list[1]['nums']=$getallcount2['allcount'];
+        $list[1]['allmoney']=$getallmoney2['allmoney'];
+        $list[1]['findtime']=$findtime;
+
+        $sql5="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where." and ordertype=3";;
+        $getallmoney3=pdo_fetch($sql5,$data);
+        $sql6="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where." and ordertype=3";
+        $getallcount3=pdo_fetch($sql6,$data);
+        $list[2]['ordertype']=3;
+        $list[2]['nums']=$getallcount3['allcount'];
+        $list[2]['allmoney']=$getallmoney3['allmoney'];
+        $list[2]['findtime']=$findtime;
+
+        break;
+    case 1:
+        $where.=" and ordertype=".$ordertype;
+        $sql1="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where;
+        $getallmoney=pdo_fetch($sql1,$data);
+        $sql2="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where;
+        $getallcount=pdo_fetch($sql2,$data);
+        $list[0]['ordertype']=1;
+        $list[0]['nums']=$getallcount['allcount'];
+        $list[0]['allmoney']=$getallmoney['allmoney'];
+        $list[0]['findtime']=$findtime;
+        break;
+    case 2:
+        $where.=" and ordertype=".$ordertype;
+        $sql1="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where;
+        $getallmoney=pdo_fetch($sql1,$data);
+        $sql2="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where;
+        $getallcount=pdo_fetch($sql2,$data);
+        $list[0]['ordertype']=2;
+        $list[0]['nums']=$getallcount['allcount'];
+        $list[0]['allmoney']=$getallmoney['allmoney'];
+        $list[0]['findtime']=$findtime;
+        break;
+    case 3:
+        $where.=" and ordertype=".$ordertype;
+        $sql1="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where;
+        $getallmoney=pdo_fetch($sql1,$data);
+        $sql2="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where;
+        $getallcount=pdo_fetch($sql2,$data);
+        $list[0]['ordertype']=3;
+        $list[0]['nums']=$getallcount['allcount'];
+        $list[0]['allmoney']=$getallmoney['allmoney'];
+        $list[0]['findtime']=$findtime;
+        break;
 }
-$sql="SELECT id,order_num,state,time,money,ordertype,uniacid FROM ".tablename('mask_order') .$where." ORDER BY id DESC";
-$total=pdo_fetchcolumn("SELECT count(*) FROM ".tablename('mask_order')  .$where." ORDER BY id DESC",$data);
-$select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
-$list=pdo_fetchall($select_sql,$data);
 
-
-$pager = pagination($total, $pageindex, $pagesize);
 
 if(checksubmit('export_submit', true)) {
     $time=date("Y-m-d");
     $time="'%$time%'";
     $start=$_GPC['time']['start'];
     $end=$_GPC['time']['end'];
+
     $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE uniacid={$_W['uniacid']} and state=2 and time >='{$start}' and time<='{$end}'");
     $pagesize = ceil($count/5000);
     //array_unshift( $names,  '活动名称');
