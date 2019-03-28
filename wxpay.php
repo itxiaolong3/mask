@@ -79,7 +79,7 @@
             'spbill_create_ip' => $_SERVER['REMOTE_ADDR'], //终端IP
             'notify_url' => $notifyurl, //通知地址  确保外网能正常访问
            // 'openid' => $this->openid, //用户id
-            'trade_type' => 'JSAPI',//交易类型
+            'trade_type' => 'MWEB',//交易类型
             'scene_info'=>"{'h5_info': {'type':'Wap','wap_url':  $notifyurl,'wap_name': '紫色魅影支付'}}",
         );
         //统一下单签名

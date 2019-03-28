@@ -4595,7 +4595,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         echo json_encode($return);
     }
     //H5支付
-    public function doPagedoPayH5(){
+    public function doPagePayH5(){
         global $_W, $_GPC;
         include IA_ROOT.'/addons/mask/wxpay.php';
         $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
@@ -4615,6 +4615,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $oid=$_GPC['orderid'];
         pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$oid));
         $total_fee =$_GPC['money'];
+
         if(empty($total_fee)) //默认1分
         {
             $body =$res2['url_name'];
