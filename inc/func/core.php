@@ -116,6 +116,7 @@ class Core extends WeModuleSite
                      0 => $this->createMainMenu('记录列表 ', $do, 'dealrecord', ''),
                      1 => $this->createMainMenu('区域商审核 ', $do, 'ruzhu', ''),
                      2 => $this->createMainMenu('提现管理 ', $do, 'txlist', ''),
+                     3 => $this->createMainMenu('销售管理 ', $do, 'selldata', ''),
                  )
              );
 
