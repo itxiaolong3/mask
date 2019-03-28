@@ -227,14 +227,12 @@ class Core extends WeModuleSite
 //                    2=> $this->createMainMenumy('二级会员 ', $do, 'twoteam','','',$userid,$types),
 //                )
 //            );
-            // $navemenu[15] = array(
-            //     'title' => '<a href="index.php?c=site&a=entry&op=display&do=analysis&m=mask" class="panel-title wytitle" id="yframe-15"><icon style="color:#8d8d8d;" class="fa fa-recycle"></icon>  经营分析</a>',
-            //     'items' => array(
-            //         0 => $this->createMainMenu('经营分析 ', $do, 'analysis', ''),
-            //         // 1 => $this->createMainMenu('营业统计 ', $do, 'statistics', ''),
-            //         // 2 => $this->createMainMenu('商家分析', $do, 'selleranaly', '')
-            //     )
-            // );
+             $navemenu[15] = array(
+                 'title' => '<a href="index.php?c=site&a=entry&op=display&do=gaikuangdata&m=mask" class="panel-title wytitle" id="frame-0"><icon style="color:#8d8d8d;" class="fa fa-recycle"></icon>销售管理</a>',
+                 'items' => array(
+                     0 => $this->createMainMenu('数据概况 ', $do, 'gaikuangdata', ''),
+                 )
+             );
 //
             $navemenu[7] = array(
                 'title' => '<a href="index.php?c=site&a=entry&op=display&do=allgood&m=mask" class="panel-title wytitle" id="yframe-7">

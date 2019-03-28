@@ -248,7 +248,7 @@
                                 {elseif $item['order']['state']==6}
                                 <div class="left orderconfirm2">待退款</div>
                                 <a data-toggle="modal" data-target="#myModal2{$item['order']['id']}"><div class="left orderconfirm">去退款</div></a>
-                                <a href="{php echo $this->createWebUrl('order',array('op'=>'reject','id'=>$item['order']['id']));}"><div class="left orderconfirm">拒绝退款</div></a>
+                                <a data-toggle="modal" data-target="#myModal3{$item['order']['id']}"><div class="left orderconfirm">拒绝退款</div></a>
                                 {elseif $item['order']['state']==7}
                                 <div class="left orderconfirm2">退款成功</div>
                                 {elseif $item['order']['state']==8}
@@ -430,6 +430,38 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                             <a href="{php echo $this->createWebUrl('order',array('op'=>'refund','id'=>$item['order']['id']));}"  class="btn btn-info" >确定</a>
+                            <!--<a href="{php echo $this->createWebUrl('onetype', array('op' => 'delete', 'id' => $row['ID']))}" id="postfee" type="button" class="btn btn-info" >确定</a>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--拒绝退款-->
+            <div class="modal fade" id="myModal3{$item['order']['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel3" style="font-size: 20px;">请选择拒绝退款后订单恢复状态</h4>
+                        </div>
+                        <div class="modal-body" style="font-size: 20px">
+                            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label class="col-xs-8 col-sm-3  control-label">请选择订单恢复状态</label>
+                                    <div class="col-sm-9">
+                                        <!--<input type="text" name="level" id="level{$row['id']}" class="form-control" value="{$row['level']}" />-->
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select class="col-sm-5" id="orderstate{$item['order']['id']}" name="item" autocomplete="off">
+                                            <option value="2" selected >待发货</option>
+                                            <option value="3">已发货</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <a href="javascript:void(0);" onclick="refusestate({$item['order']['id']});" type="button"  class="btn btn-info" >确定</a>
                             <!--<a href="{php echo $this->createWebUrl('onetype', array('op' => 'delete', 'id' => $row['ID']))}" id="postfee" type="button" class="btn btn-info" >确定</a>-->
                         </div>
                     </div>
@@ -644,6 +676,7 @@
 <script>
     var postpath = "{$_W['siteroot']}/web/index.php?c=site&i={$_W['uniacid']}&a=entry&do=order&m=mask&op=jd";
     var postpath1 = "{$_W['siteroot']}/web/index.php?c=site&i={$_W['uniacid']}&a=entry&do=order&m=mask&op=editinfo";
+    var postpath3 = "{$_W['siteroot']}/web/index.php?c=site&i={$_W['uniacid']}&a=entry&do=order&m=mask&op=reject";
     function dowuliu(id) {
         $('.btn-info').removeAttr("onclick")
         //var data = $('form').serializeArray();
@@ -716,6 +749,34 @@
             },
             error:function(e){
                 alert('修改失败');
+                console.log('执行失败')
+            },
+            complete:function(e){
+                console.log('每一步都执行')
+            }
+        })
+    }
+    function refusestate(id) {
+        $('.btn-info').removeAttr("onclick")
+        //var data = $('form').serializeArray();
+        getstate=$("#orderstate"+id).val();
+
+        //开始提交数据进行保存
+        $.ajax({
+            type:"post",
+            url:postpath3,
+            data:{
+                orderstate:getstate,
+                op:'reject',
+                id:id
+            },
+            success:function(e){
+                //var res = JSON.parse(e)
+                console.log('执行成功')
+                window.location.reload()
+
+            },
+            error:function(e){
                 console.log('执行失败')
             },
             complete:function(e){
