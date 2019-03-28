@@ -680,7 +680,11 @@ if($_GPC['op']=='refund'){
 }
 if($_GPC['op']=='reject'){
     //更改订单操作
-    $rst=pdo_update('mask_order',array('state'=>2),array('id'=>$_GPC['id']));
+    $orderstate=$_GPC['orderstate'];
+    if (empty($orderstate)){
+        message('拒绝失败！','','error');
+    }
+    $rst=pdo_update('mask_order',array('state'=>$orderstate),array('id'=>$_GPC['id']));
     if($rst){
         $this->updcommission($_GPC['id']);
         message('拒绝成功',$this->createWebUrl('order',array()),'success');

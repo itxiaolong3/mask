@@ -419,7 +419,12 @@ class maskModuleWxapp extends WeModuleWxapp {
             }
             $getuserinfo=pdo_get('mask_user',array('openid'=>$getopenid));
             if ($getuserinfo){
-                pdo_update('mask_user',array('dq_time'=>date('Y-m-d H:i:s',time()),'unionId'=>$_GPC['unionId'],'headerimg'=>$_GPC['headerimg'],'nickname'=>$_GPC['nickname']),array('openid'=>$getopenid));
+                if ($getuserinfo['unionId']){
+                    $unionid=$getuserinfo['unionId'];
+                }else{
+                    $unionid=$_GPC['unionId'];
+                }
+                pdo_update('mask_user',array('dq_time'=>date('Y-m-d H:i:s',time()),'unionId'=>$unionid,'headerimg'=>$_GPC['headerimg'],'nickname'=>$_GPC['nickname']),array('openid'=>$getopenid));
                 echo $this->resultToJson(1,'保存openid成功',$getuserinfo);
             }else{
                 $insres=pdo_insert('mask_user',$sdata);
@@ -894,7 +899,10 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(-1,'无推荐人，无法下单','');
             die();
         }
-
+        if (empty($_GPC['money'])||$_GPC['money']=='NaN'){
+            echo $this->resultToJson(0,'金额异常，请返回上页重新提交','');
+            die();
+        }
         $addid=$_GPC['aid'];//地址id
         $goodinfo=json_decode(htmlspecialchars_decode($_GPC['arr']),true);//商品信息数组
         //echo $this->resultToJson(0,'返回提交的信息',$goodinfo);die();
@@ -996,6 +1004,9 @@ class maskModuleWxapp extends WeModuleWxapp {
                     echo  $this->resultToJson(0,'这个是开发人员下的单','');
                     die();
                 }
+            }else if(empty($v['id'])){
+                echo  $this->resultToJson(0,'订单异常，请返回上页重新提交','');
+                die();
             }
         }
 
@@ -1551,15 +1562,16 @@ class maskModuleWxapp extends WeModuleWxapp {
                     if (empty($res['openid'])){
                         //没有openid
                         $openid=$this->getopenid($code);
-                        $upopenid=pdo_update('mask_user',array('openid'=>$openid),array('id'=>$res['id']));
+                        //$upopenid=pdo_update('mask_user',array('openid'=>$openid),array('id'=>$res['id']));
                         if (empty($upopenid)){
-                            echo $this->resultToJson(0,'登陆失败，openid无法获取','');die();
+                            // echo $this->resultToJson(0,'登陆失败，openid无法获取','');die();
                         }else{
-                            $res['openid']=$openid;
+                            // $res['openid']=$openid;
                         }
                     }
                 }
-                echo $this->resultToJson(1,'用户登录成功',$res);
+                //echo $this->resultToJson(1,'用户登录成功',$res);
+                echo $this->resultToJson(0,'请删除当前版本重新搜索小程序进去',$res);
             }else{
                 //是否注册
                 $isp=pdo_get('mask_user',array('user_tel'=>$phone,'uniacid'=>$_W['uniacid']));
