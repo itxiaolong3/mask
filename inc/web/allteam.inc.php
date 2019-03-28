@@ -1,7 +1,7 @@
 <?php
 global $_GPC, $_W;
 $GLOBALS['frames'] = $this->getMainMenu();
-
+$leveltype=isset($_GPC['leveltype'])?$_GPC['leveltype']:0;
 if($_GPC['keywords']){
     $op=$_GPC['keywords'];
     $where="%$op%";
@@ -13,11 +13,17 @@ if($_GPC['keywords']){
 $list=pdo_fetchall($sql,array(':name'=>$where,'uniacid'=>$_W['uniacid']));*/
 $pageindex = max(1, intval($_GPC['page']));
 $pagesize=10;
-$sql="select *  from " . tablename("mask_user") ." WHERE  level in (1,2,3,4,5) and (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid order by  level desc";
+
+if ($leveltype){
+    $wherelevel=' level='.$leveltype;
+}else{
+    $wherelevel=' level in (1,2,3,4,5) ';
+}
+$sql="select *  from " . tablename("mask_user") ." WHERE  ".$wherelevel." and (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid order by  level desc";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list = pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':name'=>$where));
 $total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") .
-    " WHERE level in (1,2,3,4,5) and  (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid ",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
+    " WHERE ".$wherelevel." and  (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid ",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
 $pager = pagination($total, $pageindex, $pagesize);
 //	if($_GPC['id']){
 //		$res4=pdo_delete("mask_user",array('u_id'=>$_GPC['id']));
