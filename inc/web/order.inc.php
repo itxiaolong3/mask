@@ -6,7 +6,13 @@ $pageindex = max(1, intval($_GPC['page']));
 $pagesize=8;
 $type=isset($_GPC['type'])?$_GPC['type']:'now';
 $type2=isset($_GPC['type2'])?$_GPC['type2']:'today';
+$ordertype=isset($_GPC['ordertype'])?$_GPC['ordertype']:0;
 $where=" where a.uniacid=:uniacid ";
+if ($ordertype){
+    $where.=' and a.ordertype='.$ordertype;
+}else{
+    $where.=' and a.ordertype in (1,2,3) ';
+}
 $data[':uniacid']=$_W['uniacid'];
 if(isset($_GPC['keywords'])){
     $where.=" and (a.name LIKE  concat('%', :name,'%') || a.order_num LIKE  concat('%', :name,'%') || b.nickname LIKE  concat('%', :name,'%') || b.id LIKE  concat('%', :name,'%'))";
@@ -17,8 +23,22 @@ if(isset($_GPC['keywords'])){
 if($_GPC['time']){
     $start=$_GPC['time']['start'];
     $end=$_GPC['time']['end'];
-    $where.=" and a.time >='{$start}' and a.time<='{$end}'";
-    $type='all';
+    if($type=='wait'){//待支付
+        $where.=" and a.time >='{$start}' and a.time<='{$end}' and a.state=1 ";
+    }
+    if($type=='now'){//待发货
+        $where.=" and a.time >='{$start}' and a.time<='{$end}' and a.state=2 ";
+    }
+    if($type=='cancel'){//取消
+        $where.=" and a.time >='{$start}' and a.time<='{$end}' and a.state in (6,7,8) ";
+    }
+    if($type=='complete'){//已完成
+        $where.=" and a.time >='{$start}' and a.time<='{$end}' and a.state=4 ";
+    }
+    if($type=='delivery'){//待收货
+        $where.=" and a.time >='{$start}' and a.time<='{$end}' and a.state=3 ";
+    }
+    //$type='all';
 }else{
     if($type=='wait'){//待支付
         $where.=" and a.state=1";
@@ -532,7 +552,6 @@ if($_GPC['op']=='wc'){
     }
 }
 if($_GPC['op']=='refund'){
-    //等级恢复条件
     $orderinfo=pdo_get('mask_order', array('id' => $_GPC['id']), array('order_num','getgoodtype','user_id','money'));
     $ordernumber=pdo_fetch("SELECT COUNT(*) as ordernumber FROM ".tablename('mask_order')." WHERE  user_id ={$orderinfo['user_id']} and state in (2,3,4,6,8) and isafter=0");
     //符合金银卡条件
@@ -552,6 +571,7 @@ if($_GPC['op']=='refund'){
         }
         //判断是否是399订单
         if ($orderinfo['money']>=399){
+            //查询是否
             if ($ordernumber['ordernumber']<2){
                 //恢复身份
                 pdo_update('mask_user', array('level' => 0), array('id' => $orderinfo['user_id']));
@@ -561,7 +581,6 @@ if($_GPC['op']=='refund'){
 //                $zhituinum=$twonum['zhituinum'];//达成银卡所需的直推金额
 //                $yingkanum=$twonum['yingkanum'];//达成金卡所需的银卡数量
 //                $pid=pdo_getcolumn('mask_relation', array('uid' => $orderinfo['user_id']), 'pid',1);
-
             }
         }
         message('操作成功',$this->createWebUrl('order',array()),'success');
@@ -756,7 +775,14 @@ if(checksubmit('export_submit', true)) {
     $time="'%$time%'";
     $start=$_GPC['time']['start'];
     $end=$_GPC['time']['end'];
-    $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE uniacid={$_W['uniacid']} and state=2 and time >='{$start}' and time<='{$end}'");
+    $ordertype=$_GPC['ordertype'];
+    $ordertypewhere='';
+    if ($ordertype){
+        $ordertypewhere.=' and ordertype='.$ordertype;
+    }else{
+        $ordertypewhere=' and ordertype in (1,2,3) ';
+    }
+    $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE uniacid={$_W['uniacid']}".$ordertypewhere." and state=2 and time >='{$start}' and time<='{$end}'");
     $pagesize = ceil($count/5000);
     //array_unshift( $names,  '活动名称');
 
@@ -781,7 +807,7 @@ if(checksubmit('export_submit', true)) {
     }
     $html .= "\n";
     for ($j = 1; $j <= $pagesize; $j++) {
-        $sql = "select a.* from " . tablename("mask_order")."  a"  . "   WHERE a.uniacid={$_W['uniacid']} and a.state=2 and a.time >='{$start}' and a.time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
+        $sql = "select * from " . tablename("mask_order") . "   WHERE uniacid={$_W['uniacid']} ".$ordertypewhere." and state=2 and time >='{$start}' and time<='{$end}' limit " . ($j - 1) * 5000 . ",5000 ";
         $list = pdo_fetchall($sql);
     }
     if (!empty($list)) {

@@ -127,6 +127,12 @@
         <input type="hidden" name="token" value="{$_W['token']}"/>
         <input type="submit" name="submit2"  value="开始发货" class="dishes_inp2 btn btn-info btn-sm" />
     </form>
+    <div class="nav nav-tabs">
+        <li {if $ordertype==0} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('ordertype'=>0,'type'=>$type));}">全部类型</a></li>
+        <li {if $ordertype==1} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('ordertype'=>1,'type'=>$type));}">399订单</a></li>
+        <li {if $ordertype==2} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('ordertype'=>2,'type'=>$type));}">免费订单</a></li>
+        <li {if $ordertype==3} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('ordertype'=>3,'type'=>$type));}">积分订单</a></li>
+    </div>
 </div>
 
 <div class="row ygrow">
@@ -146,16 +152,18 @@
         </form>
         <a class="btn btn-sm btn-info ms_mb" href="{$_W['siteroot']}addons/mask/excel/fahuo.xls">下载发货模板</a>
         <ul class="nav nav-tabs data_tip col-md-4" style="float: left;margin:0">
-            <li{if $type2=='yesterday'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type2'=>yesterday,'type'=>$type));}">昨天</a></li>
-            <li{if $type2=='today'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type2'=>today,'type'=>$type));}">今天</a></li>
-            <li{if $type2=='week'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type2'=>week,'type'=>$type));}">近七天</a></li>
-            <li{if $type2=='month'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type2'=>month,'type'=>$type));}">本月</a></li>
+            <li{if $type2=='yesterday'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type2'=>yesterday,'type'=>$type,'ordertype'=>$ordertype));}">昨天</a></li>
+            <li{if $type2=='today'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type2'=>today,'type'=>$type,'ordertype'=>$ordertype));}">今天</a></li>
+            <li{if $type2=='week'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type2'=>week,'type'=>$type,'ordertype'=>$ordertype));}">近七天</a></li>
+            <li{if $type2=='month'} class="active" {/if}><a href="{php echo $this->createWebUrl('order',array('type2'=>month,'type'=>$type,'ordertype'=>$ordertype));}">本月</a></li>
         </ul>
         <form action="" method="get" class="col-md-6">
             <input type="hidden" name="c" value="site" />
             <input type="hidden" name="a" value="entry" />
             <input type="hidden" name="m" value="mask" />
             <input type="hidden" name="do" value="order" />
+            <input type="hidden" name="ordertype" value="{$ordertype}" />
+            <input type="hidden" name="type" value="{$type}" />
             <div class="input-group" style="width: 100px">
                 {php echo tpl_form_field_daterange('time',$_GPC['time'],true);}
                 <span class="input-group-btn">

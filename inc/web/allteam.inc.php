@@ -22,6 +22,52 @@ if ($leveltype){
 $sql="select *  from " . tablename("mask_user") ." WHERE  ".$wherelevel." and (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid order by  level desc";
 $select_sql =$sql." LIMIT " .($pageindex - 1) * $pagesize.",".$pagesize;
 $list = pdo_fetchall($select_sql,array(':uniacid'=>$_W['uniacid'],':name'=>$where));
+foreach ($list as $k=>$v){
+    $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+        " WHERE  ruid ={$v['id']} and rsettlement=0 and rtype <> 7 ");
+    $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+        " WHERE ruid ={$v['id']} and rsettlement=1 and rtype <> 7 ");
+    //查询已退款的待结算记录
+    $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record').
+        " WHERE  ruid ={$v['id']} and rtype <> 7 and rstate=1 and rsettlement=0 ");
+    //待结算和已结算
+    $list[$k]['nosettlement']=number_format($nodeal['con']-$tknodeal['cons'],2);
+    $list[$k]['settlement']=number_format($deal['con'],2);
+    //总收益
+    $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$v['id']} and  rtype <> 7");
+    $list[$k]['alltotal']=number_format($allrecord['con']-$tknodeal['cons'],2);
+    //剩余大米
+    $tixian=pdo_fetch("SELECT sum(rsqmoney) as con FROM ".tablename('mask_record').
+        " WHERE ruid ={$v['id']} and rtype = 7 and risrefu=0 ");
+    $yuepay=pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+        " WHERE ruid ={$v['id']} and rtype = 9 ");
+    $truemoney=number_format($deal['con']-$tixian['con']-$yuepay['con'],2);
+    $list[$k]['dami']=$truemoney;
+    $list[$k]['tixian']=number_format($tixian['con'],2);
+}
+//总待结算和已结算
+$nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+    " WHERE  rsettlement=0 and rtype <> 7 ");
+$deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+    " WHERE rsettlement=1 and rtype <> 7 ");
+//查询已退款的待结算记录
+$tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record').
+    " WHERE  rtype <> 7 and rstate=1 and rsettlement=0 ");
+$allnosettlement=number_format($nodeal['con']-$tknodeal['cons'],2);
+$allsettlement=number_format($deal['con'],2);
+//总剩余大米
+$tixian=pdo_fetch("SELECT sum(rsqmoney) as con FROM ".tablename('mask_record').
+    " WHERE rtype = 7 and risrefu=0 ");
+$yuepay=pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
+    " WHERE rtype = 9 ");
+$truemoney=number_format($deal['con']-$tixian['con']-$yuepay['con'],2);
+$alldami=$truemoney;
+//总累计收益
+$allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE rtype <> 7");
+$allalltotal=number_format($allrecord['con']-$tknodeal['cons'],2);
+//总提现
+$alltixian=number_format($tixian['con'],2);
+
 $total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") .
     " WHERE ".$wherelevel." and  (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid ",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
 $pager = pagination($total, $pageindex, $pagesize);
