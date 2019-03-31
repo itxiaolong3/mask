@@ -177,7 +177,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         $dates=$_GPC['dates'];
         //指定日期的前30天数据
         $end_time1=mktime(23, 59, 59, date('m'), date('t'), date('Y'));
-        $end_time=date('Y-m-d',$end_time1);
+        $end_time=date('Y-m-d',$end_time1+86400);
         if ($type){
             switch ($type){
                 case 1:
@@ -2207,27 +2207,27 @@ class maskModuleWxapp extends WeModuleWxapp {
         $dates=$_GPC['dates'];
         //指定日期的前30天数据
         if ($type){
-            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime) order by raddtime desc");
+            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and  DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime)");
+            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime)");
+            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime)");
+            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype={$type} and  DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime) order by raddtime desc");
             foreach ($list as $k=>$v){
                 if ($v['rstate']){
                     $list[$k]['rmoney']='(退)'.$v['rmoney'];
                 }
             }
         }else{
-            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']}  and  rtype <> 7 and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
-            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and  DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime) order by raddtime desc");
+            $allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and  DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime)");
+            $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']}  and  rtype <> 7 and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime)");
+            $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and rsettlement=1 and DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime)");
+            $list = pdo_fetchall("SELECT * FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and  rtype <> 7 and  DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime) order by raddtime desc");
             foreach ($list as $k=>$v){
                 if ($v['rstate']){
                     $list[$k]['rmoney']='(退)'.$v['rmoney'];
                 }
             }
         }
-        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 30 DAY) <= date(raddtime)");
+        $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record')." WHERE  ruid ={$_GPC['uid']} and rtype <> 7 and rstate=1 and rsettlement=0 and DATE_SUB('{$dates}', INTERVAL 31 DAY) <= date(raddtime)");
         $redata['alltotal']=number_format($allrecord['con']-$tknodeal['cons'],2);
         $redata['nodealtotal']=number_format($nodeal['con']-$tknodeal['cons'],2);
         $redata['dealtotal']=number_format($deal['con'],2);
