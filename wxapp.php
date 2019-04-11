@@ -1797,6 +1797,12 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(0,'手机号为空！','');
             die();
         }
+        //判断别人是否已经存在改手机号了
+        $othersave=pdo_get('mask_user', array('id !=' => $uid,'user_tel'=>$getphone));
+        if ($othersave){
+            echo $this->resultToJson(0,'该手机号已被注册','');
+            die();
+        }
         $cdata=array();
         $cdata['psw']=$getpsw;
         $cdata['user_tel']=$getphone;
