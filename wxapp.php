@@ -1360,6 +1360,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         echo $this->resultToJson(1,'支付参数'.$total_fee,$return);
     }
     public function doPagedoPay1(){
+        //测试的
         global $_W, $_GPC;
         include IA_ROOT.'/addons/mask/wxpay1.php';
         $res=pdo_get('mask_pay',array('uniacid'=>$_W['uniacid']));
