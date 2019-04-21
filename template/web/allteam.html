@@ -72,6 +72,7 @@
     <li class="countclass">累计收益汇总:{$allalltotal}</li>
     <li class="countclass">剩余大米汇总:{$alldami}</li>
     <li class="countclass">提现汇总:{$alltixian}</li>
+    <li class="countclass">余额支付汇总:{$yuepay1}</li>
 </ul>
 <div class="main">
     <div class="panel panel-default">
@@ -117,12 +118,13 @@
                         <th class="col-md-1">头像</th>
                         <th class="col-md-1">昵称</th>
                         <th class="col-md-1">身份</th>
-                        <th class="col-md-2">手机号</th>
+                        <th class="col-md-1">手机号</th>
                         <th class="col-md-1">待结算</th>
                         <th class="col-md-1">已结算</th>
                         <th class="col-md-1">累计收益</th>
                         <th class="col-md-1">剩余大米</th>
                         <th class="col-md-1">提现记录</th>
+                        <th class="col-md-1">余额支付</th>
                         <td  class="col-md-2">操作</td>
                     </tr>
                     {loop $list  $row}
@@ -151,6 +153,7 @@
                         <td>{$row['alltotal']}</td>
                         <td>{$row['dami']}</td>
                         <td>{$row['tixian']}</td>
+                        <td>{$row['yuepay']}</td>
                         <td>
                             <a class="btn ygyouhui2 btn-xs"  value="编 辑"  data-toggle="modal" data-target="#myModal{$row['id']}">设置身份</a>
                             <a class="btn ygyouhui2 btn-xs"  href="index.php?c=site&a=entry&op=display&do=oneteam&m=mask&uid={$row['id']}&types=up">上级</a>

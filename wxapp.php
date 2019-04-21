@@ -347,37 +347,6 @@ class maskModuleWxapp extends WeModuleWxapp {
             " u on r.uid=u.id"." where r.uniacid={$_W['uniacid']} and r.pid=100003";
         echo json_encode($data);
     }
-    //获取unionid
-    public function doPageGetUnionID(){
-        global $_W, $_GPC;
-        $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
-        $code=$_GPC['code'];
-        $encryptedData=$_GPC['encryptedData'];
-        $iv=$_GPC['iv'];
-        $appid=$res['appid'];
-        $secret=$res['appsecret'];
-        $url="https://api.weixin.qq.com/sns/jscode2session?appid=".$appid."&secret=".$secret."&js_code=".$code."&grant_type=authorization_code";
-        function getsession_key($url,$data = null){
-            $con = file_get_contents($url);
-            $getcode = json_decode($con);
-            return $getcode->session_key;
-        }
-        $getsessionkey=getsession_key($url);
-        $personinfo=$this->decodephone($appid,$getsessionkey,$encryptedData,$iv);
-       echo $this->resultToJson(1,'获取私人信息',htmlspecialchars_decode($personinfo));
-    }
-    //解密私人信息，包括手机号，unionid
-    public function  decodephone($appid,$sessionKey,$encryptedData,$iv){
-        include IA_ROOT.'/addons/mask/getphonelib/wxBizDataCrypt.php';
-        //include_once "getphonelib/wxBizDataCrypt.php";
-        $pc = new WXBizDataCrypt($appid, $sessionKey);
-        $errCode = $pc->decryptData($encryptedData, $iv, $data );
-        if ($errCode == 0) {
-            return $data;
-        } else {
-            return $data;
-        }
-    }
     //获取openid并保存用户信息
     public function doPageOpenid(){
         global $_W, $_GPC;
@@ -892,9 +861,7 @@ class maskModuleWxapp extends WeModuleWxapp {
 
         global $_W, $_GPC;
         $uid=$_GPC['uid'];
-        //是否有推荐人
         $isok=pdo_get('mask_relation',array('uid'=>$uid));
-
         if (!$isok){
             echo $this->resultToJson(-1,'无推荐人，无法下单','');
             die();
@@ -986,7 +953,6 @@ class maskModuleWxapp extends WeModuleWxapp {
 
             }else if ($v['id']==24){
                 $data['ordertype']=1;//下单的订单类型
-                //待放服务器
                 $islogin=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'user_tel',1);
                 $psw=pdo_getcolumn('mask_user', array('id' => $_GPC['uid']), 'psw',1);
                 if (!$psw||!$islogin){
@@ -1180,6 +1146,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             }
         }
         $res=pdo_insert('mask_order',$data);
+
         $order_id=pdo_insertid();
         if($res){
             $onegood=pdo_get('mask_goodmy',array('gID'=>$gid));
@@ -1264,9 +1231,28 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function doPageCancelMyOrder(){
         global $_W, $_GPC;
         $res=pdo_update('mask_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$_GPC['oid']));
+        $getorder=pdo_get('mask_order',array('id'=>$_GPC['oid']));
         if ($res){
             //取消所有子订单
             pdo_update('mask_order_goods',array('state'=>5),array('order_id'=>$_GPC['oid']));
+            //恢复积分
+            if($getorder['ordertype']==3){
+                $scorearr=explode(',',$getorder['Summary']);
+                $getscore=$this->getnumfromstring($scorearr[1]);
+                $data2['score']=$getscore*5;
+                //当前积分
+                $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$getorder['user_id']} and type=0");
+                $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$getorder['user_id']} and type=1");
+                $jifen=$getjifenf['getscore']-$payjifenf['payscore'];
+                $data2['beforescore']=$jifen;
+                $data2['afterscore']=$jifen+($getscore*5);
+                $data2['note']='退回积分';
+                $data2['type']=0;
+                $data2['user_id']=$getorder['user_id'];
+                $data2['cerated_time']=date('Y-m-d H:i:s');
+                $data2['uniacid']=$_W['uniacid'];//小程序id
+                pdo_insert('mask_integral',$data2);
+            }
             echo $this->resultToJson(1,'取消订单成功','');
         }else{
             echo $this->resultToJson(0,'取消订单失败','');
@@ -1479,7 +1465,7 @@ class maskModuleWxapp extends WeModuleWxapp {
             $res = pdo_get('mask_relation', array('uid'=>$uid,'uniacid' => $_W['uniacid']));
             if($res){
                 //已被其他人推荐过
-                echo $this->resultToJson(0,'欢迎回来','');
+                echo $this->resultToJson(0,'欢迎归来','');
             }else{
                 //不存在就插入
                 $res=pdo_insert('mask_relation',array('pid'=>$pid,'uid'=>$uid,'uniacid' => $_W['uniacid'],'addtime'=>date('Y-m-d H:i:s',time())));
@@ -1582,6 +1568,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                         }
                     }
                 }
+                //迁移到app版后这里的注释还开启登录成功，把删除当前版本注释掉。这里的意义是强制小程序用户废弃手机号登录操作
                 //echo $this->resultToJson(1,'用户登录成功',$res);
                 echo $this->resultToJson(0,'请删除当前版本重新搜索小程序进去',$res);
             }else{
@@ -1599,6 +1586,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     }
     //用户注册和找回密码
     public function doPageRegorFind(){
+        //废弃
         global $_GPC, $_W;
         $getphone=$_GPC['phone'];
         $getpsw=md5('itxiaolong'.$_GPC['psw']);
@@ -1809,23 +1797,28 @@ class maskModuleWxapp extends WeModuleWxapp {
             echo $this->resultToJson(0,'手机号为空！','');
             die();
         }
-            $cdata=array();
-            $cdata['psw']=$getpsw;
-            $cdata['user_tel']=$getphone;
-                $cres=pdo_update('mask_user',$cdata,array('id'=>$uid));
-                if ($cres){
-                    //生成专属二维码
-                    $qrcodeimg = pdo_get('mask_user', array('id' => $uid), array('id','img'));
-                    if (!$qrcodeimg['img']){
-                        //生成二维码
-                        $getimg=$this->getqrcodecode($uid);
-                        pdo_update('mask_user',array('img'=>$getimg),array('id'=>$uid));
-                    }
-                    echo $this->resultToJson(1,'手机号和密码设置成功',$getimg);
-                }else{
-                    echo $this->resultToJson(0,'设置密码失败','');
-                }
-
+        //判断别人是否已经存在改手机号了
+        $othersave=pdo_get('mask_user', array('id !=' => $uid,'user_tel'=>$getphone));
+        if ($othersave){
+            echo $this->resultToJson(0,'该手机号已被注册','');
+            die();
+        }
+        $cdata=array();
+        $cdata['psw']=$getpsw;
+        $cdata['user_tel']=$getphone;
+        $cres=pdo_update('mask_user',$cdata,array('id'=>$uid));
+        if ($cres){
+            //生成专属二维码
+            $qrcodeimg = pdo_get('mask_user', array('id' => $uid), array('id','img'));
+            if (!$qrcodeimg['img']){
+                //生成二维码
+                $getimg=$this->getqrcodecode($uid);
+                pdo_update('mask_user',array('img'=>$getimg),array('id'=>$uid));
+            }
+            echo $this->resultToJson(1,'手机号和密码设置成功',$getimg);
+        }else{
+            echo $this->resultToJson(0,'设置密码失败','');
+        }
     }
     //app用户注册和找回密码
     public function doPageAppReg(){
@@ -1976,27 +1969,27 @@ class maskModuleWxapp extends WeModuleWxapp {
     //海报数据
     public function doPageQrcodeinfo(){
         global $_GPC, $_W;
-        //检查是否升级等级
         $uid=$_GPC['uid'];
         if ($uid){
             $this->checkupvip($uid);
         }
         $info=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','headerimg','img','level','quyuid'));
-        $info['shen']=1;
         if ($info){
             echo $this->resultToJson(1,'海报数据成功',$info);
         }else{
-            echo $this->resultToJson(0,'返回海报数据失败',$info);
+            echo $this->resultToJson(0,'返回海报数据失败','');
         }
     }
     //投诉电话
     public function doPageTousu(){
         global $_GPC, $_W;
         $info=pdo_get('mask_system',array('uniacid' => $_W['uniacid']),array('tel'));
+        $info['shen']=1;//1显示分销中心，0，关闭
+        $info['shen2']=1;
         if ($info){
-            echo $this->resultToJson(1,'投诉电话成功',$info);
+            echo $this->resultToJson(1,'海报数据成功',$info);
         }else{
-            echo $this->resultToJson(0,'返回投诉电话失败','');
+            echo $this->resultToJson(0,'返回海报数据失败',$info);
         }
     }
     //我的分销页面
@@ -2405,6 +2398,7 @@ class maskModuleWxapp extends WeModuleWxapp {
         }else{
             $res['issetpsw']=0;
         }
+        $res['paypsw']=$paypsw;
         echo $this->resultToJson(1,'返回个人信息',$res);
     }
     //我的资产部分
@@ -2838,6 +2832,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                         if ($getulevel<1){
                             pdo_update('mask_user', array('level' => 1), array('id' => $order['user_id']));
                         }
+                        //pdo_update('mask_user', array('level' => 1), array('id' => $order['user_id']));
                         if ($pid){
                             //间推等级
                             $twopid=pdo_getcolumn('mask_relation', array('uid' => $pid), 'pid',1);
@@ -3030,6 +3025,37 @@ class maskModuleWxapp extends WeModuleWxapp {
         }
 
     }
+    //获取unionid
+    public function doPageGetUnionID(){
+        global $_W, $_GPC;
+        $res=pdo_get('mask_system',array('uniacid'=>$_W['uniacid']));
+        $code=$_GPC['code'];
+        $encryptedData=$_GPC['encryptedData'];
+        $iv=$_GPC['iv'];
+        $appid=$res['appid'];
+        $secret=$res['appsecret'];
+        $url="https://api.weixin.qq.com/sns/jscode2session?appid=".$appid."&secret=".$secret."&js_code=".$code."&grant_type=authorization_code";
+        function getsession_key($url,$data = null){
+            $con = file_get_contents($url);
+            $getcode = json_decode($con);
+            return $getcode->session_key;
+        }
+        $getsessionkey=getsession_key($url);
+        $personinfo=$this->decodephone($appid,$getsessionkey,$encryptedData,$iv);
+        echo $this->resultToJson(1,'获取私人信息',htmlspecialchars_decode($personinfo));
+    }
+    //解密私人信息，包括手机号，unionid
+    public function  decodephone($appid,$sessionKey,$encryptedData,$iv){
+        include IA_ROOT.'/addons/mask/getphonelib/wxBizDataCrypt.php';
+        //include_once "getphonelib/wxBizDataCrypt.php";
+        $pc = new WXBizDataCrypt($appid, $sessionKey);
+        $errCode = $pc->decryptData($encryptedData, $iv, $data );
+        if ($errCode == 0) {
+            return $data;
+        } else {
+            return $data;
+        }
+    }
     //自发货后7天自动收货
     public function collectGood(){
         global $_W, $_GPC;
@@ -3045,16 +3071,6 @@ class maskModuleWxapp extends WeModuleWxapp {
             foreach ($uidandrmoney as $kk=>$vv){
                 pdo_update('mask_user', array('wallet +=' => $vv['rmoney']), array('id' => $vv['ruid']));
             }
-        }
-    }
-    //24小时未支付的订单自动取消订单
-    public function closeorder($uid){
-        global $_W, $_GPC;
-        $daytimes=1*86400;
-        $orders = pdo_fetchall('select user_id,state,id,order_num from ' . tablename('mask_order') . " where user_id={$uid} and uniacid=" . $_W['uniacid'] . ' and state=1 and UNIX_TIMESTAMP(time) + ' . $daytimes . ' <=unix_timestamp() ');
-        foreach ($orders as $k=>$v){
-            pdo_update('mask_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$v['id']));
-            pdo_update('mask_order_goods',array('state'=>5),array('order_id'=>$v['id']));
         }
     }
     //随机生成0.08-1
@@ -3168,14 +3184,14 @@ class maskModuleWxapp extends WeModuleWxapp {
         //判断是否达到要求
         if ($wm['total']>=$zhituinum){
             //达成银卡升级条件
+            //达成银卡升级条件
             $uidinfo=pdo_get('mask_user',array('id'=>$uid));
             if ($uidinfo['level']==1){
                 $upres=pdo_update('mask_user',array('level'=>2),array('id'=>$uid));
             }
-
             //if ($upres){
-                //$userinfo=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','headerimg','img','level'));
-                //升级银卡成功奖励300元到余额
+            //$userinfo=pdo_get('mask_user',array('id'=>$uid),array('nickname','id','headerimg','img','level'));
+            //升级银卡成功奖励300元到余额
 //                $jldata['rtype']=1;
 //                $jldata['rstate']=0;
 //                $jldata['rmoney']=8;//直推奖励
@@ -3186,12 +3202,40 @@ class maskModuleWxapp extends WeModuleWxapp {
 //                $jldata['rcardid']=$card['id'];
 //                $jldata['rcomment']="银卡升级奖励：300元";
 //                $jldata['raddtime']=date('Y-m-d H:i:s',time());
-                //更新余额
-                //pdo_update('mask_user', array('wallet +=' => 300), array('id' => $_GPC['uid']));
-            //}
+            //更新余额
+            //pdo_update('mask_user', array('wallet +=' => 300), array('id' => $_GPC['uid']));
+            // }
             if ($completeyinkanum>=$yingkanum){
                 //达成金卡升级条件
                 pdo_update('mask_user',array('level'=>3),array('id'=>$uid));
+            }
+        }
+    }
+    //24小时未支付的订单自动取消订单
+    public function closeorder($uid){
+        global $_W, $_GPC;
+        $daytimes=1*86400;
+        $orders = pdo_fetchall('select user_id,state,id,order_num from ' . tablename('mask_order') . " where user_id={$uid} and uniacid=" . $_W['uniacid'] . ' and state=1 and UNIX_TIMESTAMP(time) + ' . $daytimes . ' <=unix_timestamp() ');
+        foreach ($orders as $k=>$v){
+            pdo_update('mask_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$v['id']));
+            pdo_update('mask_order_goods',array('state'=>5),array('order_id'=>$v['id']));
+            //恢复积分
+            if($v['ordertype']==3){
+                $scorearr=explode(',',$v['Summary']);
+                $getscore=$this->getnumfromstring($scorearr[1]);
+                $data2['score']=$getscore*5;
+                //当前积分
+                $getjifenf=pdo_fetch("SELECT sum(score) as getscore FROM ".tablename('mask_integral')." WHERE  user_id ={$v['user_id']} and type=0");
+                $payjifenf=pdo_fetch("SELECT sum(score) as payscore FROM ".tablename('mask_integral')." WHERE  user_id ={$v['user_id']} and type=1");
+                $jifen=$getjifenf['getscore']-$payjifenf['payscore'];
+                $data2['beforescore']=$jifen;
+                $data2['afterscore']=$jifen+($getscore*5);
+                $data2['note']='退回积分';
+                $data2['type']=0;
+                $data2['user_id']=$v['user_id'];
+                $data2['cerated_time']=date('Y-m-d H:i:s');
+                $data2['uniacid']=$_W['uniacid'];//小程序id
+                pdo_insert('mask_integral',$data2);
             }
         }
     }
@@ -3218,6 +3262,16 @@ class maskModuleWxapp extends WeModuleWxapp {
                 pdo_update('mask_user', array('wallet +=' => $vv['rmoney']), array('id' => $vv['ruid']));
             }
         }
+    }
+    //字符串中提取数字
+    function getnumfromstring($str){
+        $result='';
+        for($i=0;$i<strlen($str);$i++){
+            if(is_numeric($str[$i])){
+                $result.=$str[$i];
+            }
+        }
+        return $result;
     }
     ///////////面膜接口结束//////////////
     //保存用户的openid
@@ -4616,7 +4670,6 @@ class maskModuleWxapp extends WeModuleWxapp {
         $oid=$_GPC['orderid'];
         pdo_update('mask_order',array('code'=>$out_trade_no),array('id'=>$oid));
         $total_fee =$_GPC['money'];
-
         if(empty($total_fee)) //默认1分
         {
             $body =$res2['url_name'];
