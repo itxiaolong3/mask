@@ -3154,12 +3154,13 @@ class maskModuleWxapp extends WeModuleWxapp {
         $zhituinum=$twonum['zhituinum'];
         $yingkanum=$twonum['yingkanum'];
 
-        $hcountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and o.state=4 ";
+        $hcountwhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and o.state=4 and o.ordertype=1 ";
         $countdatas[':uniacid']=$_W['uniacid'];
         $countdatas[':pid']=$uid;
         //直接销售额
         $wm=pdo_fetch("select sum(money) as total from ". tablename("mask_order") . " o"
             . " left join " . tablename("mask_relation") . " r on o.user_id=r.uid".$hcountwhere,$countdatas);
+        $wmsql="select sum(money) as total from ims_mask_order  o left join ims_mask_relation r on o.user_id=r.uid WHERE r.uniacid=:uniacid and r.pid=100067 and o.state=4 and o.ordertype=1";
         //银卡成交数量
         $yinkawhere=" WHERE r.uniacid=:uniacid and r.pid=:pid and u.level=2";
         $jinkacount=pdo_fetch("select count(*) as con from " . tablename("mask_relation") . " r"  . " left join " . tablename("mask_user") . " u on r.uid=u.id".$yinkawhere,$countdatas);

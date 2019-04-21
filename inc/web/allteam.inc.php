@@ -39,32 +39,41 @@ foreach ($list as $k=>$v){
     //剩余大米
     $tixian=pdo_fetch("SELECT sum(rsqmoney) as con FROM ".tablename('mask_record').
         " WHERE ruid ={$v['id']} and rtype = 7 and risrefu=0 ");
-    //$yuepay=pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$v['id']} and rtype = 9 ");
-    $truemoney=number_format($deal['con']-$tixian['con'],2);
+    $yuepay=pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE ruid ={$v['id']} and rtype = 9 ");
+    $truemoney=number_format($deal['con']-$tixian['con']-$yuepay['con'],2);
     $list[$k]['dami']=$truemoney;
     $list[$k]['tixian']=number_format($tixian['con'],2);
+    $list[$k]['yuepay']=number_format($yuepay['con'],2);
+}
+$timewhere='';
+if($_GPC['time']){
+    $start=$_GPC['time']['start'];
+    $end=$_GPC['time']['end'];
+    $timewhere.=" and raddtime >='{$start}' and raddtime<='{$end}'";
 }
 //总待结算和已结算
 $nodeal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
-    " WHERE  rsettlement=0 and rtype <> 7 ");
+    " WHERE  rsettlement=0 and rtype <> 7 ".$timewhere);
 $deal = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record').
-    " WHERE rsettlement=1 and rtype <> 7 ");
+    " WHERE rsettlement=1 and rtype <> 7 ".$timewhere);
 //查询已退款的待结算记录
 $tknodeal = pdo_fetch("SELECT sum(rmoney) as cons FROM ".tablename('mask_record').
-    " WHERE  rtype <> 7 and rstate=1 and rsettlement=0 ");
+    " WHERE  rtype <> 7 and rstate=1 and rsettlement=0 ".$timewhere);
 $allnosettlement=number_format($nodeal['con']-$tknodeal['cons'],2);
 $allsettlement=number_format($deal['con'],2);
 //总剩余大米
 $tixian=pdo_fetch("SELECT sum(rsqmoney) as con FROM ".tablename('mask_record').
-    " WHERE rtype = 7 and risrefu=0 ");
-//$yuepay=pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE rtype = 9 ");
-$truemoney=number_format($deal['con']-$tixian['con'],2);
+    " WHERE rtype = 7 and risrefu=0 ".$timewhere);
+$yuepay=pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE rtype = 9 ".$timewhere);
+$truemoney=number_format($deal['con']-$tixian['con']-$yuepay['con'],2);
 $alldami=$truemoney;
 //总累计收益
-$allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE rtype <> 7 and rtype<>9");
+$allrecord = pdo_fetch("SELECT sum(rmoney) as con FROM ".tablename('mask_record')." WHERE rtype <> 7 and rtype<>9".$timewhere);
 $allalltotal=number_format($allrecord['con']-$tknodeal['cons'],2);
 //总提现
 $alltixian=number_format($tixian['con'],2);
+//余额支付
+$yuepay1=number_format($yuepay['con'],2);
 
 $total=pdo_fetchcolumn("select count(*) from " . tablename("mask_user") .
     " WHERE ".$wherelevel." and  (nickname LIKE :name || user_tel LIKE :name || id LIKE :name) and uniacid=:uniacid ",array(':uniacid'=>$_W['uniacid'],':name'=>$where));
