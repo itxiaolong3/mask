@@ -137,6 +137,7 @@
                     <option value="1" {if $ordertype==1} selected="selected" {/if}>399订单</option>
                     <option value="2" {if $ordertype==2} selected="selected" {/if}>免费订单</option>
                     <option value="3" {if $ordertype==3} selected="selected" {/if}>积分订单</option>
+                    <option value="4" {if $ordertype==4} selected="selected" {/if}>活动订单</option>
                 </select>
             </div>
             <div class="input-group" style="width: 100px">
@@ -172,6 +173,8 @@
                     <span>免费订单</span>
                     {elseif $item['ordertype']==3}
                     <span>积分订单</span>
+                    {elseif $item['ordertype']==4}
+                    <span>活动订单</span>
                     {/if}
                 </td>
                 <td>{$item['nums']}</td>

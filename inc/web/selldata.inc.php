@@ -68,6 +68,15 @@ switch ($ordertype){
         $list[2]['allmoney']=$getallmoney3['allmoney'];
         $list[2]['findtime']=$findtime;
 
+        $sql7="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where." and ordertype=4";;
+        $getallmoney4=pdo_fetch($sql7,$data);
+        $sql8="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where." and ordertype=4";
+        $getallcount4=pdo_fetch($sql8,$data);
+        $list[3]['ordertype']=4;
+        $list[3]['nums']=$getallcount4['allcount'];
+        $list[3]['allmoney']=$getallmoney4['allmoney'];
+        $list[3]['findtime']=$findtime;
+
         break;
     case 1:
         $where.=" and ordertype=".$ordertype;
@@ -98,6 +107,17 @@ switch ($ordertype){
         $sql2="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where;
         $getallcount=pdo_fetch($sql2,$data);
         $list[0]['ordertype']=3;
+        $list[0]['nums']=$getallcount['allcount'];
+        $list[0]['allmoney']=$getallmoney['allmoney'];
+        $list[0]['findtime']=$findtime;
+        break;
+    case 4:
+        $where.=" and ordertype=".$ordertype;
+        $sql1="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where;
+        $getallmoney=pdo_fetch($sql1,$data);
+        $sql2="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where;
+        $getallcount=pdo_fetch($sql2,$data);
+        $list[0]['ordertype']=4;
         $list[0]['nums']=$getallcount['allcount'];
         $list[0]['allmoney']=$getallmoney['allmoney'];
         $list[0]['findtime']=$findtime;
@@ -171,6 +191,15 @@ if(checksubmit('export_submit', true)) {
             $list[2]['allmoney']=$getallmoney3['allmoney'];
             $list[2]['findtime']=$findtime;
 
+            $sql7="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where." and ordertype=4";;
+            $getallmoney4=pdo_fetch($sql7,$data);
+            $sql8="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where." and ordertype=4";
+            $getallcount4=pdo_fetch($sql8,$data);
+            $list[3]['ordertype']=4;
+            $list[3]['nums']=$getallcount4['allcount'];
+            $list[3]['allmoney']=$getallmoney4['allmoney'];
+            $list[3]['findtime']=$findtime;
+
             break;
         case 1:
             $where.=" and ordertype=".$ordertype;
@@ -201,6 +230,17 @@ if(checksubmit('export_submit', true)) {
             $sql2="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where;
             $getallcount=pdo_fetch($sql2,$data);
             $list[0]['ordertype']=3;
+            $list[0]['nums']=$getallcount['allcount'];
+            $list[0]['allmoney']=$getallmoney['allmoney'];
+            $list[0]['findtime']=$findtime;
+            break;
+        case 4:
+            $where.=" and ordertype=".$ordertype;
+            $sql1="SELECT sum(money) as allmoney FROM ".tablename('mask_order') .$where;
+            $getallmoney=pdo_fetch($sql1,$data);
+            $sql2="SELECT count(*) as allcount FROM ".tablename('mask_order') .$where;
+            $getallcount=pdo_fetch($sql2,$data);
+            $list[0]['ordertype']=4;
             $list[0]['nums']=$getallcount['allcount'];
             $list[0]['allmoney']=$getallmoney['allmoney'];
             $list[0]['findtime']=$findtime;
@@ -236,6 +276,8 @@ if(checksubmit('export_submit', true)) {
                     $row['ordertype']='免费订单';
                 }elseif($row['ordertype']==3){
                     $row['ordertype']='积分订单';
+                }elseif($row['ordertype']==4){
+                    $row['ordertype']='活动订单';
                 }
                 foreach ($keys as $key) {
                     $data5[] = $row[$key];

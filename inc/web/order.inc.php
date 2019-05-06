@@ -11,7 +11,7 @@ $where=" where a.uniacid=:uniacid ";
 if ($ordertype){
     $where.=' and a.ordertype='.$ordertype;
 }else{
-    $where.=' and a.ordertype in (1,2,3) ';
+    $where.=' and a.ordertype in (1,2,3,4) ';
 }
 $data[':uniacid']=$_W['uniacid'];
 if(isset($_GPC['keywords'])){
@@ -780,7 +780,7 @@ if(checksubmit('export_submit', true)) {
     if ($ordertype){
         $ordertypewhere.=' and ordertype='.$ordertype;
     }else{
-        $ordertypewhere=' and ordertype in (1,2,3) ';
+        $ordertypewhere=' and ordertype in (1,2,3,4) ';
     }
     $count = pdo_fetchcolumn("SELECT COUNT(*) FROM". tablename("mask_order")." WHERE uniacid={$_W['uniacid']}".$ordertypewhere." and state=2 and time >='{$start}' and time<='{$end}'");
     $pagesize = ceil($count/5000);
