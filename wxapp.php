@@ -3216,7 +3216,7 @@ class maskModuleWxapp extends WeModuleWxapp {
     public function closeorder($uid){
         global $_W, $_GPC;
         $daytimes=1*86400;
-        $orders = pdo_fetchall('select user_id,state,id,order_num from ' . tablename('mask_order') . " where user_id={$uid} and uniacid=" . $_W['uniacid'] . ' and state=1 and UNIX_TIMESTAMP(time) + ' . $daytimes . ' <=unix_timestamp() ');
+        $orders = pdo_fetchall('select user_id,state,id,order_num,ordertype,Summary from ' . tablename('mask_order') . " where user_id={$uid} and uniacid=" . $_W['uniacid'] . ' and state=1 and UNIX_TIMESTAMP(time) + ' . $daytimes . ' <=unix_timestamp() ');
         foreach ($orders as $k=>$v){
             pdo_update('mask_order',array('state'=>5,'cancel_time'=>date("Y-m-d H:i:s")),array('id'=>$v['id']));
             pdo_update('mask_order_goods',array('state'=>5),array('order_id'=>$v['id']));
@@ -3231,7 +3231,7 @@ class maskModuleWxapp extends WeModuleWxapp {
                 $jifen=$getjifenf['getscore']-$payjifenf['payscore'];
                 $data2['beforescore']=$jifen;
                 $data2['afterscore']=$jifen+($getscore*5);
-                $data2['note']='退回积分';
+                $data2['note']='自动退回';
                 $data2['type']=0;
                 $data2['user_id']=$v['user_id'];
                 $data2['cerated_time']=date('Y-m-d H:i:s');
